@@ -20,6 +20,8 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import org.checkerframework.checker.units.qual.K;
+
 import javafx.geometry.Point2D;
 
 public class Model implements Serializable {
@@ -71,29 +73,8 @@ public class Model implements Serializable {
         var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream));
         var id2node = new HashMap<Long, Node>();
         var way = new ArrayList<Node>();
-        var coast = false;
-        var set = new HashSet<>();
-        if (fidelity < 1) {
-            //low level
-            set.add("unclassified");
-            set.add("residential");
-        }
-        if (fidelity < 2) {
-            //medium level
-            set.add("secondary");
-            set.add("tertiary");
-        }
-        if (fidelity < 3) {
-            //semi high
-            set.add("trunk");
-            set.add("primary");
-        }
-        if (fidelity < 4) {
-            //high level
-            set.add("coastline");
-            set.add("motorway");
-        }
-
+        var addWay = false;
+        DrawType currentDrawType = null;
 
         while (input.hasNext()) {
             var tagKind = input.next();
@@ -111,11 +92,14 @@ public class Model implements Serializable {
                     id2node.put(id, new Node(lat, lon));
                 } else if (name == "way") {
                     way.clear();
-                    coast = false;
+                    addWay = false;
+                    currentDrawType = null;
                 } else if (name == "tag") {
+                    var k = input.getAttributeValue(null, "k");
                     var v = input.getAttributeValue(null, "v");
-                    if (set.contains(v)) {
-                        coast = true;
+                    currentDrawType = keyValToDrawType(k, v);
+                    if (currentDrawType != null) {
+                        addWay = true;
                     }
 
                 } else if (name == "nd") {
@@ -125,7 +109,7 @@ public class Model implements Serializable {
                 }
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
                 var name = input.getLocalName();
-                if (name == "way" && coast) {
+                if (name == "way" && addWay) {
                     ways.add(new Way(way));
                 }
             }
@@ -136,11 +120,18 @@ public class Model implements Serializable {
         lines.add(new Edge(p1, p2));
     }
 
-    public int getFidelity() {
-        return fidelity;
-    }
+    private DrawType keyValToDrawType(String key, String val) {
 
-    public void setFidelity(int fidelity) {
-        this.fidelity = fidelity;
+        switch (key) {
+            case "building":
+                return DrawType.building;
+        }
+
+        switch (val) {
+            case "motorway":
+                return DrawType.motorway;
+        }
+
+        return null;
     }
 }

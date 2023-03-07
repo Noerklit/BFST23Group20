@@ -7,6 +7,7 @@ import javafx.scene.canvas.GraphicsContext;
 
 public class Way implements Serializable {
     double[] coords;
+    DrawType drawType;
 
     public Way(ArrayList<Node> way) {
         coords = new double[way.size() * 2];
