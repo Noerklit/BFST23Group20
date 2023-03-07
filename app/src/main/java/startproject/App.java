@@ -6,6 +6,10 @@ package startproject;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import Model.Model;
+import View.View;
+import Controller.Controller;
+
 public class App extends Application{
     public String getGreeting() {
         return "Hello World!";
@@ -20,6 +24,10 @@ public class App extends Application{
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Start Project");
         primaryStage.show();
+        String filename = "../app/data/bornholm.osm.zip";
+        var model = Model.load(filename);
+        var view = new View(model, primaryStage);
+        new Controller(model, view);
         
     }
 }
