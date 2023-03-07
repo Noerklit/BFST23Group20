@@ -165,3 +165,5 @@ gradle-app.setting
 # Build
 app/build/*
 app/bin/*
+app/data/*
+!app/data/bornholm.osm.zip
