@@ -4,6 +4,9 @@
 package startproject;
 
 import org.junit.jupiter.api.Test;
+
+import App.App;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class AppTest {

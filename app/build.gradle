@@ -52,7 +52,7 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass = 'startproject.App'
+    mainClass = 'App.App'
 }
 
 tasks.named('test') {
@@ -67,6 +67,6 @@ javafx{
 
 jar {
     manifest {
-        attributes 'Main-Class': 'startproject.App'
+        attributes 'Main-Class': 'App.App'
     }
 }
