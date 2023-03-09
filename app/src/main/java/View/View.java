@@ -1,5 +1,6 @@
 package View;
 
+import java.util.HashMap;
 import java.util.Iterator;
 
 import javafx.geometry.Point2D;
@@ -13,6 +14,7 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.stage.Stage;
 
 import Model.Model;
+import Model.DrawType;
 import Model.Edge;
 
 public class View {
@@ -26,14 +28,18 @@ public class View {
     Affine trans = new Affine();
 
     Model model;
+    HashMap<DrawType, Color> defaultColorMap;
+    int fidelity; 
 
     public View(Model model, Stage primaryStage) {
         this.model = model;
+        createColorMap();
         primaryStage.setTitle("Draw Lines");
         BorderPane pane = new BorderPane(canvas);
         Scene scene = new Scene(pane);
         primaryStage.setScene(scene);
         primaryStage.show();
+        calculateFidelity();
         redraw();
         pan(-0.56*model.minlon, model.maxlat);
         zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
@@ -41,15 +47,33 @@ public class View {
 
     public void redraw() {
         gc.setTransform(new Affine());
-        gc.setFill(Color.WHITE);
+        gc.setFill(Color.web("#6e8dff"));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
-        gc.setLineWidth(1/Math.sqrt(trans.determinant()));
-        for (var line : model.lines) {
-            line.draw(gc);
+        gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
+        for (var edge : model.edges) {
+            edge.draw(gc);
         }
         for (var way : model.ways) {
-            way.draw(gc);
+            way.draw(gc, defaultColorMap, fidelity);
+            gc.setStroke(Color.web("#000000"));
+        }
+    }
+
+    private void calculateFidelity() {
+        double zoomLevel = trans.getMxx();
+        fidelity = 0;
+        if (zoomLevel > 2000) {
+            fidelity = 1;
+        }
+        if (zoomLevel > 3200) {
+            fidelity = 2;
+        }
+        if (zoomLevel > 15000) {
+            fidelity = 3;
+        }
+        if (zoomLevel > 35000) {
+            fidelity = 4;
         }
     }
 
@@ -62,6 +86,7 @@ public class View {
         pan(-dx, -dy);
         trans.prependScale(factor, factor);
         pan(dx, dy);
+        calculateFidelity();
         redraw();
     }
 
@@ -72,6 +97,39 @@ public class View {
             // TODO Auto-generated catch block
             throw new RuntimeException(e);
         }
+    }
+
+    public void createColorMap() {
+        defaultColorMap = new HashMap<>();
+        defaultColorMap.put(DrawType.motorway, Color.web("#EA90A1")); // pink-ish red
+        defaultColorMap.put(DrawType.trunk, Color.web("#FCC0AC")); // salmon
+        defaultColorMap.put(DrawType.coastline, Color.web("#000000")); //Black
+
+        defaultColorMap.put(DrawType.primary, Color.web("#FDD7A1")); // light orange
+        defaultColorMap.put(DrawType.secondary, Color.web("#F6FABB")); // light green
+        defaultColorMap.put(DrawType.tertiary, Color.GREEN); // White
+
+        defaultColorMap.put(DrawType.unclassified, Color.RED); // Red
+        defaultColorMap.put(DrawType.residential, Color.LAVENDER); // Lavender?
+
+        defaultColorMap.put(DrawType.livingStreet, Color.web("#EDEDED")); // Blue-ish-white
+        defaultColorMap.put(DrawType.service,Color.DARKMAGENTA); // Dark magenta
+
+        defaultColorMap.put(DrawType.building,Color.web("#858585")); // grey
+        /*/
+        defaultColorMap = new HashMap<>();
+        defaultColorMap.put(DrawType.motorway, Color.web("#EA90A1")); // pink-ish red
+        defaultColorMap.put(DrawType.trunk, Color.web("#FCC0AC")); // salmon
+        defaultColorMap.put(DrawType.coastline, Color.web("#000000")); //Black
+        defaultColorMap.put(DrawType.primary, Color.web("#FDD7A1")); // light orange
+        defaultColorMap.put(DrawType.secondary, Color.web("#F6FABB")); // light green
+        defaultColorMap.put(DrawType.tertiary, Color.web("#FEFEFE")); // White
+        defaultColorMap.put(DrawType.unclassified, Color.web("#FEFEFE")); // White
+        defaultColorMap.put(DrawType.residential, Color.web("#FEFEFE")); // White
+        defaultColorMap.put(DrawType.livingStreet, Color.web("#EDEDED")); // Blue-ish-white
+        defaultColorMap.put(DrawType.service,Color.web("#ffffff")); // white
+        defaultColorMap.put(DrawType.building,Color.web("#858585")); // grey
+        //*/
 
     }
 }
