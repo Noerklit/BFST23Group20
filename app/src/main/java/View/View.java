@@ -47,7 +47,8 @@ public class View {
 
     public void redraw() {
         gc.setTransform(new Affine());
-        gc.setFill(Color.web("#6e8dff"));
+        gc.setFill(Color.WHITE); // Hvidt canvas
+        //gc.setFill(Color.web("#6e8dff")); Blåt canvas
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gc.setTransform(trans);
         gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
@@ -107,7 +108,7 @@ public class View {
 
         defaultColorMap.put(DrawType.primary, Color.web("#FDD7A1")); // light orange
         defaultColorMap.put(DrawType.secondary, Color.web("#F6FABB")); // light green
-        defaultColorMap.put(DrawType.tertiary, Color.GREEN); // White
+        defaultColorMap.put(DrawType.tertiary, Color.GREEN); // Green
 
         defaultColorMap.put(DrawType.unclassified, Color.RED); // Red
         defaultColorMap.put(DrawType.residential, Color.LAVENDER); // Lavender?
