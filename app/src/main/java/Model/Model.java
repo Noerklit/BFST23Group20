@@ -25,7 +25,7 @@ import org.checkerframework.checker.units.qual.K;
 import javafx.geometry.Point2D;
 
 public class Model implements Serializable {
-    public List<Edge> lines = new ArrayList<Edge>();
+    public List<Edge> edges = new ArrayList<Edge>();
     public List<Way> ways = new ArrayList<Way>();
 
     private int fidelity = 0;
@@ -97,11 +97,12 @@ public class Model implements Serializable {
                 } else if (name == "tag") {
                     var k = input.getAttributeValue(null, "k");
                     var v = input.getAttributeValue(null, "v");
-                    currentDrawType = keyValToDrawType(k, v);
+                    if (currentDrawType == null)
+                        currentDrawType = keyValToDrawType(k, v);
                     if (currentDrawType != null) {
                         addWay = true;
                     }
-
+                    
                 } else if (name == "nd") {
                     var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
                     var node = id2node.get(ref);
@@ -110,14 +111,14 @@ public class Model implements Serializable {
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
                 var name = input.getLocalName();
                 if (name == "way" && addWay) {
-                    ways.add(new Way(way));
+                    ways.add(new Way(way, currentDrawType));
                 }
             }
         }
     }
 
     public void add(Point2D p1, Point2D p2) {
-        lines.add(new Edge(p1, p2));
+        edges.add(new Edge(p1, p2));
     }
 
     private DrawType keyValToDrawType(String key, String val) {
@@ -125,11 +126,36 @@ public class Model implements Serializable {
         switch (key) {
             case "building":
                 return DrawType.building;
+            case "highway":
+                switch (val) {
+                    case "motorway":
+                        return DrawType.motorway;
+                    case "trunk":
+                        return DrawType.trunk;
+                    case "primary":
+                        return DrawType.primary;
+                    case "secondary":
+                        return DrawType.secondary;
+                    case "tertiary":
+                        return DrawType.tertiary;
+                    case "unclassified":
+                        return DrawType.unclassified;
+                    case "residential":
+                        return DrawType.residential;
+                    case "living_street":
+                        return DrawType.livingStreet;
+                    case "service":
+                        return DrawType.service;
+                    
+                }
+                break;
+            case "landuse":
+                break;
         }
 
         switch (val) {
-            case "motorway":
-                return DrawType.motorway;
+            case "coastline":
+                return DrawType.coastline;
         }
 
         return null;

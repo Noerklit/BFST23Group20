@@ -7,7 +7,7 @@ public enum DrawType {
 
     primary(1),
     secondary(1),
-    teritary(1),
+    tertiary(1),
 
     unclassified(2),
     residential(2),

@@ -2,29 +2,39 @@ package Model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 public class Way implements Serializable {
     double[] coords;
     DrawType drawType;
 
-    public Way(ArrayList<Node> way) {
+    public Way(ArrayList<Node> way, DrawType drawType) {
         coords = new double[way.size() * 2];
         for (int i = 0 ; i < way.size() ; ++i) {
             var node = way.get(i);
             coords[2 * i] = 0.56 * node.lon;
             coords[2 * i + 1] = -node.lat;
         }
+        this.drawType = drawType;
     }
 
-    public void draw(GraphicsContext gc) {
+    public void draw(GraphicsContext gc, HashMap<DrawType, Color> colorMap, int fidelity) {
+        Color color = colorMap.get(drawType);
+        if(drawType.fidelity <= fidelity) {
+            drawStroke(gc, color);
+        }
+    }
+
+    private void drawStroke(GraphicsContext gc, Color color) {
         gc.beginPath();
         gc.moveTo(coords[0], coords[1]);
+        gc.setStroke(color);
         for (int i = 2 ; i < coords.length ; i += 2) {
             gc.lineTo(coords[i], coords[i+1]);
         }
         gc.stroke();
     }
-    
 }
