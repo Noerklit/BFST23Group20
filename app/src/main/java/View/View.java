@@ -61,7 +61,7 @@ public class View {
         }
 //        System.out.println(trans.getTy() / scalingConst / canvas.getHeight() / 3.14159265);
         for (var way : model.ways) {
-//            System.out.println(way.coords[1]);
+            // I have no clue why this works but it does
             if (way.coords[1] > ((trans.getTy() * scalingConst * canvas.getHeight() * 3.14159265) - 0.6)*-1) {
                 way.draw(gc, defaultColorMap, fidelity);
                 gc.setStroke(Color.web("#000000"));
