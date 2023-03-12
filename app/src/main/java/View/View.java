@@ -62,7 +62,7 @@ public class View {
 //        System.out.println(trans.getTy() / scalingConst / canvas.getHeight() / 3.14159265);
         for (var way : model.ways) {
             // I have no clue why this works but it does
-            if (way.coords[1] > ((trans.getTy() * scalingConst * canvas.getHeight() * 3.14159265) - 0.6)*-1) {
+            if (way.coords[1] > ((trans.getTy() * scalingConst * canvas.getHeight() * 3.14159265) - 0.6)*-1 && way.coords[0] > (((trans.getTx() * scalingConst * canvas.getHeight() * 3.14159265)+0.1)*-1)) {
                 way.draw(gc, defaultColorMap, fidelity);
                 gc.setStroke(Color.web("#000000"));
             }
@@ -89,7 +89,7 @@ public class View {
     public void pan(double dx, double dy) {
 
         trans.prependTranslation(dx, dy);
-//        System.out.println(trans.getTx() / scalingConst / canvas.getHeight() / 3.14 + " : " + ((trans.getTy() * scalingConst * canvas.getHeight() * 3.14159265) - 0.6));
+//        System.out.println((((trans.getTx() * scalingConst * canvas.getHeight() * 3.14159265) - 0.6)*-1) + " : " + ((trans.getTy() * scalingConst * canvas.getHeight() * 3.14159265) - 0.6)*-1);
 //        System.out.println(trans.getTx() + " 2:2 " + trans.getTy());
 //        System.out.println(model.minlon + " 3:3 " + model.maxlat);
         redraw();
