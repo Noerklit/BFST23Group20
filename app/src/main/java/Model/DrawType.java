@@ -4,6 +4,7 @@ public enum DrawType {
     motorway(0),
     trunk(0),
     coastline(0),
+    farmland(0),
 
     primary(1),
     secondary(1),

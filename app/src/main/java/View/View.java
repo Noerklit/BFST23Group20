@@ -118,6 +118,7 @@ public class View {
         defaultColorMap.put(DrawType.motorway, Color.web("#EA90A1")); // pink-ish red
         defaultColorMap.put(DrawType.trunk, Color.web("#FCC0AC")); // salmon
         defaultColorMap.put(DrawType.coastline, Color.web("#000000")); //Black
+        defaultColorMap.put(DrawType.farmland, Color.web("#abb895")); // Brownish Green?
 
         defaultColorMap.put(DrawType.primary, Color.web("#FDD7A1")); // light orange
         defaultColorMap.put(DrawType.secondary, Color.web("#F6FABB")); // light green
