@@ -18,8 +18,10 @@ import Model.DrawType;
 import Model.Edge;
 
 public class View {
-    public Canvas canvas = new Canvas(640, 480);
+    public Canvas canvas = new Canvas(1500, 1200);
     GraphicsContext gc = canvas.getGraphicsContext2D();
+
+    double scalingConst;
     double x1 = 100;
     double y1 = 100;
     double x2 = 200;
@@ -41,6 +43,8 @@ public class View {
         primaryStage.show();
         calculateFidelity();
         redraw();
+        scalingConst = (model.maxlat - model.minlat) / canvas.getHeight();
+        System.out.println(model.maxlat);
         pan(-0.56*model.minlon, model.maxlat);
         zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
     }
@@ -55,9 +59,13 @@ public class View {
         for (var edge : model.edges) {
             edge.draw(gc);
         }
+//        System.out.println(trans.getTy() / scalingConst / canvas.getHeight() / 3.14159265);
         for (var way : model.ways) {
-            way.draw(gc, defaultColorMap, fidelity);
-            gc.setStroke(Color.web("#000000"));
+//            System.out.println(way.coords[1]);
+            if (way.coords[1] > ((trans.getTy() * scalingConst * canvas.getHeight() * 3.14159265) - 0.6)*-1) {
+                way.draw(gc, defaultColorMap, fidelity);
+                gc.setStroke(Color.web("#000000"));
+            }
         }
     }
 
@@ -79,13 +87,18 @@ public class View {
     }
 
     public void pan(double dx, double dy) {
+
         trans.prependTranslation(dx, dy);
+//        System.out.println(trans.getTx() / scalingConst / canvas.getHeight() / 3.14 + " : " + ((trans.getTy() * scalingConst * canvas.getHeight() * 3.14159265) - 0.6));
+//        System.out.println(trans.getTx() + " 2:2 " + trans.getTy());
+//        System.out.println(model.minlon + " 3:3 " + model.maxlat);
         redraw();
     }
 
     public void zoom(double dx, double dy, double factor) {
         pan(-dx, -dy);
         trans.prependScale(factor, factor);
+        scalingConst /= factor;
         pan(dx, dy);
         calculateFidelity();
         redraw();
