@@ -8,7 +8,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Way implements Serializable {
-    double[] coords;
+    public double[] coords;
     DrawType drawType;
 
     public Way(ArrayList<Node> way, DrawType drawType) {

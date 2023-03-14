@@ -4,6 +4,9 @@ public enum DrawType {
     motorway(0, false),
     trunk(0, false),
     coastline(0, false),
+    landuseFarmland(0,true),
+    landuseResidential(0, true),
+
 
     primary(1, false),
     secondary(1, false),
