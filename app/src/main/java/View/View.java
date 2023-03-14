@@ -81,7 +81,7 @@ public class View {
         if (zoomLevel > 15000) {
             fidelity = 3;
         }
-        if (zoomLevel > 35000) {
+        if (zoomLevel > 100000) {
             fidelity = 4;
         }
     }
