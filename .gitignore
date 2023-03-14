@@ -167,3 +167,4 @@ app/build/*
 app/bin/*
 app/data/*
 !app/data/bornholm.osm.zip
+file-to-load.txt
