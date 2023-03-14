@@ -36,8 +36,6 @@ public class choosefile {
         }
 
         System.out.println("Choose a file by typing the corresponding number:");
-        //for (File dataFile : dataFiles) {
-        System.out.println(dataFiles.length);
         for (int i = 0; i < dataFiles.length; i++) {
             String temp = dataFiles[i].toPath().toString().substring(dataPath.length());
             System.out.printf("[%s] %s\n", i, temp);
