@@ -24,8 +24,7 @@ public class App extends Application{
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Start Project");
         primaryStage.show();
-        String filename = "../app/data/bornholm.osm.zip";
-        // String filename = "../app/data/denmark-latest.osm.zip";
+        String filename = FileToLoad.getFileToLoad();
         var model = Model.load(filename);
         var view = new View(model, primaryStage);
         new Controller(model, view);
