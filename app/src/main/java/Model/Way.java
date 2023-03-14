@@ -25,7 +25,7 @@ public class Way implements Serializable {
         Color color = colorMap.get(drawType);
         if(drawType.fidelity <= fidelity) {
             makePath(gc);
-            if(drawType == DrawType.building) {
+            if(drawType.shouldFill) {
                 makeFill(gc, color);
             } else {
                 makeStroke(gc, color);
@@ -39,7 +39,6 @@ public class Way implements Serializable {
         for (int i = 2 ; i < coords.length ; i += 2) {
             gc.lineTo(coords[i], coords[i+1]);
         }
-        
     }
     
     private void makeStroke(GraphicsContext gc, Color color) {
