@@ -152,9 +152,9 @@ public class Model implements Serializable {
             case "landuse":
                 switch(val) {
                     case "forest":
-                        return DrawType.farmland;
+                        return DrawType.landuseFarmland;
                     case "residential":
-                        return DrawType.residential; //Currently residential roads, not residential landuse.
+                        return DrawType.landuseResidential; //Currently residential roads, not residential landuse.
                 }
                 break;
         }
