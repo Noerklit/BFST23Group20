@@ -26,17 +26,31 @@ class AdressParsing {
 
     public static void parse() {
         if (online) {
-            onlineParsing();
+            onlineParsing(toParse);
         } else {
-            offlineParsing();
+            offlineParsing(toParse);
         }
     }
 
-    private static void onlineParsing() {
-        return;
+    private static void onlineParsing(String searchFor) {
+        try {
+            URL url = new URL("https://api.dataforsyningen.dk/autocomplete?q=" + searchFor + "&caretpos=18&fuzzy=");
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            if (connection == 200) {
+                // Parse output
+            } else {
+                System.out.println("Could not connect to DAWA API\nFalling back to offline parsing");
+                offlineParsing(searchFor);
+            }
+
+        } catch (Exception e) {
+                e.printStackTrace();
+        }
     }
 
-    private static void offlineParsing() {
+    private static void offlineParsing(String toParse) {
+        // Regex her
         return;
     }
 }
