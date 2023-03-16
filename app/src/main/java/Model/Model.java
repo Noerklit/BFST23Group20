@@ -73,12 +73,14 @@ public class Model implements Serializable {
 
     private void parseOSM(InputStream inputStream) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
         var stax = (XMLInputFactory2)XMLInputFactory2.newInstance();
-        stax.configureForLowMemUsage();
+        stax.configureForSpeed();
         var input = (XMLStreamReader2)stax.createXMLStreamReader(inputStream);
-        var id2node = new HashMap<Long, Node>();
+//        var id2node = new HashMap<Long, Node>();
+        var id2node = new ArrayList<Node>();
         var way = new ArrayList<Node>();
         var addWay = false;
         DrawType currentDrawType = null;
+        var hasSorted = false;
 
         while (input.hasNext()) {
             var tagKind = input.next();
@@ -93,8 +95,13 @@ public class Model implements Serializable {
                     var id = Long.parseLong(input.getAttributeValue(null, "id"));
                     var lat = Double.parseDouble(input.getAttributeValue(null, "lat"));
                     var lon = Double.parseDouble(input.getAttributeValue(null, "lon"));
-                    id2node.put(id, new Node(lat, lon));
+//                    id2node.put(id, new Node(lat, lon));
+                    id2node.add(new Node(lat, lon, id));
                 } else if (name == "way") {
+                    if (!hasSorted){
+                        Collections.sort(id2node);
+                        hasSorted = true;
+                    }
                     way.clear();
                     addWay = false;
                     currentDrawType = null;
@@ -108,7 +115,8 @@ public class Model implements Serializable {
                     }
                 } else if (name == "nd") {
                     var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
-                    var node = id2node.get(ref);
+                    var index = Collections.binarySearch(id2node, new Node(0, 0, ref));
+                    var node = id2node.get(index);
                     way.add(node);
                 }
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {

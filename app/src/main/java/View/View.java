@@ -63,9 +63,9 @@ public class View {
         for (var way : model.ways) {
             // I have no clue why this works but it does
             if (way.coords[1] > ((trans.getTy() * scalingConst * canvas.getHeight() * 3.14159265) - 0.6)*-1 && way.coords[0] > (((trans.getTx() * scalingConst * canvas.getHeight() * 3.14159265)+0.1)*-1)) {
-                way.draw(gc, defaultColorMap, fidelity);
-                gc.setStroke(Color.web("#000000"));
             }
+                way.draw(gc, defaultColorMap, fidelity);
+//                gc.setStroke(Color.web("#000000"));
         }
     }
 
