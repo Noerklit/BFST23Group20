@@ -87,11 +87,7 @@ public class View {
     }
 
     public void pan(double dx, double dy) {
-
         trans.prependTranslation(dx, dy);
-//        System.out.println((((trans.getTx() * scalingConst * canvas.getHeight() * 3.14159265) - 0.6)*-1) + " : " + ((trans.getTy() * scalingConst * canvas.getHeight() * 3.14159265) - 0.6)*-1);
-//        System.out.println(trans.getTx() + " 2:2 " + trans.getTy());
-//        System.out.println(model.minlon + " 3:3 " + model.maxlat);
         redraw();
     }
 
@@ -118,6 +114,7 @@ public class View {
         defaultColorMap.put(DrawType.motorway, Color.web("#EA90A1")); // pink-ish red
         defaultColorMap.put(DrawType.trunk, Color.web("#FCC0AC")); // salmon
         defaultColorMap.put(DrawType.coastline, Color.web("#000000")); //Black
+      
         defaultColorMap.put(DrawType.landuseFarmland, Color.web("#abb895")); // Brownish Green?
         defaultColorMap.put(DrawType.landuseResidential, Color.web("#cecfcc")); // Light grey
 
