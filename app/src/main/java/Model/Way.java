@@ -8,7 +8,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Way implements Serializable {
-    double[] coords;
+    public double[] coords;
     DrawType drawType;
 
     public Way(ArrayList<Node> way, DrawType drawType) {
@@ -24,17 +24,30 @@ public class Way implements Serializable {
     public void draw(GraphicsContext gc, HashMap<DrawType, Color> colorMap, int fidelity) {
         Color color = colorMap.get(drawType);
         if(drawType.fidelity <= fidelity) {
-            drawStroke(gc, color);
-        }
+            makePath(gc);
+            if(drawType.shouldFill) {
+                makeFill(gc, color);
+            } else {
+                makeStroke(gc, color);
+            }
+        } 
     }
 
-    private void drawStroke(GraphicsContext gc, Color color) {
+    private void makePath(GraphicsContext gc) {
         gc.beginPath();
         gc.moveTo(coords[0], coords[1]);
-        gc.setStroke(color);
         for (int i = 2 ; i < coords.length ; i += 2) {
             gc.lineTo(coords[i], coords[i+1]);
         }
+    }
+    
+    private void makeStroke(GraphicsContext gc, Color color) {
+        gc.setStroke(color);
         gc.stroke();
+    }
+
+    private void makeFill(GraphicsContext gc, Color color) {
+        gc.setFill(color);
+        gc.fill();
     }
 }

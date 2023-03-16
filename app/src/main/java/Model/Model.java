@@ -102,7 +102,6 @@ public class Model implements Serializable {
                     if (currentDrawType != null) {
                         addWay = true;
                     }
-                    
                 } else if (name == "nd") {
                     var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
                     var node = id2node.get(ref);
@@ -115,6 +114,7 @@ public class Model implements Serializable {
                 }
             }
         }
+        input.close();
     }
 
     public void add(Point2D p1, Point2D p2) {
@@ -150,6 +150,12 @@ public class Model implements Serializable {
                 }
                 break;
             case "landuse":
+                switch(val) {
+                    case "forest":
+                        return DrawType.landuseFarmland;
+                    case "residential":
+                        return DrawType.landuseResidential; //Currently residential roads, not residential landuse.
+                }
                 break;
         }
 

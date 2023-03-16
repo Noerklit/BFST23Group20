@@ -1,25 +1,30 @@
 package Model;
 
 public enum DrawType {
-    motorway(0),
-    trunk(0),
-    coastline(0),
+    motorway(0, false),
+    trunk(0, false),
+    coastline(0, false),
+    landuseFarmland(0,true),
+    landuseResidential(0, true),
 
-    primary(1),
-    secondary(1),
-    tertiary(1),
 
-    unclassified(2),
-    residential(2),
+    primary(1, false),
+    secondary(1, false),
+    tertiary(1, false),
 
-    livingStreet(3),
-    service(3),
+    unclassified(2, false),
+    residential(2, false),
 
-    building(4),
+    livingStreet(3, false),
+    service(3, false),
+
+    building(4, true),
     ;
 
     public int fidelity;
-    private DrawType(int fidelity) {
+    public boolean shouldFill;
+    private DrawType(int fidelity, boolean shouldFill) {
         this.fidelity = fidelity;
+        this.shouldFill = shouldFill;
     }
 }
