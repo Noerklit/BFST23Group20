@@ -167,6 +167,9 @@ app/build/*
 app/bin/*
 app/data/*
 !app/data/bornholm.osm.zip
+file-to-load.txt
+choosefile.class
+
 /.idea/.name
 /.idea/git_toolbox_prj.xml
 /.idea/vcs.xml
