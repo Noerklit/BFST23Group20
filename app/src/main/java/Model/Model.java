@@ -19,10 +19,12 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
+import org.codehaus.stax2.*;
 
 import org.checkerframework.checker.units.qual.K;
 
 import javafx.geometry.Point2D;
+import org.codehaus.stax2.evt.XMLEvent2;
 
 public class Model implements Serializable {
     public List<Edge> edges = new ArrayList<Edge>();
@@ -70,7 +72,9 @@ public class Model implements Serializable {
     }
 
     private void parseOSM(InputStream inputStream) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
-        var input = XMLInputFactory.newInstance().createXMLStreamReader(new InputStreamReader(inputStream));
+        var stax = (XMLInputFactory2)XMLInputFactory2.newInstance();
+        stax.configureForLowMemUsage();
+        var input = (XMLStreamReader2)stax.createXMLStreamReader(inputStream);
         var id2node = new HashMap<Long, Node>();
         var way = new ArrayList<Node>();
         var addWay = false;
@@ -78,7 +82,7 @@ public class Model implements Serializable {
 
         while (input.hasNext()) {
             var tagKind = input.next();
-            if (tagKind == XMLStreamConstants.START_ELEMENT) {
+            if (tagKind == XMLEvent2.START_ELEMENT) {
                 var name = input.getLocalName();
                 if (name == "bounds") {
                     minlat = Double.parseDouble(input.getAttributeValue(null, "minlat"));

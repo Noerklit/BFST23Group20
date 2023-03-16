@@ -48,6 +48,7 @@ dependencies {
     implementation 'org.openjfx:javafx-controls:19.0.0'
     implementation 'org.openjfx:javafx-fxml:19.0.0'
     implementation 'org.openjfx:javafx-base:19.0.0'
+    implementation 'com.fasterxml.woodstox:woodstox-core:6.5.0'
 }
 
 application {
