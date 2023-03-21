@@ -1,190 +1,40 @@
 package View;
 
-import java.util.HashMap;
-import java.util.Iterator;
+import Model.Model;
 
-import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
-import javafx.scene.transform.Affine;
-import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.stage.Stage;
 
-import Model.Model;
-import Model.DrawType;
-import Model.Edge;
-import Benchmark.FrameRateTimer;
-
 public class View {
-    public Canvas canvas = new Canvas(1500, 850);
-    GraphicsContext gc = canvas.getGraphicsContext2D();
 
-    double scalingConst;
-    double x1 = 100;
-    double y1 = 100;
-    double x2 = 200;
-    double y2 = 800;
-
-    Affine trans = new Affine();
-
-    Model model;
-    HashMap<DrawType, Color> defaultColorMap;
-    int fidelity; 
-
-    double cutoffFactor = .1; // value can be: 0 - 0.5
+    private Canvas canvas;
+    private MapDraw mapDraw;
 
     public View(Model model, Stage primaryStage) {
-        this.model = model;
-        createColorMap();
+        this.canvas = new Canvas(600, 500);
+
         primaryStage.setTitle("Draw Lines");
         BorderPane pane = new BorderPane(canvas);
         Scene scene = new Scene(pane);
         primaryStage.setScene(scene);
         primaryStage.show();
-        calculateFidelity();
-        System.out.println(model.maxlat);
-        pan(-0.56*model.minlon, model.maxlat);
-        zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
-        scalingConst = (model.maxlat - model.minlat) / canvas.getHeight();
-        redraw();
+
+        this.mapDraw = new MapDraw(model, canvas);
     }
 
-    public void redraw() {
-        FrameRateTimer.startFrame(trans.getMxx(), fidelity);
-        gc.setTransform(new Affine());
-        gc.setFill(Color.WHITE); // Hvidt canvas
-        //gc.setFill(Color.web("#6e8dff")); Blåt canvas
-        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        
-        gc.setTransform(trans);
-
-        drawDebugLines();
-
-        double up = getScreenLat(0 + cutoffFactor);
-        double down = getScreenLat(1 - cutoffFactor);
-
-        double left = getScreenLon(0 + cutoffFactor);
-        double right = getScreenLon(1 - cutoffFactor);
-        
-        gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
-
-        for (var edge : model.edges) {
-            edge.draw(gc);
-        }
-
-        for (var way : model.ways) {
-            boolean inHorizontal = left < way.coords[0] && way.coords[0] < right;
-            boolean inVertical = up < way.coords[1] && way.coords[1] < down;
-
-            if (inHorizontal && inVertical) {
-                way.draw(gc, defaultColorMap, fidelity);
-            }
-        }
-        FrameRateTimer.endFrame();
-    }
-    
-    
-    private void drawDebugLines() {
-        gc.setLineWidth(10 * 1/Math.sqrt(trans.determinant()));
-        gc.setStroke(Color.web("#6e8dff"));
-
-        double up = getScreenLat(0 + cutoffFactor);
-        double down = getScreenLat(1 - cutoffFactor);
-        double left = getScreenLon(0 + cutoffFactor);
-        double right = getScreenLon(1 - cutoffFactor);
-        
-        gc.beginPath();
-        gc.moveTo(left, up);
-        gc.lineTo(right, up);
-        gc.lineTo(right, down);
-        gc.lineTo(left, down);
-        gc.lineTo(left, up);
-        
-        gc.stroke();
+    public Canvas getCanvas() {
+        return canvas;
     }
 
-    private double getScreenLon(double factor) {
-        return (trans.getTx() * -1 + canvas.getWidth() * factor) * scalingConst;
+    public void panMap(double dx, double dy) {
+        mapDraw.pan(dx, dy);
     }
-    private double getScreenLat(double factor) {
-        return (trans.getTy() * -1 + canvas.getHeight() * factor) * scalingConst;
+    public void zoomMap(double dx, double dy, double factor) {
+        mapDraw.zoom(dx, dy, factor);
     }
-
-    private void calculateFidelity() {
-        double zoomLevel = trans.getMxx();
-        fidelity = 0;
-        if (zoomLevel > 2000) {
-            fidelity = 1;
-        }
-        if (zoomLevel > 3200) {
-            fidelity = 2;
-        }
-        if (zoomLevel > 15000) {
-            fidelity = 3;
-        }
-        if (zoomLevel > 100000) {
-            fidelity = 4;
-        }
-    }
-
-    public void pan(double dx, double dy) {
-        trans.prependTranslation(dx, dy);
-    }
-
-    public void zoom(double dx, double dy, double factor) {
-        pan(-dx, -dy);
-        trans.prependScale(factor, factor);
-        scalingConst /= factor;
-        pan(dx, dy);
-        calculateFidelity();
-    }
-
-    public Point2D mousetoModel(double lastX, double lastY) {
-        try {
-            return trans.inverseTransform(lastX, lastY);
-        } catch (NonInvertibleTransformException e) {
-            // TODO Auto-generated catch block
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void createColorMap() {
-        defaultColorMap = new HashMap<>();
-        defaultColorMap.put(DrawType.motorway, Color.web("#EA90A1")); // pink-ish red
-        defaultColorMap.put(DrawType.trunk, Color.web("#FCC0AC")); // salmon
-        defaultColorMap.put(DrawType.coastline, Color.web("#000000")); //Black
-      
-        defaultColorMap.put(DrawType.landuseFarmland, Color.web("#abb895")); // Brownish Green?
-        defaultColorMap.put(DrawType.landuseResidential, Color.web("#cecfcc")); // Light grey
-
-        defaultColorMap.put(DrawType.primary, Color.web("#FDD7A1")); // light orange
-        defaultColorMap.put(DrawType.secondary, Color.web("#F6FABB")); // light green
-        defaultColorMap.put(DrawType.tertiary, Color.GREEN); // Green
-
-        defaultColorMap.put(DrawType.unclassified, Color.RED); // Red
-        defaultColorMap.put(DrawType.residential, Color.LAVENDER); // Lavender?
-
-        defaultColorMap.put(DrawType.livingStreet, Color.web("#EDEDED")); // Blue-ish-white
-        defaultColorMap.put(DrawType.service,Color.DARKMAGENTA); // Dark magenta
-
-        defaultColorMap.put(DrawType.building,Color.web("#858585")); // grey
-        /*/
-        defaultColorMap = new HashMap<>();
-        defaultColorMap.put(DrawType.motorway, Color.web("#EA90A1")); // pink-ish red
-        defaultColorMap.put(DrawType.trunk, Color.web("#FCC0AC")); // salmon
-        defaultColorMap.put(DrawType.coastline, Color.web("#000000")); //Black
-        defaultColorMap.put(DrawType.primary, Color.web("#FDD7A1")); // light orange
-        defaultColorMap.put(DrawType.secondary, Color.web("#F6FABB")); // light green
-        defaultColorMap.put(DrawType.tertiary, Color.web("#FEFEFE")); // White
-        defaultColorMap.put(DrawType.unclassified, Color.web("#FEFEFE")); // White
-        defaultColorMap.put(DrawType.residential, Color.web("#FEFEFE")); // White
-        defaultColorMap.put(DrawType.livingStreet, Color.web("#EDEDED")); // Blue-ish-white
-        defaultColorMap.put(DrawType.service,Color.web("#ffffff")); // white
-        defaultColorMap.put(DrawType.building,Color.web("#858585")); // grey
-        //*/
-
+    public void redrawMap() {
+        mapDraw.redraw();
     }
 }

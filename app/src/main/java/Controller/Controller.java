@@ -2,40 +2,34 @@ package Controller;
 
 import Model.Model;
 import View.View;
-
 import javafx.geometry.Point2D;
 
 public class Controller {
-    double lastX;
-    double lastY;
+
+    private double lastX;
+    private double lastY;
 
     public Controller(Model model, View view) {
-        view.canvas.setOnMousePressed(e -> {
+
+        view.getCanvas().setOnMousePressed(e -> {
             lastX = e.getX();
             lastY = e.getY();
         });
-        view.canvas.setOnMouseDragged(e -> {
-            // if (e.isPrimaryButtonDown()) {
-            //     Point2D lastmodel = view.mousetoModel(lastX, lastY);
-            //     Point2D newmodel = view.mousetoModel(e.getX(), e.getY());
-            //     model.add(lastmodel, newmodel);
-            //     view.redraw();
-            // } else {
-            // }
+        view.getCanvas().setOnMouseDragged(e -> {
             double dx = e.getX() - lastX;
             double dy = e.getY() - lastY;
-            view.pan(dx, dy);
+            view.panMap(dx, dy);
 
             lastX = e.getX();
             lastY = e.getY();
 
-            view.redraw();
+            view.redrawMap();
         });
-        view.canvas.setOnScroll(e -> {
+        view.getCanvas().setOnScroll(e -> {
             double factor = e.getDeltaY();
-            view.zoom(e.getX(), e.getY(), Math.pow(1.01, factor));
+            view.zoomMap(e.getX(), e.getY(), Math.pow(1.01, factor));
 
-            view.redraw();
+            view.redrawMap();
         });
     }
 

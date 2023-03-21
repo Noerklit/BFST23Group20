@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 
 import Model.Model;
 import View.View;
+import View.MapDraw;
 import Benchmark.TaskTimer;
 import Controller.Controller;
 
