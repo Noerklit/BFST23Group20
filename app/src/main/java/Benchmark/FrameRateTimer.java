@@ -2,12 +2,15 @@ package Benchmark;
 
 //import static Benchmark.BenchmarkUtility.convertMillis;
 
+import javafx.scene.text.Text;
+
 public class FrameRateTimer {
     private static int frameCount = 0;
 
     private static long startFrameTime;
     private static double savedZoomLevel;
     private static int savedFidelity;
+    private static Text fps;
 
     public static void startFrame(double zoomLevel, int fidelity) { // zoom level...
         frameCount++;
@@ -24,9 +27,17 @@ public class FrameRateTimer {
         long frameTime = endFrameTime - startFrameTime;
         System.out.printf("%03d ms - frametime\n", frameTime);
         logSeperator();
+        fps.setText(String.format("fps: %03d", 1000/frameTime));
     }
 
     private static void logSeperator() {
         System.out.println("------------------");
+    }
+
+    public static Text getFps(){
+        return fps;
+    }
+    public static void setFps(Text text){
+        fps = text;
     }
 }
