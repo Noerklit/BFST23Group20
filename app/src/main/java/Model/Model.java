@@ -183,7 +183,6 @@ public class Model implements Serializable {
                 }
                 break;
             case "landuse":
-
                 switch(val) {
                     case "forest":
                         return DrawType.landuseFarmland;
