@@ -25,7 +25,7 @@ public class MapDraw {
     private HashMap<DrawType, Color> defaultColorMap;
     private int fidelity;
 
-    private boolean darkMode;
+    private boolean darkMode, toggleDebug;
 
     private double cutoffFactor = .1; // value can be: 0 - 0.5
 
@@ -33,6 +33,7 @@ public class MapDraw {
         this.model = model;
         this.canvas = canvas;
         this.darkMode = false;
+        this.toggleDebug = false;
 
         this.gc = canvas.getGraphicsContext2D();
 
@@ -59,7 +60,12 @@ public class MapDraw {
         
         gc.setTransform(trans);
 
-        drawDebugLines();
+        if (toggleDebug){
+            cutoffFactor = .1;
+            drawDebugLines();
+        } else {
+            cutoffFactor = 0;
+        }
 
         double up = getScreenLat(0 + cutoffFactor);
         double down = getScreenLat(1 - cutoffFactor);
@@ -180,4 +186,6 @@ public class MapDraw {
     public void toggleDarkMode(boolean toggle) {
         this.darkMode = toggle;
     }
+
+    public void setToggleDebug(){this.toggleDebug = !this.toggleDebug;}
 }

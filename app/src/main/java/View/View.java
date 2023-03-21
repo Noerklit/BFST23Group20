@@ -15,6 +15,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.Scanner;
 
 public class View {
@@ -22,14 +23,15 @@ public class View {
     private Canvas canvas;
     private MapDraw mapDraw;
     private MenuBar menuBar;
+    private Scene scene;
 
 
     public View(Model model, Stage primaryStage) {
         this.canvas = new Canvas(600, 500);
-
+        this.scene = createGeneralUi();
         primaryStage.setTitle("Draw Lines");
 
-        primaryStage.setScene(createGeneralUi());
+        primaryStage.setScene(scene);
         primaryStage.show();
 
         this.mapDraw = new MapDraw(model, canvas);
@@ -38,9 +40,11 @@ public class View {
     private Scene createGeneralUi(){
         Text fps = new Text();
         FrameRateTimer.setFps(fps);
-        TextField textField = new TextField("");
+//        TextField textField = new TextField("");
         this.menuBar = createMenuBar();
-        var hBox = new HBox(menuBar, textField);
+        var hBox = new HBox(menuBar);
+        hBox.setAlignment(Pos.CENTER);
+        hBox.setStyle("-fx-background-color: #5a9fb0");
 
         VBox vBox = new VBox(hBox, fps, canvas);
         return new Scene(vBox);
@@ -65,8 +69,9 @@ public class View {
             }
         }
 
-
-        return new MenuBar(chooseDarkMode, chooseFile);
+        var mb = new MenuBar(chooseDarkMode, chooseFile);
+        mb.setStyle("-fx-background-color: #5a9fb0");
+        return mb;
     }
 
     public Canvas getCanvas() {
@@ -98,5 +103,12 @@ public class View {
                 redrawMap();
                 return;
         }
+    }
+    public void debug(){
+        mapDraw.setToggleDebug();
+    }
+
+    public Scene getScene() {
+        return scene;
     }
 }

@@ -7,6 +7,7 @@ import javafx.geometry.Point2D;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import App.App;
+import javafx.scene.input.KeyEvent;
 
 public class Controller {
 
@@ -15,26 +16,33 @@ public class Controller {
 
     public Controller(Model model, View view) {
 
-        view.getCanvas().setOnMousePressed(e -> {
-            lastX = e.getX();
-            lastY = e.getY();
-        });
-        view.getCanvas().setOnMouseDragged(e -> {
-            double dx = e.getX() - lastX;
-            double dy = e.getY() - lastY;
-            view.panMap(dx, dy);
+    view.getCanvas().setOnMousePressed(e -> {
+        lastX = e.getX();
+        lastY = e.getY();
+    });
+    view.getCanvas().setOnMouseDragged(e -> {
+        double dx = e.getX() - lastX;
+        double dy = e.getY() - lastY;
+        view.panMap(dx, dy);
 
-            lastX = e.getX();
-            lastY = e.getY();
+        lastX = e.getX();
+        lastY = e.getY();
 
+        view.redrawMap();
+    });
+    view.getCanvas().setOnScroll(e -> {
+        double factor = e.getDeltaY();
+        view.zoomMap(e.getX(), e.getY(), Math.pow(1.01, factor));
+
+        view.redrawMap();
+    });
+
+    view.getScene().addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
+        if (keyEvent.getText().equals("\t")){
+            view.debug();
             view.redrawMap();
-        });
-        view.getCanvas().setOnScroll(e -> {
-            double factor = e.getDeltaY();
-            view.zoomMap(e.getX(), e.getY(), Math.pow(1.01, factor));
-
-            view.redrawMap();
-        });
+        }
+    });
     view.getMenuBar()
             .getMenus()
             .get(1)// choose file
