@@ -12,7 +12,14 @@ import View.MapDraw;
 import Benchmark.TaskTimer;
 import Controller.Controller;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+
 public class App extends Application{
+
+    private static Model model;
+    private static View view;
+    private static Stage primaryStage;
     public String getGreeting() {
         return "Hello World!";
     }
@@ -24,16 +31,26 @@ public class App extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        App.primaryStage = primaryStage;
         primaryStage.setTitle("Start Project");
         primaryStage.show();
         String filename = FileToLoad.getFileToLoad();
 
         TaskTimer.recordTask("Start model load");
-        var model = Model.load(filename);
+        model = Model.load(filename);
         TaskTimer.endTasks();
         
-        var view = new View(model, primaryStage);
+        view = new View(model, primaryStage);
         new Controller(model, view);
-        
+    }
+
+    public static void reloadModel(String filename) throws XMLStreamException, IOException, ClassNotFoundException {
+        model = Model.load("../app/data/"+filename);
+        view = new View(model, App.primaryStage);
+        new Controller(model, view);
+    }
+
+    public Model getModel() {
+        return model;
     }
 }

@@ -21,6 +21,8 @@ public class View {
 
     private Canvas canvas;
     private MapDraw mapDraw;
+    private MenuBar menuBar;
+
 
     public View(Model model, Stage primaryStage) {
         this.canvas = new Canvas(600, 500);
@@ -37,7 +39,7 @@ public class View {
         Text fps = new Text();
         FrameRateTimer.setFps(fps);
         TextField textField = new TextField("");
-        var menuBar = createMenuBar();
+        this.menuBar = createMenuBar();
         var hBox = new HBox(menuBar, textField);
 
         VBox vBox = new VBox(hBox, fps, canvas);
@@ -57,7 +59,11 @@ public class View {
         File[] files = path.listFiles();
         Menu chooseFile = new Menu("Choose File");
         for (File file : files){
-            chooseFile.getItems().add(new MenuItem(file.getName()));
+            var item = new MenuItem(file.getName());
+//            item.setOnAction(event -> {
+//                System.out.println(file.getName());
+//            });
+            chooseFile.getItems().add(item);
         }
 
 
@@ -76,5 +82,9 @@ public class View {
     }
     public void redrawMap() {
         mapDraw.redraw();
+    }
+
+    public MenuBar getMenuBar() {
+        return menuBar;
     }
 }

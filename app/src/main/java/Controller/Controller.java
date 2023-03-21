@@ -4,6 +4,10 @@ import Model.Model;
 import View.View;
 import javafx.geometry.Point2D;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import App.App;
+
 public class Controller {
 
     private double lastX;
@@ -31,6 +35,20 @@ public class Controller {
 
             view.redrawMap();
         });
+    view.getMenuBar().getMenus().get(1).getItems().forEach(menuItem -> {
+            menuItem.setOnAction(event -> {
+                try {
+                    App.reloadModel(menuItem.getText());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                } catch (XMLStreamException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        });
     }
+
 
 }
