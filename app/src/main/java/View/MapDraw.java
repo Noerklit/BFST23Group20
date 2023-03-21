@@ -2,12 +2,10 @@ package View;
 
 import java.util.HashMap;
 
-import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
-import javafx.scene.transform.NonInvertibleTransformException;
 
 import Model.Model;
 import Model.DrawType;
@@ -25,7 +23,7 @@ public class MapDraw {
     private HashMap<DrawType, Color> defaultColorMap;
     private int fidelity;
 
-    private boolean darkMode, toggleDebug;
+    private boolean darkMode, debugMode;
 
     private double cutoffFactor = .1; // value can be: 0 - 0.5
 
@@ -33,7 +31,7 @@ public class MapDraw {
         this.model = model;
         this.canvas = canvas;
         this.darkMode = false;
-        this.toggleDebug = false;
+        this.debugMode = false;
 
         this.gc = canvas.getGraphicsContext2D();
 
@@ -60,7 +58,7 @@ public class MapDraw {
         
         gc.setTransform(trans);
 
-        if (toggleDebug){
+        if (debugMode){
             cutoffFactor = .1;
             drawDebugLines();
         } else {
@@ -187,5 +185,5 @@ public class MapDraw {
         this.darkMode = toggle;
     }
 
-    public void setToggleDebug(){this.toggleDebug = !this.toggleDebug;}
+    public void toggleDebug(){this.debugMode = !this.debugMode;}
 }

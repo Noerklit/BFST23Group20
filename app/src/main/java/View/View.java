@@ -104,8 +104,8 @@ public class View {
                 return;
         }
     }
-    public void debug(){
-        mapDraw.setToggleDebug();
+    public void toggleDebug(){
+        mapDraw.toggleDebug();
     }
 
     public Scene getScene() {

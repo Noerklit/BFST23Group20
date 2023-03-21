@@ -39,7 +39,7 @@ public class Controller {
 
     view.getScene().addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
         if (keyEvent.getText().equals("\t")){
-            view.debug();
+            view.toggleDebug();
             view.redrawMap();
         }
     });
