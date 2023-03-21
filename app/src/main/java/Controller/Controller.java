@@ -28,10 +28,14 @@ public class Controller {
 
             lastX = e.getX();
             lastY = e.getY();
+
+            view.redraw();
         });
         view.canvas.setOnScroll(e -> {
             double factor = e.getDeltaY();
             view.zoom(e.getX(), e.getY(), Math.pow(1.01, factor));
+
+            view.redraw();
         });
     }
 

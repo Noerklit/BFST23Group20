@@ -16,9 +16,10 @@ import javafx.stage.Stage;
 import Model.Model;
 import Model.DrawType;
 import Model.Edge;
+import Benchmark.FrameRateTimer;
 
 public class View {
-    public Canvas canvas = new Canvas(1500, 1200);
+    public Canvas canvas = new Canvas(1500, 850);
     GraphicsContext gc = canvas.getGraphicsContext2D();
 
     double scalingConst;
@@ -33,6 +34,8 @@ public class View {
     HashMap<DrawType, Color> defaultColorMap;
     int fidelity; 
 
+    double cutoffFactor = .1; // value can be: 0 - 0.5
+
     public View(Model model, Stage primaryStage) {
         this.model = model;
         createColorMap();
@@ -42,31 +45,72 @@ public class View {
         primaryStage.setScene(scene);
         primaryStage.show();
         calculateFidelity();
-        redraw();
-        scalingConst = (model.maxlat - model.minlat) / canvas.getHeight();
         System.out.println(model.maxlat);
         pan(-0.56*model.minlon, model.maxlat);
         zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
+        scalingConst = (model.maxlat - model.minlat) / canvas.getHeight();
+        redraw();
     }
 
     public void redraw() {
+        FrameRateTimer.startFrame(trans.getMxx(), fidelity);
         gc.setTransform(new Affine());
         gc.setFill(Color.WHITE); // Hvidt canvas
         //gc.setFill(Color.web("#6e8dff")); Blåt canvas
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        
         gc.setTransform(trans);
+
+        drawDebugLines();
+
+        double up = getScreenLat(0 + cutoffFactor);
+        double down = getScreenLat(1 - cutoffFactor);
+
+        double left = getScreenLon(0 + cutoffFactor);
+        double right = getScreenLon(1 - cutoffFactor);
+        
         gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
+
         for (var edge : model.edges) {
             edge.draw(gc);
         }
-//        System.out.println(trans.getTy() / scalingConst / canvas.getHeight() / 3.14159265);
+
         for (var way : model.ways) {
-            // I have no clue why this works but it does
-            if (way.coords[1] > ((trans.getTy() * scalingConst * canvas.getHeight() * 3.14159265) - 0.6)*-1 && way.coords[0] > (((trans.getTx() * scalingConst * canvas.getHeight() * 3.14159265)+0.1)*-1)) {
-            }
+            boolean inHorizontal = left < way.coords[0] && way.coords[0] < right;
+            boolean inVertical = up < way.coords[1] && way.coords[1] < down;
+
+            if (inHorizontal && inVertical) {
                 way.draw(gc, defaultColorMap, fidelity);
-//                gc.setStroke(Color.web("#000000"));
+            }
         }
+        FrameRateTimer.endFrame();
+    }
+    
+    
+    private void drawDebugLines() {
+        gc.setLineWidth(10 * 1/Math.sqrt(trans.determinant()));
+        gc.setStroke(Color.web("#6e8dff"));
+
+        double up = getScreenLat(0 + cutoffFactor);
+        double down = getScreenLat(1 - cutoffFactor);
+        double left = getScreenLon(0 + cutoffFactor);
+        double right = getScreenLon(1 - cutoffFactor);
+        
+        gc.beginPath();
+        gc.moveTo(left, up);
+        gc.lineTo(right, up);
+        gc.lineTo(right, down);
+        gc.lineTo(left, down);
+        gc.lineTo(left, up);
+        
+        gc.stroke();
+    }
+
+    private double getScreenLon(double factor) {
+        return (trans.getTx() * -1 + canvas.getWidth() * factor) * scalingConst;
+    }
+    private double getScreenLat(double factor) {
+        return (trans.getTy() * -1 + canvas.getHeight() * factor) * scalingConst;
     }
 
     private void calculateFidelity() {
@@ -88,7 +132,6 @@ public class View {
 
     public void pan(double dx, double dy) {
         trans.prependTranslation(dx, dy);
-        redraw();
     }
 
     public void zoom(double dx, double dy, double factor) {
@@ -97,7 +140,6 @@ public class View {
         scalingConst /= factor;
         pan(dx, dy);
         calculateFidelity();
-        redraw();
     }
 
     public Point2D mousetoModel(double lastX, double lastY) {
