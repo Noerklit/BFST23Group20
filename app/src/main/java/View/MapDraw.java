@@ -49,7 +49,6 @@ public class MapDraw {
     public void redraw() {
         FrameRateTimer.startFrame(trans.getMxx(), fidelity);
         gc.setTransform(new Affine());
-        System.out.println(darkMode);
         if (darkMode){
             gc.setFill(Color.web("#4a4a4a"));
         } else {

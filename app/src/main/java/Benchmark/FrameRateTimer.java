@@ -10,6 +10,7 @@ public class FrameRateTimer {
     private static long startFrameTime;
     private static double savedZoomLevel;
     private static int savedFidelity;
+
     private static Text fps;
 
     public static void startFrame(double zoomLevel, int fidelity) { // zoom level...
@@ -20,23 +21,23 @@ public class FrameRateTimer {
     }
     
     public static void endFrame() {
+        long endFrameTime = System.currentTimeMillis();
+        long frameTime = endFrameTime - startFrameTime;
+        //logFrameInfo(frameTime);
+        fps.setText(String.format("fps: %.2f", 1000./frameTime));
+    }
+
+    private static void logFrameInfo(long frameTime) {
         logSeperator();
         System.out.printf("Frame: %s\n", frameCount);
         System.out.printf("Zoom level: %.2f, fidelity: %s\n", savedZoomLevel, savedFidelity);
-        long endFrameTime = System.currentTimeMillis();
-        long frameTime = endFrameTime - startFrameTime;
         System.out.printf("%03d ms - frametime\n", frameTime);
         logSeperator();
-        fps.setText(String.format("fps: %03d", 1000/frameTime));
     }
-
     private static void logSeperator() {
         System.out.println("------------------");
     }
 
-    public static Text getFps(){
-        return fps;
-    }
     public static void setFps(Text text){
         fps = text;
     }
