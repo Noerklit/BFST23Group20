@@ -23,13 +23,16 @@ public class MapDraw {
 
     private Model model;
     private HashMap<DrawType, Color> defaultColorMap;
-    private int fidelity; 
+    private int fidelity;
+
+    private boolean darkMode;
 
     private double cutoffFactor = .1; // value can be: 0 - 0.5
 
     public MapDraw(Model model, Canvas canvas) {
         this.model = model;
         this.canvas = canvas;
+        this.darkMode = false;
 
         this.gc = canvas.getGraphicsContext2D();
 
@@ -46,7 +49,12 @@ public class MapDraw {
     public void redraw() {
         FrameRateTimer.startFrame(trans.getMxx(), fidelity);
         gc.setTransform(new Affine());
-        gc.setFill(Color.WHITE); // Hvidt canvas
+        System.out.println(darkMode);
+        if (darkMode){
+            gc.setFill(Color.web("#4a4a4a"));
+        } else {
+            gc.setFill(Color.WHITE); // Hvidt canvas
+        }
         //gc.setFill(Color.web("#6e8dff")); Blåt canvas
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         
@@ -168,5 +176,9 @@ public class MapDraw {
         defaultColorMap.put(DrawType.building,Color.web("#858585")); // grey
         //*/
 
+    }
+
+    public void toggleDarkMode(boolean toggle) {
+        this.darkMode = toggle;
     }
 }

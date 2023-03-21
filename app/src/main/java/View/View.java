@@ -50,7 +50,7 @@ public class View {
         // Darkmode
         MenuItem on = new MenuItem("on");
         MenuItem off = new MenuItem("off");
-        Menu chooseDarkMode = new Menu("Dark Mode");
+        Menu chooseDarkMode = new Menu("Toggle Dark Mode");
         chooseDarkMode.getItems().add(on);
         chooseDarkMode.getItems().add(off);
 
@@ -59,11 +59,10 @@ public class View {
         File[] files = path.listFiles();
         Menu chooseFile = new Menu("Choose File");
         for (File file : files){
-            var item = new MenuItem(file.getName());
-//            item.setOnAction(event -> {
-//                System.out.println(file.getName());
-//            });
-            chooseFile.getItems().add(item);
+            var curr = file.getName();
+            if (curr.endsWith(".obj")){
+                chooseFile.getItems().add(new MenuItem(curr));
+            }
         }
 
 
@@ -86,5 +85,18 @@ public class View {
 
     public MenuBar getMenuBar() {
         return menuBar;
+    }
+
+    public void setDarkMode(String toggle){
+        switch (toggle) {
+            case "on" -> {
+                mapDraw.toggleDarkMode(true);
+                redrawMap();
+            }
+            case "off" -> {
+                mapDraw.toggleDarkMode(false);
+                redrawMap();
+            }
+        }
     }
 }

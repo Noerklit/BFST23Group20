@@ -35,7 +35,11 @@ public class Controller {
 
             view.redrawMap();
         });
-    view.getMenuBar().getMenus().get(1).getItems().forEach(menuItem -> {
+    view.getMenuBar()
+            .getMenus()
+            .get(1)// choose file
+            .getItems()
+            .forEach(menuItem -> {
             menuItem.setOnAction(event -> {
                 try {
                     App.reloadModel(menuItem.getText());
@@ -48,6 +52,16 @@ public class Controller {
                 }
             });
         });
+
+    view.getMenuBar()
+            .getMenus()
+            .get(0)// Dark mode toggle
+            .getItems()
+            .forEach(menuItem -> {
+        menuItem.setOnAction(event -> {
+            view.setDarkMode(menuItem.getText());
+        });
+    });
     }
 
 
