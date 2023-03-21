@@ -26,6 +26,8 @@ import org.checkerframework.checker.units.qual.K;
 import javafx.geometry.Point2D;
 import org.codehaus.stax2.evt.XMLEvent2;
 
+import Benchmark.TaskTimer;
+
 public class Model implements Serializable {
     public List<Edge> edges = new ArrayList<Edge>();
     public List<Way> ways = new ArrayList<Way>();
@@ -36,6 +38,7 @@ public class Model implements Serializable {
 
     public static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException, XMLStreamException, FactoryConfigurationError {
         if (filename.endsWith(".obj")) {
+            TaskTimer.recordTask("Load obj-file");
             try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
                 return (Model) in.readObject();
             }
@@ -72,6 +75,7 @@ public class Model implements Serializable {
     }
 
     private void parseOSM(InputStream inputStream) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
+        TaskTimer.recordTask("Begin OSM parsing");
         var stax = (XMLInputFactory2)XMLInputFactory2.newInstance();
         stax.configureForSpeed();
         var input = (XMLStreamReader2)stax.createXMLStreamReader(inputStream);
@@ -81,6 +85,8 @@ public class Model implements Serializable {
         var addWay = false;
         DrawType currentDrawType = null;
         var hasSorted = false;
+
+        boolean firstNode = true, firstWay = true, firstRelation = true;
 
         while (input.hasNext()) {
             var tagKind = input.next();
@@ -92,16 +98,24 @@ public class Model implements Serializable {
                     minlon = Double.parseDouble(input.getAttributeValue(null, "minlon"));
                     maxlon = Double.parseDouble(input.getAttributeValue(null, "maxlon"));
                 } else if (name == "node") {
+                    if (firstNode) {
+                        TaskTimer.recordTask("Nodes");
+                        firstNode = false;
+                    } 
+                    TaskTimer.incrementSubtask();
                     var id = Long.parseLong(input.getAttributeValue(null, "id"));
                     var lat = Double.parseDouble(input.getAttributeValue(null, "lat"));
                     var lon = Double.parseDouble(input.getAttributeValue(null, "lon"));
 //                    id2node.put(id, new Node(lat, lon));
                     id2node.add(new Node(lat, lon, id));
                 } else if (name == "way") {
-                    if (!hasSorted){
+                    if (firstWay) {
+                        TaskTimer.recordTask("Sort array");
                         Collections.sort(id2node);
-                        hasSorted = true;
+                        TaskTimer.recordTask("Ways");
+                        firstWay = false;
                     }
+                    TaskTimer.incrementSubtask();
                     way.clear();
                     addWay = false;
                     currentDrawType = null;
@@ -118,6 +132,12 @@ public class Model implements Serializable {
                     var index = Collections.binarySearch(id2node, new Node(0, 0, ref));
                     var node = id2node.get(index);
                     way.add(node);
+                } else if (name == "relation") {
+                    if (firstRelation) {
+                        TaskTimer.recordTask("Relations");
+                        firstRelation = false;
+                    } 
+                    TaskTimer.incrementSubtask();
                 }
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
                 var name = input.getLocalName();
@@ -126,6 +146,7 @@ public class Model implements Serializable {
                 }
             }
         }
+        TaskTimer.recordTask("Finalize parsing");
         input.close();
     }
 

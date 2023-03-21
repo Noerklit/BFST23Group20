@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 
 import Model.Model;
 import View.View;
+import Benchmark.TaskTimer;
 import Controller.Controller;
 
 public class App extends Application{
@@ -25,7 +26,11 @@ public class App extends Application{
         primaryStage.setTitle("Start Project");
         primaryStage.show();
         String filename = FileToLoad.getFileToLoad();
+
+        TaskTimer.recordTask("Start model load");
         var model = Model.load(filename);
+        TaskTimer.endTasks();
+        
         var view = new View(model, primaryStage);
         new Controller(model, view);
         
