@@ -89,14 +89,14 @@ public class View {
 
     public void setDarkMode(String toggle){
         switch (toggle) {
-            case "on" -> {
+            case "on":
                 mapDraw.toggleDarkMode(true);
                 redrawMap();
-            }
-            case "off" -> {
+                return;
+            case "off":
                 mapDraw.toggleDarkMode(false);
                 redrawMap();
-            }
+                return;
         }
     }
 }
