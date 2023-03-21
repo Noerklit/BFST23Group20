@@ -3,20 +3,16 @@ package View;
 import Benchmark.FrameRateTimer;
 import Model.Model;
 
-import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.util.Scanner;
 
 public class View {
 
@@ -95,11 +91,11 @@ public class View {
     public void setDarkMode(String toggle){
         switch (toggle) {
             case "on":
-                mapDraw.toggleDarkMode(true);
+                mapDraw.setDarkMode(true);
                 redrawMap();
                 return;
             case "off":
-                mapDraw.toggleDarkMode(false);
+                mapDraw.setDarkMode(false);
                 redrawMap();
                 return;
         }

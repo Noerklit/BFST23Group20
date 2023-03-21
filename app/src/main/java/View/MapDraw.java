@@ -181,7 +181,7 @@ public class MapDraw {
 
     }
 
-    public void toggleDarkMode(boolean toggle) {
+    public void setDarkMode(boolean toggle) {
         this.darkMode = toggle;
     }
 
