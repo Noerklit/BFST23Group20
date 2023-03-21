@@ -169,11 +169,3 @@ app/data/*
 !app/data/bornholm.osm.zip
 file-to-load.txt
 choosefile.class
-
-/.idea/.name
-/.idea/git_toolbox_prj.xml
-/.idea/vcs.xml
-/.idea/misc.xml
-/.idea/jarRepositories.xml
-/.idea/compiler.xml
-/.idea/.gitignore
