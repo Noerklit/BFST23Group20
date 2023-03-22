@@ -8,7 +8,6 @@ import javafx.stage.Stage;
 
 import Model.Model;
 import View.View;
-import View.MapDraw;
 import Benchmark.TaskTimer;
 import Controller.Controller;
 
@@ -45,7 +44,9 @@ public class App extends Application{
     }
 
     public static void reloadModel(String filename) throws XMLStreamException, IOException, ClassNotFoundException {
+        TaskTimer.recordTask("Start model load");
         model = Model.load("../app/data/"+filename);
+        TaskTimer.endTasks();
         view = new View(model, App.primaryStage);
         new Controller(model, view);
     }

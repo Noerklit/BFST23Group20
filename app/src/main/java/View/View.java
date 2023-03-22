@@ -24,25 +24,29 @@ public class View {
 
     public View(Model model, Stage primaryStage) {
         this.canvas = new Canvas(600, 500);
+        
+        this.mapDraw = new MapDraw(model, canvas);
+
         this.scene = createGeneralUi();
+
         primaryStage.setTitle("Draw Lines");
 
         primaryStage.setScene(scene);
         primaryStage.show();
-
-        this.mapDraw = new MapDraw(model, canvas);
     }
 
     private Scene createGeneralUi(){
-        Text fps = new Text();
-        FrameRateTimer.setFps(fps);
+        Text fpsText = new Text();
+        FrameRateTimer.setFpsText(fpsText);
+        Text mapDrawDebugText = new Text();
+        mapDraw.setDebugText(mapDrawDebugText);
 //        TextField textField = new TextField("");
         this.menuBar = createMenuBar();
         var hBox = new HBox(menuBar);
         hBox.setAlignment(Pos.CENTER);
         hBox.setStyle("-fx-background-color: #5a9fb0");
 
-        VBox vBox = new VBox(hBox, fps, canvas);
+        VBox vBox = new VBox(hBox, fpsText, mapDrawDebugText, canvas);
         return new Scene(vBox);
     }
 
@@ -92,16 +96,22 @@ public class View {
         switch (toggle) {
             case "on":
                 mapDraw.setDarkMode(true);
-                redrawMap();
                 return;
             case "off":
                 mapDraw.setDarkMode(false);
-                redrawMap();
                 return;
         }
     }
     public void toggleDebug(){
         mapDraw.toggleDebug();
+    }
+
+    public void increaseMapDebugZone() {
+        mapDraw.increaseDebugZone();
+    }
+
+    public void decreaseMapDebugZone() {
+        mapDraw.decreaseDebugZone();
     }
 
     public Scene getScene() {

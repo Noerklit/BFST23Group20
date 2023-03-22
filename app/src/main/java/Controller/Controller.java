@@ -41,6 +41,10 @@ public class Controller {
         if (keyEvent.getText().equals("\t")){
             view.toggleDebug();
             view.redrawMap();
+        } else if (keyEvent.getText().equals("a")) {
+            view.increaseMapDebugZone();
+        } else if (keyEvent.getText().equals("d")) {
+            view.decreaseMapDebugZone();
         }
     });
     view.getMenuBar()

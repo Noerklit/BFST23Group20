@@ -7,6 +7,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 
+import javafx.scene.text.Text;
+
 import Model.Model;
 import Model.DrawType;
 import Benchmark.FrameRateTimer;
@@ -17,7 +19,7 @@ public class MapDraw {
 
     private double scalingConst;
 
-    private Affine trans = new Affine();
+    private Affine trans;
 
     private Model model;
     private HashMap<DrawType, Color> defaultColorMap;
@@ -25,7 +27,11 @@ public class MapDraw {
 
     private boolean darkMode, debugMode;
 
-    private double cutoffFactor = .1; // value can be: 0 - 0.5
+    private final double defaultCutoffFactor;
+    private  double debugCutoffFactor;
+    private double cutoffFactor; // value can be: 0 - 0.5
+
+    private Text debugText;
 
     public MapDraw(Model model, Canvas canvas) {
         this.model = model;
@@ -33,7 +39,11 @@ public class MapDraw {
         this.darkMode = false;
         this.debugMode = false;
 
+        this.trans = new Affine();
         this.gc = canvas.getGraphicsContext2D();
+
+        cutoffFactor = defaultCutoffFactor = 0;
+        debugCutoffFactor = .1;
 
         createColorMap();
         
@@ -58,11 +68,15 @@ public class MapDraw {
         
         gc.setTransform(trans);
 
-        if (debugMode){
-            cutoffFactor = .1;
-            drawDebugLines();
+        if (debugMode) {
+            cutoffFactor = debugCutoffFactor;
         } else {
-            cutoffFactor = 0;
+            cutoffFactor = defaultCutoffFactor;
+        }
+        showCutoffFactor();
+
+        if (debugMode) {
+            drawDebugLines();
         }
 
         double up = getScreenLat(0 + cutoffFactor);
@@ -143,7 +157,46 @@ public class MapDraw {
         pan(dx, dy);
         calculateFidelity();
     }
+    
+    public void setDarkMode(boolean darkMode) {
+        this.darkMode = darkMode;
+    }
 
+    public void toggleDebug() {
+        this.debugMode = !this.debugMode;
+        redraw();
+    }
+
+    public void increaseDebugZone() {
+        changeDebugZone(1);
+    }
+    public void decreaseDebugZone() {
+        changeDebugZone(-1);
+    }
+    private void changeDebugZone(int factor) {
+        if (!debugMode) return;
+
+        debugCutoffFactor += .05 * factor;
+
+        double minCutoffFactor = -.5;
+        double maxCutoffFactor = .5;
+        if (debugCutoffFactor < minCutoffFactor) debugCutoffFactor = minCutoffFactor;
+        if (maxCutoffFactor < debugCutoffFactor) debugCutoffFactor = maxCutoffFactor;
+
+        cutoffFactor = debugCutoffFactor;
+
+        showCutoffFactor();
+
+        redraw();
+    }
+    private void showCutoffFactor() {
+        String output = String.format("Cutoff factor: %.2f", cutoffFactor);
+        if (debugText != null) debugText.setText(output);
+    }
+    public void setDebugText(Text debugText) {
+        this.debugText = debugText;
+    }
+    
     private void createColorMap() {
         defaultColorMap = new HashMap<>();
         defaultColorMap.put(DrawType.motorway, Color.web("#EA90A1")); // pink-ish red
@@ -180,10 +233,4 @@ public class MapDraw {
         //*/
 
     }
-
-    public void setDarkMode(boolean toggle) {
-        this.darkMode = toggle;
-    }
-
-    public void toggleDebug(){this.debugMode = !this.debugMode;}
 }
