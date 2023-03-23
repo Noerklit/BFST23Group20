@@ -2,6 +2,8 @@ package Parser;
 
 import java.util.ArrayList;
 
+// https://www.youtube.com/watch?v=3CbFFVHQrk4
+
 public class TrieNode {
     private int size_accepted_chars = 256;
     
@@ -16,22 +18,13 @@ public class TrieNode {
         terminal = false;
     }
 
-    private trieInsert(String text) {
+    public boolean trieInsert(String text) {
         int lengthString = text.length();
 
         // traverse the tree, and create nodes
-        for (int i = 0; i < lengthString; i++) {
-            TrieNode tmp = children[symbolTableToChar(i)];
-
-            if (tmp.children[symbolTableToChar(i)] == null) {
-                tmp.children[symbolTableToChar(i)] = new TrieNode();
-            }
-
-            tmp = children[symbolTableToChar(i)];
-        }
     }
 
-    private symbolTableToChar(int cchar) {
+    private int symbolTableToChar(int cchar) {
         return cchar;
     }
 }
