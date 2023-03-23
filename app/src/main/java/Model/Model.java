@@ -31,6 +31,8 @@ import Benchmark.TaskTimer;
 public class Model implements Serializable {
     public List<Edge> edges = new ArrayList<Edge>();
     public List<Way> ways = new ArrayList<Way>();
+    public List<Way> outerWays = new ArrayList<Way>();
+
 
     private int fidelity = 0;
 
@@ -79,13 +81,20 @@ public class Model implements Serializable {
         var stax = (XMLInputFactory2)XMLInputFactory2.newInstance();
         stax.configureForSpeed();
         var input = (XMLStreamReader2)stax.createXMLStreamReader(inputStream);
-//        var id2node = new HashMap<Long, Node>();
-        var id2node = new ArrayList<Node>();
-        var way = new ArrayList<Node>();
+//      var id2node = new HashMap<Long, Node>();
+        var allNodes = new ArrayList<Node>();
+        var allWays = new ArrayList<Way>();
+        var nodesToWay = new ArrayList<Node>();
+        Long wayId = null;
+
+        var outerWay = new ArrayList<Node>();
+
         var addWay = false;
+        var addRelation = false;
         DrawType currentDrawType = null;
         var hasSorted = false;
 
+        boolean inNode = false, inWay = false, inRelation = false;
         boolean firstNode = true, firstWay = true, firstRelation = true;
 
         while (input.hasNext()) {
@@ -101,24 +110,31 @@ public class Model implements Serializable {
                     if (firstNode) {
                         TaskTimer.recordTask("Nodes");
                         firstNode = false;
-                    } 
+                        inNode = true;
+                    }
                     TaskTimer.incrementSubtask();
                     var id = Long.parseLong(input.getAttributeValue(null, "id"));
                     var lat = Double.parseDouble(input.getAttributeValue(null, "lat"));
                     var lon = Double.parseDouble(input.getAttributeValue(null, "lon"));
 //                    id2node.put(id, new Node(lat, lon));
-                    id2node.add(new Node(lat, lon, id));
+                    allNodes.add(new Node(lat, lon, id));
                 } else if (name == "way") {
                     if (firstWay) {
-                        TaskTimer.recordTask("Sort array");
-                        Collections.sort(id2node);
+                        TaskTimer.recordTask("Sort node array");
+                        Collections.sort(allNodes);
                         TaskTimer.recordTask("Ways");
                         firstWay = false;
+                        inWay = true;
                     }
+
                     TaskTimer.incrementSubtask();
-                    way.clear();
+                    nodesToWay.clear();
                     addWay = false;
                     currentDrawType = null;
+
+                    wayId = Long.parseLong(input.getAttributeValue(null, "id"));
+
+
                 } else if (name == "tag") {
                     var k = input.getAttributeValue(null, "k");
                     var v = input.getAttributeValue(null, "v");
@@ -129,21 +145,65 @@ public class Model implements Serializable {
                     }
                 } else if (name == "nd") {
                     var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
-                    var index = Collections.binarySearch(id2node, new Node(0, 0, ref));
-                    var node = id2node.get(index);
-                    way.add(node);
+                    var index = Collections.binarySearch(allNodes, new Node(0, 0, ref));
+                    var node = allNodes.get(index);
+                    nodesToWay.add(node);
                 } else if (name == "relation") {
                     if (firstRelation) {
-                        TaskTimer.recordTask("Relations");
                         firstRelation = false;
-                    } 
+                        inRelation = true;
+
+                        TaskTimer.recordTask("Sort way array");
+                        Collections.sort(allWays);
+                        TaskTimer.recordTask("Relations");
+
+                    }
+                    currentDrawType = null;
+                    addWay =false;
+
+                    outerWays.clear();
+
+                    addRelation = false;
                     TaskTimer.incrementSubtask();
+                } else if (name == "member") {
+                    var type = input.getAttributeValue(null, "type");
+                    var ref = Long.parseLong(input.getAttributeValue(null, "ref"));
+                    var role = input.getAttributeValue(null, "role");
+                
+                    ArrayList<Node> empty = new ArrayList<>();
+
+                    if ((type.equals("way")) && (role.equals("outer"))) {
+                        var index = Collections.binarySearch(allWays, new Way(empty,null, ref));
+
+                        if (index >= 0) {
+                            var singleOuterWay = allWays.get(index);
+
+                            //Some relations does not have drawtype (fx Coastline), this makes sure we dont draw realtion way where the ways have drawtypes
+                            if (singleOuterWay.drawType == null){
+                                outerWays.add(singleOuterWay);
+                            }
+                        }
+                    }
                 }
+
             } else if (tagKind == XMLStreamConstants.END_ELEMENT) {
                 var name = input.getLocalName();
-                if (name == "way" && addWay) {
-                    ways.add(new Way(way, currentDrawType));
+                Way wayToAdd = new Way(nodesToWay, currentDrawType, wayId);
+                if (name == "way") {
+                    allWays.add(wayToAdd);
                 }
+                if (name == "way" && addWay) {
+                    ways.add(wayToAdd);
+                }
+                if  (name == "relation" && currentDrawType != null) {
+                    for(Way way : outerWays){
+                        way.drawType = currentDrawType;
+                        ways.add(0,way);
+                    }
+                }
+                inNode = false;
+                inWay = false;
+                inRelation = false;
             }
         }
         TaskTimer.recordTask("Finalize parsing");
@@ -179,17 +239,23 @@ public class Model implements Serializable {
                         return DrawType.livingStreet;
                     case "service":
                         return DrawType.service;
-                    
                 }
                 break;
             case "landuse":
                 switch(val) {
-                    case "forest":
+                    case "farmland":
                         return DrawType.landuseFarmland;
                     case "residential":
                         return DrawType.landuseResidential; //Currently residential roads, not residential landuse.
+                    case "forest":
+                        return DrawType.landuseForest;
                 }
                 break;
+            case "natural":
+                switch (val) {
+                    case "wetland":
+                        return DrawType.wetland;
+                }
         }
 
         switch (val) {

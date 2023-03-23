@@ -203,8 +203,11 @@ public class MapDraw {
         defaultColorMap.put(DrawType.trunk, Color.web("#FCC0AC")); // salmon
         defaultColorMap.put(DrawType.coastline, Color.web("#000000")); //Black
       
-        defaultColorMap.put(DrawType.landuseFarmland, Color.web("#abb895")); // Brownish Green?
+        defaultColorMap.put(DrawType.landuseFarmland, Color.web("#f0f4d4")); // Beige
         defaultColorMap.put(DrawType.landuseResidential, Color.web("#cecfcc")); // Light grey
+        defaultColorMap.put(DrawType.landuseForest,Color.web("8cbc7c")); //forest green
+        defaultColorMap.put(DrawType.wetland, Color.BLUE); //Grim blå, skal skiftes
+
 
         defaultColorMap.put(DrawType.primary, Color.web("#FDD7A1")); // light orange
         defaultColorMap.put(DrawType.secondary, Color.web("#F6FABB")); // light green

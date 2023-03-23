@@ -7,19 +7,25 @@ import java.util.HashMap;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Way implements Serializable {
+public class Way implements Serializable, Comparable<Way> {
     public double[] coords;
     DrawType drawType;
 
-    public Way(ArrayList<Node> way, DrawType drawType) {
-        coords = new double[way.size() * 2];
-        for (int i = 0 ; i < way.size() ; ++i) {
-            var node = way.get(i);
-            coords[2 * i] = 0.56 * node.lon;
-            coords[2 * i + 1] = -node.lat;
-        }
-        this.drawType = drawType;
+    Long id;
+
+    public Way(ArrayList<Node> way, DrawType drawType, Long id) {
+            coords = new double[way.size() * 2];
+            for (int i = 0; i < way.size(); ++i) {
+                var node = way.get(i);
+                coords[2 * i] = 0.56 * node.lon;
+                coords[2 * i + 1] = -node.lat;
+            }
+            this.drawType = drawType;
+            this.id = id;
+
     }
+
+
 
     public void draw(GraphicsContext gc, HashMap<DrawType, Color> colorMap, int fidelity) {
         Color color = colorMap.get(drawType);
@@ -49,5 +55,10 @@ public class Way implements Serializable {
     private void makeFill(GraphicsContext gc, Color color) {
         gc.setFill(color);
         gc.fill();
+    }
+
+    @Override
+    public int compareTo(Way otherWay) {
+        return Long.compare(id, otherWay.id);
     }
 }
