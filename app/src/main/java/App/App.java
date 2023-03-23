@@ -10,6 +10,7 @@ import Model.Model;
 import View.View;
 import Benchmark.TaskTimer;
 import Controller.Controller;
+import Parser.AddressParser;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
@@ -25,6 +26,10 @@ public class App extends Application{
 
     public static void main(String[] args) {
         System.out.println(new App().getGreeting());
+    
+        AddressParser A = new AddressParser();
+        A.getAddresses("Ed");
+
         launch(args);
     }
 

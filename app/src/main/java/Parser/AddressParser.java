@@ -1,4 +1,4 @@
-package Model;
+package Parser;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -6,18 +6,27 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+
 public class AddressParser {
     private static boolean online;
 
     public AddressParser() {
         this.online = isOnline();
+        System.out.println("fuck?");
     }
 
-    public static Address[] getAddresses(String address) {
+    //public static Address[] getAddresses(String address) {
+    public static void getAddresses(String address) {
         String result = parse(address);         
 
         Address[] addresses = JsonParser.parseAddress(result);
-        return addresses;
+        // return addresses;
     }
 
     private static String getUrlEncodedStr(String nonEncodedStr) {
@@ -39,7 +48,7 @@ public class AddressParser {
 
     private static String parse(String toParse) {
         String result = "";
-        if (online) {
+        if (!online) {
             result = onlineParsing(toParse);
         } else {
             result = offlineParsing(toParse);
@@ -91,8 +100,22 @@ public class AddressParser {
     }
 
     private static String offlineParsing(String toParse) {
-        // Regex her
-        System.out.println("Parsing offline now");
+        String fileToLoadPath = "/home/cave/UNI/Map/BFST23Group20/app/data/addresses_static";
+        File file = new File(fileToLoadPath);
+        
+        List<String> FileLines = new ArrayList<>();
+        try {
+            List<String> lines = Files.readAllLines(file.toPath());
+            for (String line : lines) {
+                FileLines.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (String line : FileLines) {
+            System.out.println(line);
+        }
         return "";
     }
 }

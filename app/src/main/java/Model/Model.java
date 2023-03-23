@@ -74,6 +74,40 @@ public class Model implements Serializable {
         parseOSM(new FileInputStream(filename));
     }
 
+    private String parseAddress(String k, String v) {
+        // Currently not used, only used for creating data address file
+
+        if (k.contains("addr:country")) {
+            System.out.print(v+", ");
+        }
+        if (k.contains("addr:municipality")) {
+            System.out.print(v+", ");
+        }
+        if (k.contains("addr:place")) {
+            System.out.print(v+", ");
+        }
+        if (k.contains("addr:postcode")) {
+            System.out.print(v+", ");
+        }
+        if (k.contains("addr:city")) {
+            System.out.print(v+", ");
+        }
+        if (k.contains("addr:housenumber")) {
+            System.out.print(v+", ");
+        }
+        if (k.contains("addr:street")) {
+            System.out.print(v);
+        }
+
+
+        if (k.contains("osak:identifier")) {
+            System.out.println("");
+        }
+
+        
+        return "";
+    }
+
     private void parseOSM(InputStream inputStream) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
         TaskTimer.recordTask("Begin OSM parsing");
         var stax = (XMLInputFactory2)XMLInputFactory2.newInstance();
@@ -122,6 +156,9 @@ public class Model implements Serializable {
                 } else if (name == "tag") {
                     var k = input.getAttributeValue(null, "k");
                     var v = input.getAttributeValue(null, "v");
+
+                    // parseAddress(k,v);
+
                     if (currentDrawType == null)
                         currentDrawType = keyValToDrawType(k, v);
                     if (currentDrawType != null) {
