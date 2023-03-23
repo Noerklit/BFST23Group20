@@ -100,22 +100,24 @@ public class AddressParser {
     }
 
     private static String offlineParsing(String toParse) {
-        String fileToLoadPath = "/home/cave/UNI/Map/BFST23Group20/app/data/addresses_static";
-        File file = new File(fileToLoadPath);
-        
-        List<String> FileLines = new ArrayList<>();
-        try {
-            List<String> lines = Files.readAllLines(file.toPath());
-            for (String line : lines) {
-                FileLines.add(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // String fileToLoadPath = "/home/cave/UNI/Map/BFST23Group20/app/data/addresses_static";
+        // File file = new File(fileToLoadPath);
+        // 
+        // List<String> FileLines = new ArrayList<>();
+        // try {
+        //     List<String> lines = Files.readAllLines(file.toPath());
+        //     for (String line : lines) {
+        //         FileLines.add(line);
+        //     }
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
 
-        for (String line : FileLines) {
-            System.out.println(line);
-        }
+        // for (String line : FileLines) {
+        //     System.out.println(line);
+        // }
+        TrieNode ourTrie = new TrieNode();
+        ourTrie.trieInsert("HelloWorld");
         return "";
     }
 }
