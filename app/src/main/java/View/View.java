@@ -42,11 +42,14 @@ public class View {
         mapDraw.setDebugText(mapDrawDebugText);
 //        TextField textField = new TextField("");
         this.menuBar = createMenuBar();
-        var hBox = new HBox(menuBar);
-        hBox.setAlignment(Pos.CENTER);
-        hBox.setStyle("-fx-background-color: #5a9fb0");
+        var hBoxMenu = new HBox(menuBar);
+        hBoxMenu.setAlignment(Pos.CENTER);
+        hBoxMenu.setStyle("-fx-background-color: #5a9fb0");
 
-        VBox vBox = new VBox(hBox, fpsText, mapDrawDebugText, canvas);
+        HBox hBoxCanvas = new HBox(canvas);
+        hBoxCanvas.setAlignment(Pos.CENTER);
+
+        VBox vBox = new VBox(hBoxMenu, fpsText, mapDrawDebugText, hBoxCanvas);
         return new Scene(vBox);
     }
 
