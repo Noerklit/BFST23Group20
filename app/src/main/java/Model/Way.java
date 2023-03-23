@@ -30,7 +30,7 @@ public class Way implements Serializable, Comparable<Way> {
     public void draw(GraphicsContext gc, HashMap<DrawType, Color> colorMap, int fidelity) {
         Color color = colorMap.get(drawType);
         if(drawType.fidelity <= fidelity) {
-            makePath(gc);
+            makePath(gc, fidelity);
             if(drawType.shouldFill) {
                 makeFill(gc, color);
             } else {
@@ -39,11 +39,15 @@ public class Way implements Serializable, Comparable<Way> {
         } 
     }
 
-    private void makePath(GraphicsContext gc) {
+    private void makePath(GraphicsContext gc, int fidelity) {
         gc.beginPath();
         gc.moveTo(coords[0], coords[1]);
         for (int i = 2 ; i < coords.length ; i += 2) {
-            gc.lineTo(coords[i], coords[i+1]);
+            if (fidelity>0){
+                gc.lineTo(coords[i], coords[i+1]);
+            } else if((i/2)%16==0){
+                gc.lineTo(coords[i], coords[i+1]);
+            }
         }
     }
     

@@ -141,7 +141,7 @@ public class MapDraw {
         if (zoomLevel > 15000) {
             fidelity = 3;
         }
-        if (zoomLevel > 100000) {
+        if (zoomLevel > 30000) {
             fidelity = 4;
         }
     }
