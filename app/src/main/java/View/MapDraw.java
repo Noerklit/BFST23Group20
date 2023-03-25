@@ -92,8 +92,12 @@ public class MapDraw {
         }
 
         for (var way : model.ways) {
-            boolean inHorizontal = left < way.coords[0] && way.coords[0] < right;
-            boolean inVertical = up < way.coords[1] && way.coords[1] < down;
+            int mid = way.coords.length/2;
+            int trueMid = mid%2==0?mid:mid-1;
+            double lon = way.coords[trueMid];
+            double lat = way.coords[trueMid+1];
+            boolean inHorizontal = left < lon && lon < right;
+            boolean inVertical = up < lat && lat < down;
 
             if (inHorizontal && inVertical) {
                 way.draw(gc, defaultColorMap, fidelity);
