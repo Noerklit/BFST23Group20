@@ -161,6 +161,19 @@ public class MapDraw {
         pan(dx, dy);
         calculateFidelity();
     }
+
+    public void resizeCanvasWidth(double delta) {
+        double newCanvasWidth = canvas.getWidth() + delta;
+        canvas.setWidth(newCanvasWidth);
+        pan(delta/2, 0);
+        redraw();
+    }
+    public void resizeCanvasHeight(double delta) {
+        double newCanvasHeight = canvas.getWidth() + delta;
+        canvas.setHeight(newCanvasHeight);
+        pan(0, delta/2);
+        redraw();
+    }
     
     public void setDarkMode(boolean darkMode) {
         this.darkMode = darkMode;
