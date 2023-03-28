@@ -87,10 +87,6 @@ public class MapDraw {
         
         gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
 
-        for (var edge : model.edges) {
-            edge.draw(gc);
-        }
-
         for (var way : model.ways) {
             int mid = way.coords.length/2;
             int trueMid = mid%2==0?mid:mid-1;
