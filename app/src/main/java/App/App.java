@@ -11,6 +11,15 @@ import View.View;
 import Benchmark.TaskTimer;
 import Controller.Controller;
 import Parser.AddressParser;
+import Parser.Trie;
+
+
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
@@ -26,9 +35,27 @@ public class App extends Application{
 
     public static void main(String[] args) {
         System.out.println(new App().getGreeting());
-    
-        AddressParser A = new AddressParser();
-        A.getAddresses("Ed");
+        
+        Trie foo = new Trie();
+
+        String fileToLoadPath = "/home/cave/UNI/Map/BFST23Group20/app/data/address_test";
+        File file = new File(fileToLoadPath);
+        
+        List<String> FileLines = new ArrayList<>();
+        try {
+            List<String> lines = Files.readAllLines(file.toPath());
+            for (String line : lines) {
+                FileLines.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (String line : FileLines) {
+            foo.insert(line);
+        }
+
+        foo.autoComplete("Svaneke D");
 
         launch(args);
     }
