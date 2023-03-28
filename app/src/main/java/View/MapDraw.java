@@ -220,6 +220,14 @@ public class MapDraw {
         defaultColorMap.put(DrawType.landuseResidential, Color.web("#cecfcc")); // Light grey
         defaultColorMap.put(DrawType.landuseForest,Color.web("8cbc7c")); //forest green
         defaultColorMap.put(DrawType.wetland, Color.BLUE); //Grim blå, skal skiftes
+        defaultColorMap.put(DrawType.landuseMeadow,Color.web("d0ecb4")); //Very light green
+        defaultColorMap.put(DrawType.landuseSand,Color.web("f8ecc4")); // Yellow-orange
+        defaultColorMap.put(DrawType.landuseSand, Color.web("fff4bc")); // Yellow
+        defaultColorMap.put(DrawType.landuseFarmyard, Color.web("f0c49c")); // Mix between Salmon and Clay?
+        defaultColorMap.put(DrawType.landuseIndustrial, Color.web("e8d4e4")); // Light purple
+        defaultColorMap.put(DrawType.landuseRecreationground, Color.web("e0fce4")); // Turquoise green?
+        defaultColorMap.put(DrawType.naturalHeath,Color.web("d8dc9c")); // Light brown
+        defaultColorMap.put(DrawType.naturalWater,Color.web("3EBDDC")); // Light blue
 
 
         defaultColorMap.put(DrawType.primary, Color.web("#FDD7A1")); // light orange

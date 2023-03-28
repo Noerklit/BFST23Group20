@@ -283,12 +283,28 @@ public class OSMParser {
                         return DrawType.landuseResidential; //Currently residential roads, not residential landuse.
                     case "forest":
                         return DrawType.landuseForest;
+                    case "meadow":
+                        return DrawType.landuseMeadow;
+                    case "sand":
+                        return DrawType.landuseSand;
+                    case "beach":
+                        return DrawType.landuseBeach;
+                    case "farmyard":
+                        return DrawType.landuseFarmyard;
+                    case "industrial":
+                        return DrawType.landuseIndustrial;
+                    case "recreation_ground":
+                        return DrawType.landuseRecreationground;
                 }
                 break;
             case "natural":
                 switch (val) {
                     case "wetland":
                         return DrawType.wetland;
+                    case "heath":
+                        return DrawType.naturalHeath;
+                    case "water":
+                        return DrawType.naturalWater;
                 }
         }
 

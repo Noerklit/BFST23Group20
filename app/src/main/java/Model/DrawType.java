@@ -8,6 +8,14 @@ public enum DrawType {
     landuseResidential(0, true),
     landuseForest(0,true),
     wetland(0,true),
+    landuseMeadow(0,true),
+    landuseSand(0,true),
+    landuseBeach(0,true),
+    landuseFarmyard(0,true),
+    landuseIndustrial(0,true),
+    landuseRecreationground(0,true),
+    naturalHeath(0,true),
+    naturalWater(0,true),
 
 
     primary(1, false),
