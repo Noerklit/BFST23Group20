@@ -5,26 +5,25 @@ import java.util.ArrayList;
 // https://www.youtube.com/watch?v=3CbFFVHQrk4
 
 public class TrieNode {
-    private int size_accepted_chars = 256;
+    // private static char[] SYMTABLE = "abcdefghijklmnopqrstuwvxyzæøå0123456789áćéǵíj́ḱḿńóṕŕśúẃýźǽǿ,.-_'`& ";
+    private static int SIZE = 256; // SYMTABLE.length();
     
-    public TrieNode[] children = new TrieNode[size_accepted_chars];
+    public TrieNode[] children = new TrieNode[SIZE];
     public boolean terminal;
 
     public TrieNode() {
-        for (int i = 0; i < size_accepted_chars; i++) {
-            children[symbolTableToChar(i)] = null;
+        for (int i = 0; i < SIZE; i++) {
+            children[charSymbolLookUp(i)] = null;
         }
 
         terminal = false;
     }
 
-    public boolean trieInsert(String text) {
-        int lengthString = text.length();
-
-        // traverse the tree, and create nodes
+    public TrieNode getChild(int index) {
+        return children[charSymbolLookUp(index)];
     }
 
-    private int symbolTableToChar(int cchar) {
-        return cchar;
+    public int charSymbolLookUp(int index) {
+        return index;
     }
 }

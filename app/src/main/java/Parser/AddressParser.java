@@ -18,7 +18,6 @@ public class AddressParser {
 
     public AddressParser() {
         this.online = isOnline();
-        System.out.println("fuck?");
     }
 
     //public static Address[] getAddresses(String address) {
@@ -116,8 +115,8 @@ public class AddressParser {
         // for (String line : FileLines) {
         //     System.out.println(line);
         // }
-        TrieNode ourTrie = new TrieNode();
-        ourTrie.trieInsert("HelloWorld");
+        // TrieNode ourTrie = new TrieNode();
+        // ourTrie.trieInsert("HelloWorld");
         return "";
     }
 }
