@@ -82,6 +82,8 @@ public class OSMParser {
     }
     
     private void parseBounds(XMLStreamReader2 input) throws XMLStreamException {
+        String endTag = "node";
+
         while (input.hasNext()) {
             if (input.isStartElement()) {
                 var name = input.getLocalName();
@@ -90,8 +92,10 @@ public class OSMParser {
                     maxlat = queryDouble(input, "maxlat");
                     minlon = queryDouble(input, "minlon");
                     maxlon = queryDouble(input, "maxlon");
-                } else {
+                } else if (name == endTag) {
                     break;
+                } else {
+                    throw new OSMFileException(name.toString(), input.getLocation().getLineNumber(), "parseBounds()", endTag);
                 }
             }
             input.next();
@@ -99,6 +103,7 @@ public class OSMParser {
     }
 
     private void parseNodes(XMLStreamReader2 input) throws XMLStreamException {
+        String endTag = "way";
 
         allNodes = new ArrayList<Node>();
 
@@ -113,8 +118,10 @@ public class OSMParser {
                     allNodes.add(new Node(lat, lon, id));
                 } else if (name == "tag") {
                     
-                } else {
+                } else if (name == endTag) {
                     break;
+                } else {
+                    throw new OSMFileException(name.toString(), input.getLocation().getLineNumber(), "parseNodes()", endTag);
                 }
             }
             input.next();
@@ -125,6 +132,7 @@ public class OSMParser {
     }
 
     private void parseWays(XMLStreamReader2 input) throws XMLStreamException {
+        String endTag = "relation";
 
         allWays = new ArrayList<Way>();
         var nodesToWay = new ArrayList<Node>();
@@ -156,8 +164,10 @@ public class OSMParser {
                     if (currentDrawType != null) {
                         addWay = true;
                     }
-                } else {
+                } else if (name == endTag) {
                     break;
+                } else {
+                    throw new OSMFileException(name.toString(), input.getLocation().getLineNumber(), "parseWays()", endTag);
                 }
             } else if (input.isEndElement()) {
                 var name = input.getLocalName();
@@ -180,6 +190,7 @@ public class OSMParser {
     }
 
     private void parseRelations(XMLStreamReader2 input) throws XMLStreamException {
+        String endTag = "osm";
 
         List<Way> outerWays = new ArrayList<Way>();
 
@@ -223,7 +234,7 @@ public class OSMParser {
                         addRelation = true;
                     }
                 } else {
-                    break;
+                    throw new OSMFileException(name.toString(), input.getLocation().getLineNumber(), "parseRelations()");
                 }
             } else if (input.isEndElement()) {
                 var name = input.getLocalName();
