@@ -36,27 +36,6 @@ public class App extends Application{
     public static void main(String[] args) {
         System.out.println(new App().getGreeting());
         
-        Trie foo = new Trie();
-
-        String fileToLoadPath = "/home/cave/UNI/Map/BFST23Group20/app/data/address_test";
-        File file = new File(fileToLoadPath);
-        
-        List<String> FileLines = new ArrayList<>();
-        try {
-            List<String> lines = Files.readAllLines(file.toPath());
-            for (String line : lines) {
-                FileLines.add(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        for (String line : FileLines) {
-            foo.insert(line);
-        }
-
-        foo.autoComplete("Svaneke D");
-
         launch(args);
     }
 
