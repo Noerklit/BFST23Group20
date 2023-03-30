@@ -87,13 +87,13 @@ public class MapDraw {
         
         gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
 
-        for (var edge : model.edges) {
-            edge.draw(gc);
-        }
-
         for (var way : model.ways) {
-            boolean inHorizontal = left < way.coords[0] && way.coords[0] < right;
-            boolean inVertical = up < way.coords[1] && way.coords[1] < down;
+            int mid = way.coords.length/2;
+            int trueMid = mid%2==0?mid:mid-1;
+            double lon = way.coords[trueMid];
+            double lat = way.coords[trueMid+1];
+            boolean inHorizontal = left < lon && lon < right;
+            boolean inVertical = up < lat && lat < down;
 
             if (inHorizontal && inVertical) {
                 way.draw(gc, defaultColorMap, fidelity);
@@ -141,7 +141,7 @@ public class MapDraw {
         if (zoomLevel > 15000) {
             fidelity = 3;
         }
-        if (zoomLevel > 100000) {
+        if (zoomLevel > 30000) {
             fidelity = 4;
         }
     }
@@ -156,6 +156,19 @@ public class MapDraw {
         scalingConst /= factor;
         pan(dx, dy);
         calculateFidelity();
+    }
+
+    public void resizeCanvasWidth(double delta) {
+        double newCanvasWidth = canvas.getWidth() + delta;
+        canvas.setWidth(newCanvasWidth);
+        pan(delta/2, 0);
+        redraw();
+    }
+    public void resizeCanvasHeight(double delta) {
+        double newCanvasHeight = canvas.getWidth() + delta;
+        canvas.setHeight(newCanvasHeight);
+        pan(0, delta/2);
+        redraw();
     }
     
     public void setDarkMode(boolean darkMode) {
@@ -203,8 +216,19 @@ public class MapDraw {
         defaultColorMap.put(DrawType.trunk, Color.web("#FCC0AC")); // salmon
         defaultColorMap.put(DrawType.coastline, Color.web("#000000")); //Black
       
-        defaultColorMap.put(DrawType.landuseFarmland, Color.web("#abb895")); // Brownish Green?
+        defaultColorMap.put(DrawType.landuseFarmland, Color.web("#f0f4d4")); // Beige
         defaultColorMap.put(DrawType.landuseResidential, Color.web("#cecfcc")); // Light grey
+        defaultColorMap.put(DrawType.landuseForest,Color.web("8cbc7c")); //forest green
+        defaultColorMap.put(DrawType.wetland, Color.BLUE); //Grim blå, skal skiftes
+        defaultColorMap.put(DrawType.landuseMeadow,Color.web("d0ecb4")); //Very light green
+        defaultColorMap.put(DrawType.landuseSand,Color.web("f8ecc4")); // Yellow-orange
+        defaultColorMap.put(DrawType.landuseSand, Color.web("fff4bc")); // Yellow
+        defaultColorMap.put(DrawType.landuseFarmyard, Color.web("f0c49c")); // Mix between Salmon and Clay?
+        defaultColorMap.put(DrawType.landuseIndustrial, Color.web("e8d4e4")); // Light purple
+        defaultColorMap.put(DrawType.landuseRecreationground, Color.web("e0fce4")); // Turquoise green?
+        defaultColorMap.put(DrawType.naturalHeath,Color.web("d8dc9c")); // Light brown
+        defaultColorMap.put(DrawType.naturalWater,Color.web("3EBDDC")); // Light blue
+
 
         defaultColorMap.put(DrawType.primary, Color.web("#FDD7A1")); // light orange
         defaultColorMap.put(DrawType.secondary, Color.web("#F6FABB")); // light green

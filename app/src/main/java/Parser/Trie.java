@@ -1,8 +1,11 @@
 package Parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Trie {
-    public TrieNode root; 
-    public int NullCount = 0;
+    private TrieNode root; 
+    private List<String> return_strings = new ArrayList<>();
 
     public Trie() {
         root = new TrieNode();
@@ -21,20 +24,10 @@ public class Trie {
         current.terminal = true;
     }
 
-    public boolean find(String word) {
-        TrieNode current = root;
-        for (char c : word.toCharArray() ) {
-            if (current.children[c] == null) {
-                return false;
-            }
-            current = current.getChild(c);
-        }
-        return current.terminal; // current.terminal;
-    }
-
-    public void getSuggestions(TrieNode end, String word) {
+    private void getSuggestions(TrieNode end, String word) {
         if (end.terminal) {
-            System.out.println(word);
+            System.out.println("[*] Debug, adding: " + word);
+            return_strings.add(word);
         }
 
         for (int i = 0; i < 256; i++) {
@@ -45,16 +38,24 @@ public class Trie {
     }
 
 
-    public void autoComplete(String word) {
+    public List<String> autoComplete(String word) {
         TrieNode current = root;
     
+        char[] characterArrWord = word.toCharArray();
+
+        // Check if it even exists
+        if (current.getChild(characterArrWord[0]) == null) {
+            return null;
+        }
+
         // Get end of string
-        for ( char c : word.toCharArray() ) {
+        for ( char c : characterArrWord ) {
             if ( current.getChild(c) != null ) {
                 current = current.getChild(c);
             }
         }
-            
+          
         getSuggestions(current, word);
+        return return_strings;
     }
 }

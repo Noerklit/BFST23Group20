@@ -6,6 +6,16 @@ public enum DrawType {
     coastline(0, false),
     landuseFarmland(0,true),
     landuseResidential(0, true),
+    landuseForest(0,true),
+    wetland(0,true),
+    landuseMeadow(0,true),
+    landuseSand(0,true),
+    landuseBeach(0,true),
+    landuseFarmyard(0,true),
+    landuseIndustrial(0,true),
+    landuseRecreationground(0,true),
+    naturalHeath(0,true),
+    naturalWater(0,true),
 
 
     primary(1, false),
@@ -21,8 +31,8 @@ public enum DrawType {
     building(4, true),
     ;
 
-    public int fidelity;
-    public boolean shouldFill;
+    public final int fidelity;
+    public final boolean shouldFill;
     private DrawType(int fidelity, boolean shouldFill) {
         this.fidelity = fidelity;
         this.shouldFill = shouldFill;

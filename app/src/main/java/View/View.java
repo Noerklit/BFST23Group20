@@ -21,7 +21,6 @@ public class View {
     private MenuBar menuBar;
     private Scene scene;
 
-
     public View(Model model, Stage primaryStage) {
         this.canvas = new Canvas(600, 500);
         
@@ -33,6 +32,8 @@ public class View {
 
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        setCanvasResize();
     }
 
     private Scene createGeneralUi(){
@@ -90,11 +91,11 @@ public class View {
     public void redrawMap() {
         mapDraw.redraw();
     }
-
+    
     public MenuBar getMenuBar() {
         return menuBar;
     }
-
+    
     public void setDarkMode(String toggle){
         switch (toggle) {
             case "on":
@@ -107,8 +108,9 @@ public class View {
     }
     public void toggleDebug(){
         mapDraw.toggleDebug();
+        //updateCanvasSize();
     }
-
+    
     public void increaseMapDebugZone() {
         mapDraw.increaseDebugZone();
     }
@@ -119,5 +121,16 @@ public class View {
 
     public Scene getScene() {
         return scene;
+    }
+
+    private void setCanvasResize() {
+        scene.widthProperty().addListener((obs, oldVal, newVal) -> {
+            double deltaWidth = newVal.doubleValue() - oldVal.doubleValue();
+            mapDraw.resizeCanvasWidth(deltaWidth);
+        });
+        scene.heightProperty().addListener((obs, oldVal, newVal) -> {
+            double deltaHeight = newVal.doubleValue() - oldVal.doubleValue();
+            mapDraw.resizeCanvasHeight(deltaHeight);
+        });
     }
 }
