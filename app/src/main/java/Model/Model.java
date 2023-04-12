@@ -95,40 +95,6 @@ public class Model implements Serializable {
         return "";
     }
 
-    private String parseAddress(String k, String v) {
-        // Currently not used, only used for creating data address file
-
-        if (k.contains("addr:country")) {
-            System.out.print(v+", ");
-        }
-        if (k.contains("addr:municipality")) {
-            System.out.print(v+", ");
-        }
-        if (k.contains("addr:place")) {
-            System.out.print(v+", ");
-        }
-        if (k.contains("addr:postcode")) {
-            System.out.print(v+", ");
-        }
-        if (k.contains("addr:city")) {
-            System.out.print(v+", ");
-        }
-        if (k.contains("addr:housenumber")) {
-            System.out.print(v+", ");
-        }
-        if (k.contains("addr:street")) {
-            System.out.print(v);
-        }
-
-
-        if (k.contains("osak:identifier")) {
-            System.out.println("");
-        }
-
-        
-        return "";
-    }
-
     private void parseOSM(InputStream inputStream) {
         OSMParser parser = new OSMParser(inputStream);
         ways = parser.getWays();
