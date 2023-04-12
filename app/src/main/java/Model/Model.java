@@ -103,4 +103,4 @@ public class Model implements Serializable {
         maxlat = parser.getMaxlat();
         maxlon = parser.getMaxlon();
     }
-    
+}

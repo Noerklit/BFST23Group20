@@ -1,8 +1,12 @@
 package Parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Trie {
     public TrieNode root; 
     public int NullCount = 0;
+    List<String> return_strings;
 
     public Trie() {
         root = new TrieNode();
@@ -45,7 +49,7 @@ public class Trie {
     }
 
 
-    public void autoComplete(String word) {
+    public List<String> autoComplete(String word) {
         TrieNode current = root;
     
         // Get end of string
@@ -56,5 +60,6 @@ public class Trie {
         }
             
         getSuggestions(current, word);
+        return return_strings;
     }
 }
