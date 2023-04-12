@@ -26,7 +26,6 @@ public class Trie {
 
     private void getSuggestions(TrieNode end, String word) {
         if (end.terminal) {
-            System.out.println("[*] Debug, adding: " + word);
             return_strings.add(word);
         }
 

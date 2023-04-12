@@ -22,11 +22,10 @@ public class AddressParser {
     }
 
     public static void getAddresses(String address) {
-        String result = parse(address);         
+        List<String> result = parse(address);         
 
-        Address[] addresses = JsonParser.parseAddress(result);
-        for (Address a : addresses) {
-            System.out.println(a.forslagstekst);
+        for (String e : result) {
+            System.out.println(e);
         }
     }
 
@@ -49,8 +48,8 @@ public class AddressParser {
         return false;
     }
 
-    private static String parse(String toParse) {
-        String result = "";
+    private static List<String> parse(String toParse) {
+        List<String> result = new ArrayList<>(); 
         if (online) {
             result = onlineParsing(toParse);
         } else {
@@ -59,7 +58,7 @@ public class AddressParser {
         return result;
     }
 
-    private static String onlineParsing(String searchFor) {
+    private static List<String> onlineParsing(String searchFor) {
         String result = "";
 
         try {
@@ -68,20 +67,26 @@ public class AddressParser {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             if (connection.getResponseCode() == 200) {
                 result = httpToString(connection);
-                return result;
             } else {
                 System.out.println("Could not connect to DAWA API\nStatus code: " + connection.getResponseCode());
-                result = offlineParsing(searchFor);
-                return result;
+                List<String> return_strings = offlineParsing(searchFor);
+                return return_strings;
             }
         } catch (Exception e) {
                 e.printStackTrace();
         }
 
-        return result;
+        Address[] addresses = JsonParser.parseAddress(result);
+        List<String> return_strings = new ArrayList<>();
+
+        for (Address address : addresses) {
+            return_strings.add(address.type + " " + address.forslagstekst);
+        }
+
+        return return_strings;
     }
 
-    private static String offlineParsing(String toParse) {
+    private static List<String> offlineParsing(String toParse) {
         Trie ourTrie = new Trie();
 
         String fileToLoadPath = "/home/cave/UNI/Map/BFST23Group20/app/data/addresses_static";
@@ -98,7 +103,7 @@ public class AddressParser {
         }
 
         List<String> trieRes = ourTrie.autoComplete(toParse);
-        return "";
+        return trieRes;
     }
 
     private static String httpToString(HttpURLConnection conn) {
