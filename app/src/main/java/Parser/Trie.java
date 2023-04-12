@@ -34,7 +34,7 @@ public class Trie {
 
     public void getSuggestions(TrieNode end, String word) {
         if (end.terminal) {
-            System.out.println(word);
+            return_strings.add(word);
         }
 
         for (int i = 0; i < 256; i++) {

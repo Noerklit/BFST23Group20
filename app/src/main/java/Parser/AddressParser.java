@@ -22,10 +22,11 @@ public class AddressParser {
 
     //public static Address[] getAddresses(String address) {
     public static void getAddresses(String address) {
-        String result = parse(address);         
+        List<String> result = parse(address);         
 
-        Address[] addresses = JsonParser.parseAddress(result);
-        // return addresses;
+        for (String e : result) {
+            System.out.println(e);
+        }
     }
 
     private static String getUrlEncodedStr(String nonEncodedStr) {
@@ -45,9 +46,9 @@ public class AddressParser {
         return false;
     }
 
-    private static String parse(String toParse) {
-        String result = "";
-        if (!online) {
+    private static List<String> parse(String toParse) {
+        List<String> result = new ArrayList<>(); 
+        if (online) {
             result = onlineParsing(toParse);
         } else {
             result = offlineParsing(toParse);
@@ -55,7 +56,7 @@ public class AddressParser {
         return result;
     }
 
-    private static String onlineParsing(String searchFor) {
+    private static List<String> onlineParsing(String searchFor) {
         String result = "";
 
         try {
@@ -64,17 +65,43 @@ public class AddressParser {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             if (connection.getResponseCode() == 200) {
                 result = httpToString(connection);
-                return result;
             } else {
                 System.out.println("Could not connect to DAWA API\nStatus code: " + connection.getResponseCode());
-                result = offlineParsing(searchFor);
-                return result;
+                List<String> return_strings = offlineParsing(searchFor);
+                return return_strings;
             }
         } catch (Exception e) {
                 e.printStackTrace();
         }
 
-        return result;
+        Address[] addresses = JsonParser.parseAddress(result);
+        List<String> return_strings = new ArrayList<>();
+
+        for (Address address : addresses) {
+            return_strings.add(address.type + " " + address.forslagstekst);
+        }
+
+        return return_strings;
+    }
+
+    private static List<String> offlineParsing(String toParse) {
+        Trie ourTrie = new Trie();
+
+        String fileToLoadPath = "/home/cave/UNI/Map/BFST23Group20/app/data/addresses_static";
+        File file = new File(fileToLoadPath);
+        
+        List<String> FileLines = new ArrayList<>();
+        try {
+            List<String> lines = Files.readAllLines(file.toPath());
+            for (String line : lines) {
+                ourTrie.insert(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        List<String> trieRes = ourTrie.autoComplete(toParse);
+        return trieRes;
     }
 
     private static String httpToString(HttpURLConnection conn) {

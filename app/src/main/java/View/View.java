@@ -12,6 +12,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+
 import java.io.File;
 
 public class View {
@@ -19,6 +22,7 @@ public class View {
     private Canvas canvas;
     private MapDraw mapDraw;
     private MenuBar menuBar;
+    private TextField searchbar;
     private Scene scene;
 
     public View(Model model, Stage primaryStage) {
@@ -43,26 +47,31 @@ public class View {
         mapDraw.setDebugText(mapDrawDebugText);
 //        TextField textField = new TextField("");
         this.menuBar = createMenuBar();
-        var hBoxMenu = new HBox(menuBar);
+        this.searchbar = createSearchBar();
+        var hBoxMenu = new HBox(menuBar,searchbar);
         hBoxMenu.setAlignment(Pos.CENTER);
+
         hBoxMenu.setStyle("-fx-background-color: #5a9fb0");
 
         HBox hBoxCanvas = new HBox(canvas);
         hBoxCanvas.setAlignment(Pos.CENTER);
 
+
         VBox vBox = new VBox(hBoxMenu, fpsText, mapDrawDebugText, hBoxCanvas);
         return new Scene(vBox);
     }
 
-    private MenuBar createMenuBar(){
-        // Darkmode
+    private Menu chooseDarkWidget(){
         MenuItem on = new MenuItem("on");
         MenuItem off = new MenuItem("off");
         Menu chooseDarkMode = new Menu("Toggle Dark Mode");
         chooseDarkMode.getItems().add(on);
         chooseDarkMode.getItems().add(off);
 
-        //Choose File
+        return chooseDarkMode;
+    }
+
+    private Menu chooseFileWidget(){
         File path = new File("../app/data/");
         File[] files = path.listFiles();
         Menu chooseFile = new Menu("Choose File");
@@ -73,7 +82,22 @@ public class View {
             }
         }
 
+        return chooseFile;
+    }
+
+    public TextField createSearchBar(){
+        TextField searchbar = new TextField("Search...");
+        searchbar.setAlignment(Pos.CENTER);
+
+        return searchbar;
+    }
+
+    private MenuBar createMenuBar(){
+        Menu chooseDarkMode = chooseDarkWidget();
+        Menu chooseFile = chooseFileWidget();
+
         var mb = new MenuBar(chooseDarkMode, chooseFile);
+
         mb.setStyle("-fx-background-color: #5a9fb0");
         return mb;
     }
@@ -94,6 +118,10 @@ public class View {
     
     public MenuBar getMenuBar() {
         return menuBar;
+    }
+
+    public TextField getSearchbar() {
+        return searchbar;
     }
     
     public void setDarkMode(String toggle){
