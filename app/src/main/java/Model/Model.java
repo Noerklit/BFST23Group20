@@ -95,6 +95,40 @@ public class Model implements Serializable {
         return "";
     }
 
+    private String parseAddress(String k, String v) {
+        // Currently not used, only used for creating data address file
+
+        if (k.contains("addr:country")) {
+            System.out.print(v+", ");
+        }
+        if (k.contains("addr:municipality")) {
+            System.out.print(v+", ");
+        }
+        if (k.contains("addr:place")) {
+            System.out.print(v+", ");
+        }
+        if (k.contains("addr:postcode")) {
+            System.out.print(v+", ");
+        }
+        if (k.contains("addr:city")) {
+            System.out.print(v+", ");
+        }
+        if (k.contains("addr:housenumber")) {
+            System.out.print(v+", ");
+        }
+        if (k.contains("addr:street")) {
+            System.out.print(v);
+        }
+
+
+        if (k.contains("osak:identifier")) {
+            System.out.println("");
+        }
+
+        
+        return "";
+    }
+
     private void parseOSM(InputStream inputStream) {
         OSMParser parser = new OSMParser(inputStream);
         ways = parser.getWays();
@@ -102,5 +136,51 @@ public class Model implements Serializable {
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();
         maxlon = parser.getMaxlon();
+    }
+
+    private DrawType keyValToDrawType(String key, String val) {
+
+        switch (key) {
+            case "building":
+                return DrawType.building;
+            case "highway":
+                switch (val) {
+                    case "motorway":
+                        return DrawType.motorway;
+                    case "trunk":
+                        return DrawType.trunk;
+                    case "primary":
+                        return DrawType.primary;
+                    case "secondary":
+                        return DrawType.secondary;
+                    case "tertiary":
+                        return DrawType.tertiary;
+                    case "unclassified":
+                        return DrawType.unclassified;
+                    case "residential":
+                        return DrawType.residential;
+                    case "living_street":
+                        return DrawType.livingStreet;
+                    case "service":
+                        return DrawType.service;
+                    
+                }
+                break;
+            case "landuse":
+                switch(val) {
+                    case "forest":
+                        return DrawType.landuseFarmland;
+                    case "residential":
+                        return DrawType.landuseResidential; //Currently residential roads, not residential landuse.
+                }
+                break;
+        }
+
+        switch (val) {
+            case "coastline":
+                return DrawType.coastline;
+        }
+
+        return null;
     }
 }

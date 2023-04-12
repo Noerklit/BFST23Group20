@@ -7,11 +7,12 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.List;
+
 
 public class AddressParser {
     private static boolean online;
@@ -20,7 +21,6 @@ public class AddressParser {
         this.online = isOnline();
     }
 
-    //public static Address[] getAddresses(String address) {
     public static void getAddresses(String address) {
         List<String> result = parse(address);         
 
@@ -38,11 +38,13 @@ public class AddressParser {
             URL url = new URL("http://example.com/");
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            return (connection.getResponseCode() == 200) ? true : false;
-
+            if (connection.getResponseCode() == 200) {
+                return true;
+            }
         } catch (Exception e) {
-                e.printStackTrace();
+            return false;
         }
+
         return false;
     }
 
@@ -124,26 +126,4 @@ public class AddressParser {
 
         return result;
     }
-
-    // private static String offlineParsing(String toParse) {
-    //     // String fileToLoadPath = "/home/cave/UNI/Map/BFST23Group20/app/data/addresses_static";
-    //     // File file = new File(fileToLoadPath);
-    //     // 
-    //     // List<String> FileLines = new ArrayList<>();
-    //     // try {
-    //     //     List<String> lines = Files.readAllLines(file.toPath());
-    //     //     for (String line : lines) {
-    //     //         FileLines.add(line);
-    //     //     }
-    //     // } catch (IOException e) {
-    //     //     e.printStackTrace();
-    //     // }
-
-    //     // for (String line : FileLines) {
-    //     //     System.out.println(line);
-    //     // }
-    //     // TrieNode ourTrie = new TrieNode();
-    //     // ourTrie.trieInsert("HelloWorld");
-    //     return "";
-    // }
 }
