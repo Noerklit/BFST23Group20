@@ -10,7 +10,11 @@ import org.codehaus.stax2.*;
 import Benchmark.TaskTimer;
 
 public class OSMParser {
-
+    Comparator<Way> cmp = new Comparator<Way>() {
+        public int compare(Way o1, Way o2) {
+            return Double.compare(o1.xVal, o2.xVal) *-1;
+        }
+    };
     private List<Way> ways = new ArrayList<Way>();
 
     private double minlat, maxlat, minlon, maxlon;
@@ -23,6 +27,7 @@ public class OSMParser {
     }
 
     public List<Way> getWays() {
+        ways.sort(cmp);
         return ways;
     }
 

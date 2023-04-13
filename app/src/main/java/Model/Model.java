@@ -16,17 +16,13 @@ import java.util.*;
 import java.util.zip.ZipInputStream;
 
 import Benchmark.TaskTimer;
+import KDTree.KDTree;
+import KDTree.Quickselect;
 
 public class Model implements Serializable {
 
-    Comparator<Way> cmp = new Comparator<Way>() {
-        public int compare(Way o1, Way o2) {
-            return Integer.compare(o1.coords.length, o2.coords.length) *-1;
-        }
-    };
-
     public List<Way> ways = new ArrayList<Way>();
-    
+
     public double minlat, maxlat, minlon, maxlon;
 
     public static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException {
@@ -38,7 +34,7 @@ public class Model implements Serializable {
         }
         return new Model(filename);
     }
-    
+
 
     public Model(String filename) throws IOException {
         if (filename.endsWith(".osm.zip")) {
@@ -48,7 +44,7 @@ public class Model implements Serializable {
         } else {
             throw new IOException("Could not find .osm.zip or .osm file");
         }
-        save(filename+".obj");
+//        save(filename+".obj");
     }
 
     void save(String filename) throws IOException {
@@ -97,14 +93,18 @@ public class Model implements Serializable {
             System.out.println("");
         }
 
-        
+
         return "";
     }
 
     private void parseOSM(InputStream inputStream) {
         OSMParser parser = new OSMParser(inputStream);
-        parser.getWays().sort(cmp);
         ways = parser.getWays();
+        System.out.println(ways.get(ways.size()>>1).coords[0]);
+        System.out.println(ways.get(ways.size()>>1).coords[1]);
+        var temp = Quickselect.select(ways,0,ways.size()-1, ways.size()>>1,true);
+        System.out.println(temp.coords[0]);
+        System.out.println(temp.coords[1]);
         minlat = parser.getMinlat();
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();
@@ -136,7 +136,7 @@ public class Model implements Serializable {
                         return DrawType.livingStreet;
                     case "service":
                         return DrawType.service;
-                    
+
                 }
                 break;
             case "landuse":
