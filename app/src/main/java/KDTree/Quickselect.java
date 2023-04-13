@@ -9,44 +9,44 @@ public class Quickselect {
 
 
 
-    private static int partitionBad(List<Way> list, int left, int right, int pivotIndex, boolean isX){
-        double pivotValue;
-        if (isX){
-            pivotValue = list.get(pivotIndex).xVal;
-        } else {
-            pivotValue = list.get(pivotIndex).yVal;
-        }
-
-        swap(list, pivotIndex, right);
-
-        int storeIndex = left;
-        for (int i = left; i<right; i++){
-            if (isX){
-                if (list.get(i).xVal < pivotValue){
-                    swap(list, storeIndex, i);
-                    storeIndex++;
-                }
-            } else {
-                if (list.get(i).yVal < pivotValue){
-                    swap(list, storeIndex, i);
-                    storeIndex++;
-                }
-            }
-        }
-        swap(list, right, storeIndex);
-        return storeIndex;
-    }
-    private static int partition(List<Way> list, int left, int right, int pivotIndex, boolean isX){
-        var pivot = list.get(left + (int)(Math.random()%(right-left+1))).xVal;
+//    private static int partitionBad(List<Way> list, int left, int right, int pivotIndex, boolean isX){
+//        double pivotValue;
+//        if (isX){
+//            pivotValue = list.get(pivotIndex).xVal;
+//        } else {
+//            pivotValue = list.get(pivotIndex).yVal;
+//        }
+//
+//        swap(list, pivotIndex, right);
+//
+//        int storeIndex = left;
+//        for (int i = left; i<right; i++){
+//            if (isX){
+//                if (list.get(i).xVal < pivotValue){
+//                    swap(list, storeIndex, i);
+//                    storeIndex++;
+//                }
+//            } else {
+//                if (list.get(i).yVal < pivotValue){
+//                    swap(list, storeIndex, i);
+//                    storeIndex++;
+//                }
+//            }
+//        }
+//        swap(list, right, storeIndex);
+//        return storeIndex;
+//    }
+    private static int partition(Way[] list, int left, int right, int pivotIndex, boolean isX){
+        var pivot = list[left + (int)(Math.random()%(right-left+1))].xVal;
         int i = left;
         int j = right+1;
 
         while (true){
-            while (list.get(++i).xVal<pivot){
+            while (list[++i].xVal<pivot){
                 if (i == right)
                     break;
             }
-            while(list.get(--j).xVal>pivot){
+            while(list[--j].xVal>pivot){
                 if (j == left)
                     break;
             }
@@ -59,10 +59,10 @@ public class Quickselect {
         return j;
     }
 
-    public static Way select(List<Way> list, int left, int right, int k, boolean isX){
+    public static Way select(Way[] list, int left, int right, int k, boolean isX){
         int pivotIndex;
         if (left == right){
-            return list.get(left);
+            return list[left];
         }
 
 //        pivotIndex = left + (int)(Math.random() % (right - left +1));
@@ -85,15 +85,15 @@ public class Quickselect {
                 left = i+1;
             }
             else {
-                return list.get(i);
+                return list[i];
             }
         }
-        return list.get(left);
+        return list[left];
     }
 
-    private static void swap(List<Way> list, int val1, int val2){
-        Way temp = list.get(val1);
-        list.set(val1, list.get(val2));
-        list.set(val2, temp);
+    private static void swap(Way[] list, int val1, int val2){
+        Way temp = list[val1];
+        list[val1] = list[val2];
+        list[val2] = temp;
     }
 }

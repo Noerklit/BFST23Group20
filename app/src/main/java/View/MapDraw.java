@@ -1,7 +1,11 @@
 package View;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
+import KDTree.Quickselect;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -11,6 +15,7 @@ import javafx.scene.text.Text;
 
 import Model.Model;
 import Model.DrawType;
+import Model.Way;
 import Benchmark.FrameRateTimer;
 
 public class MapDraw {
@@ -22,6 +27,7 @@ public class MapDraw {
     private Affine trans;
 
     private Model model;
+    private Way[] waysArr;
     private HashMap<DrawType, Color> defaultColorMap;
     private int fidelity;
 
@@ -33,8 +39,15 @@ public class MapDraw {
 
     private Text debugText;
 
+    Comparator<Way> cmp = new Comparator<Way>() {
+        public int compare(Way o1, Way o2) {
+            return Double.compare(o1.xVal, o1.yVal);
+        }
+    };
+
     public MapDraw(Model model, Canvas canvas) {
         this.model = model;
+        this.waysArr = model.ways.toArray(new Way[0]);
         this.canvas = canvas;
         this.darkMode = false;
         this.debugMode = false;
@@ -52,6 +65,16 @@ public class MapDraw {
         pan(-0.56*model.minlon, model.maxlat);
         zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
         scalingConst = (model.maxlat - model.minlat) / canvas.getHeight();
+
+        var start =  System.currentTimeMillis();
+        var temp = Quickselect.select(waysArr,0,waysArr.length-1, 2,true);
+        System.out.println(temp.coords[0]);
+        System.out.println(temp.coords[1]);
+        System.out.println(System.currentTimeMillis()-start);
+        Arrays.sort(waysArr,cmp);
+//        model.ways.sort(cmp);
+        System.out.println(waysArr[2].coords[0]);
+        System.out.println(waysArr[2].coords[1]);
         redraw();
     }
 
@@ -87,7 +110,7 @@ public class MapDraw {
         
         gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
 
-        for (var way : model.ways) {
+        for (var way : waysArr) {
             int mid = way.coords.length>>1;
             int trueMid = mid%2==0?mid:mid-1;
             double lon = way.coords[trueMid];
