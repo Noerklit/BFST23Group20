@@ -19,6 +19,12 @@ import Benchmark.TaskTimer;
 
 public class Model implements Serializable {
 
+    Comparator<Way> cmp = new Comparator<Way>() {
+        public int compare(Way o1, Way o2) {
+            return Integer.compare(o1.coords.length, o2.coords.length) *-1;
+        }
+    };
+
     public List<Way> ways = new ArrayList<Way>();
     
     public double minlat, maxlat, minlon, maxlon;
@@ -97,6 +103,7 @@ public class Model implements Serializable {
 
     private void parseOSM(InputStream inputStream) {
         OSMParser parser = new OSMParser(inputStream);
+        parser.getWays().sort(cmp);
         ways = parser.getWays();
         minlat = parser.getMinlat();
         minlon = parser.getMinlon();

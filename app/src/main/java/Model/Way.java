@@ -11,7 +11,13 @@ public class Way implements Serializable, Comparable<Way> {
     public double[] coords;
     DrawType drawType;
 
+    int trueMid;
+    public int xVal;
+    public int yVal;
+
     Long id;
+    public Way left;
+    Way right;
 
     public Way(ArrayList<Node> way, DrawType drawType, Long id) {
             coords = new double[way.size() * 2];
@@ -22,7 +28,10 @@ public class Way implements Serializable, Comparable<Way> {
             }
             this.drawType = drawType;
             this.id = id;
-
+            var mid = coords.length>>1;
+            trueMid = mid%2==0?mid:mid-1;
+            xVal = trueMid;
+            yVal = trueMid+1;
     }
 
 
