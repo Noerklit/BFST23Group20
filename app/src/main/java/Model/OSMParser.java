@@ -230,12 +230,13 @@ public class OSMParser {
                 if  (name == "relation" && addRelation) {
                     for(Way way : outerWays){
                         way.drawType = currentDrawType;
-                        ways.add(0,way);
+                        ways.add(way);
                     }
                 }
             }
             input.next();
         }
+        Collections.reverse(ways);
     }
 
     private String queryString(XMLStreamReader2 input, String localName) {
