@@ -3,7 +3,6 @@ package KDTree;
 import Model.Way;
 
 import java.util.List;
-import edu.princeton.cs.algs4.*;
 
 
 public class Quickselect {
@@ -38,7 +37,7 @@ public class Quickselect {
         return storeIndex;
     }
     private static int partition(List<Way> list, int left, int right, int pivotIndex, boolean isX){
-        var pivot = list.get(left).xVal;
+        var pivot = list.get(left + (int)(Math.random()%(right-left+1))).xVal;
         int i = left;
         int j = right+1;
 
@@ -61,7 +60,6 @@ public class Quickselect {
     }
 
     public static Way select(List<Way> list, int left, int right, int k, boolean isX){
-        StdRandom.shuffle(list.toArray());
         int pivotIndex;
         if (left == right){
             return list.get(left);

@@ -27,7 +27,7 @@ public class OSMParser {
     }
 
     public List<Way> getWays() {
-        ways.sort(cmp);
+//        ways.sort(cmp);
         return ways;
     }
 

@@ -100,11 +100,11 @@ public class Model implements Serializable {
     private void parseOSM(InputStream inputStream) {
         OSMParser parser = new OSMParser(inputStream);
         ways = parser.getWays();
-        System.out.println(ways.get(ways.size()>>1).coords[0]);
-        System.out.println(ways.get(ways.size()>>1).coords[1]);
-        var temp = Quickselect.select(ways,0,ways.size()-1, ways.size()>>1,true);
-        System.out.println(temp.coords[0]);
-        System.out.println(temp.coords[1]);
+//        System.out.println(ways.get(ways.size()>>1).coords[0]);
+//        System.out.println(ways.get(ways.size()>>1).coords[1]);
+//        var temp = Quickselect.select(ways,0,ways.size()-1, ways.size()>>1,true);
+//        System.out.println(temp.coords[0]);
+//        System.out.println(temp.coords[1]);
         minlat = parser.getMinlat();
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();
