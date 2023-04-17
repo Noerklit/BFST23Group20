@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.*;
 
 import javax.xml.stream.XMLStreamException;
+
+import KDTree.KDTree;
 import org.codehaus.stax2.*;
 
 import Benchmark.TaskTimer;
@@ -21,8 +23,10 @@ public class OSMParser {
 
     private ArrayList<Node> allNodes;
     private ArrayList<Way> allWays;
+    public KDTree kdTree;
 
     public OSMParser(InputStream inputStream) {
+        kdTree = new KDTree();
         mainOSMParsing(inputStream);
     }
 
@@ -174,6 +178,7 @@ public class OSMParser {
 
                     if (addWay) {
                         ways.add(wayToAdd);
+                        kdTree.insert(wayToAdd, true);
                     }
                 }
             }
@@ -241,7 +246,7 @@ public class OSMParser {
             }
             input.next();
         }
-        Collections.reverse(ways);
+//        Collections.reverse(ways);
     }
 
     private String queryString(XMLStreamReader2 input, String localName) {

@@ -24,6 +24,7 @@ public class Model implements Serializable {
     public List<Way> ways = new ArrayList<Way>();
 
     public double minlat, maxlat, minlon, maxlon;
+    public KDTree kdTree;
 
     public static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException {
         if (filename.endsWith(".obj")) {
@@ -44,7 +45,7 @@ public class Model implements Serializable {
         } else {
             throw new IOException("Could not find .osm.zip or .osm file");
         }
-//        save(filename+".obj");
+        save(filename+".obj");
     }
 
     void save(String filename) throws IOException {
@@ -100,6 +101,7 @@ public class Model implements Serializable {
     private void parseOSM(InputStream inputStream) {
         OSMParser parser = new OSMParser(inputStream);
         ways = parser.getWays();
+        kdTree = parser.kdTree;
         minlat = parser.getMinlat();
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();

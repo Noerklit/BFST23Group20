@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import Benchmark.TaskTimer;
+import KDTree.KDTree;
 import KDTree.Quickselect;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -48,6 +50,7 @@ public class MapDraw {
     public MapDraw(Model model, Canvas canvas) {
         this.model = model;
         this.waysArr = model.ways.toArray(new Way[0]);
+//        this.waysArr = model.ways;
         this.canvas = canvas;
         this.darkMode = false;
         this.debugMode = false;
@@ -66,15 +69,6 @@ public class MapDraw {
         zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
         scalingConst = (model.maxlat - model.minlat) / canvas.getHeight();
 
-        var start =  System.currentTimeMillis();
-        var temp = Quickselect.select(waysArr,0,waysArr.length-1, 2,true);
-        System.out.println(temp.coords[0]);
-        System.out.println(temp.coords[1]);
-        System.out.println(System.currentTimeMillis()-start);
-        Arrays.sort(waysArr,cmp);
-//        model.ways.sort(cmp);
-        System.out.println(waysArr[2].coords[0]);
-        System.out.println(waysArr[2].coords[1]);
         redraw();
     }
 
@@ -110,19 +104,50 @@ public class MapDraw {
         
         gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
 
-        for (var way : waysArr) {
-            int mid = way.coords.length>>1;
-            int trueMid = mid%2==0?mid:mid-1;
-            double lon = way.coords[trueMid];
-            double lat = way.coords[trueMid+1];
-            boolean inHorizontal = left < lon && lon < right;
-            boolean inVertical = up < lat && lat < down;
+//        for (var way : model.ways) {
+//            int mid = way.coords.length>>1;
+//            int trueMid = mid%2==0?mid:mid-1;
+//            double lon = way.coords[trueMid];
+//            double lat = way.coords[trueMid+1];
+//            boolean inHorizontal = left < lon && lon < right;
+//            boolean inVertical = up < lat && lat < down;
+//
+//            if (inHorizontal && inVertical) {
+//                way.draw(gc, defaultColorMap, fidelity);
+//            }
+//        }
 
-            if (inHorizontal && inVertical) {
-                way.draw(gc, defaultColorMap, fidelity);
-            }
-        }
+        Way current = model.kdTree.root;
+
+        traverse(current, left, right, up, down, true);
         FrameRateTimer.endFrame();
+    }
+
+    private Way traverse(Way current, double left, double right, double up, double down, boolean isX) {
+        boolean inRange;
+        boolean tooLeft;
+        if (current == null) {
+            return null;
+        }
+        boolean inHorizontal = left < current.xVal && current.xVal < right;
+        boolean inVertical = up > current.yVal && current.yVal > down;
+        inRange = left < current.xVal && current.xVal < right;
+        tooLeft = current.xVal < left;
+//        if (isX) {
+//        } else {
+//            inRange = up > current.yVal && current.yVal > down;
+//            tooLeft = current.yVal < down;
+//        }
+        if (inRange) {
+            current.draw(gc, defaultColorMap, fidelity);
+            traverse(current.left, left, right, up, down, !isX);
+            traverse(current.right, left, right, up, down, !isX);
+            return current;
+        }
+        if (tooLeft) {
+            return traverse(current.right, left, right, up, down, !isX);
+        }
+        return traverse(current.left, left, right, up, down, !isX);
     }
     
     

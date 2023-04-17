@@ -16,8 +16,8 @@ public class Way implements Serializable, Comparable<Way> {
     public double yVal;
 
     Long id;
-    public Way left;
-    public Way right;
+    public Way left = null;
+    public Way right = null;
 
     public Way(ArrayList<Node> way, DrawType drawType, Long id) {
             coords = new double[way.size() * 2];
