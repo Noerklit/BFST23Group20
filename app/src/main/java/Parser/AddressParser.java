@@ -69,21 +69,21 @@ public class AddressParser {
                 result = httpToString(connection);
             } else {
                 System.out.println("Could not connect to DAWA API\nStatus code: " + connection.getResponseCode());
-                List<String> return_strings = offlineParsing(searchFor);
-                return return_strings;
+                List<String> returnStrings = offlineParsing(searchFor);
+                return returnStrings;
             }
         } catch (Exception e) {
                 e.printStackTrace();
         }
 
         Address[] addresses = JsonParser.parseAddress(result);
-        List<String> return_strings = new ArrayList<>();
+        List<String> returnStrings = new ArrayList<>();
 
         for (Address address : addresses) {
-            return_strings.add(address.type + " " + address.forslagstekst);
+            returnStrings.add(address.type + " " + address.forslagstekst);
         }
 
-        return return_strings;
+        return returnStrings;
     }
 
     private static List<String> offlineParsing(String toParse) {

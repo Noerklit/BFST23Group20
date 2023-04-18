@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Trie {
     private TrieNode root; 
-    private List<String> return_strings = new ArrayList<>();
+    private List<String> returnStrings = new ArrayList<>();
 
     public Trie() {
         root = new TrieNode();
@@ -26,7 +26,7 @@ public class Trie {
 
     private void getSuggestions(TrieNode end, String word) {
         if (end.terminal) {
-            return_strings.add(word);
+            returnStrings.add(word);
         }
 
         for (int i = 0; i < 256; i++) {
@@ -55,6 +55,6 @@ public class Trie {
         }
           
         getSuggestions(current, word);
-        return return_strings;
+        return returnStrings;
     }
 }
