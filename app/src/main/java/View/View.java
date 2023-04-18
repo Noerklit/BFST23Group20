@@ -16,6 +16,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
 import java.io.File;
+import java.util.List;
 
 import org.checkerframework.checker.units.qual.mol;
 
@@ -167,7 +168,13 @@ public class View {
     }
 
     public void search(String text) {
-        System.out.println("Now searching for: " + text);
-        model.searchAddresses(text);
+        System.out.println("Now searching for: \"" + text + "\"");
+        List<String> addresses = model.searchAddresses(text);
+
+        if (addresses == null) return;
+
+        for (String address : addresses) {
+            System.out.println("Res: \"" + address + "\"");
+        }
     }
 }

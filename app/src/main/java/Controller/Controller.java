@@ -51,9 +51,11 @@ public class Controller {
 
     // Searchbar
     view.getSearchbar()
-        .setOnKeyPressed(event -> {
+        .setOnKeyTyped(event -> {
             String searchText = view.getSearchbar().getText();
-            view.search(searchText);
+            if (!searchText.equals("")) {
+                view.search(searchText);
+            }
     });
 
     view.getMenuBar()

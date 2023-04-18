@@ -125,13 +125,12 @@ public class Model implements Serializable {
         return null;
     }
 
-    public void searchAddresses(String text) {
-        System.out.println("About to");
+    public List<String> searchAddresses(String text) {
         try {
-            System.out.println("Will");
-            addressSearch.getAddresses(text);
+            return addressSearch.getAddresses(text);
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
     }
 }

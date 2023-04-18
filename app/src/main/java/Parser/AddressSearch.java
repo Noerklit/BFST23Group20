@@ -29,12 +29,9 @@ public class AddressSearch implements Serializable {
         addressesTrie.insert(address);
     }
 
-    public void getAddresses(String address) {
-        List<String> result = parse(address);         
-
-        for (String e : result) {
-            System.out.println(e);
-        }
+    public List<String> getAddresses(String text) {
+        List<String> result = search(text);
+        return result;
     }
 
     private String getUrlEncodedStr(String nonEncodedStr) {
@@ -56,17 +53,17 @@ public class AddressSearch implements Serializable {
         return false;
     }
 
-    private List<String> parse(String toParse) {
+    private List<String> search(String toParse) {
         List<String> result = new ArrayList<>(); 
         if (online) {
-            result = onlineParsing(toParse);
+            result = onlineSearch(toParse);
         } else {
-            result = offlineParsing(toParse);
+            result = offlineSearch(toParse);
         }
         return result;
     }
 
-    private List<String> onlineParsing(String searchFor) {
+    private List<String> onlineSearch(String searchFor) {
         String result = "";
 
         try {
@@ -77,7 +74,7 @@ public class AddressSearch implements Serializable {
                 result = httpToString(connection);
             } else {
                 System.out.println("Could not connect to DAWA API\nStatus code: " + connection.getResponseCode());
-                List<String> return_strings = offlineParsing(searchFor);
+                List<String> return_strings = offlineSearch(searchFor);
                 return return_strings;
             }
         } catch (Exception e) {
@@ -94,24 +91,7 @@ public class AddressSearch implements Serializable {
         return return_strings;
     }
 
-    private List<String> offlineParsing(String toParse) {
-        /*/
-        //Trie ourTrie = new Trie();
-        
-        String fileToLoadPath = "/home/cave/UNI/Map/BFST23Group20/app/data/addresses_static";
-        File file = new File(fileToLoadPath);
-        
-        List<String> FileLines = new ArrayList<>();
-        try {
-            List<String> lines = Files.readAllLines(file.toPath());
-            for (String line : lines) {
-                ourTrie.insert(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //*/
-
+    private List<String> offlineSearch(String toParse) {
         List<String> trieRes = addressesTrie.autoComplete(toParse);
         return trieRes;
     }

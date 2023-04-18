@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Trie implements Serializable {
     private TrieNode root; 
-    private List<String> returnStrings = new ArrayList<>();
+    private List<String> returnStrings;
 
     public Trie() {
         root = new TrieNode();
@@ -39,6 +39,8 @@ public class Trie implements Serializable {
 
 
     public List<String> autoComplete(String word) {
+        returnStrings = new ArrayList<>();
+        
         TrieNode current = root;
     
         char[] characterArrWord = word.toCharArray();
