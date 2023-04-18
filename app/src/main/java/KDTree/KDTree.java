@@ -13,19 +13,6 @@ public class KDTree implements Serializable {
 
     public Way root;
 
-//    private final Comparator<Way> compareX = new Comparator<Way>(){
-//        public int compare(Way way1, Way way2) {
-//            return Double.compare(way1.xVal, way2.xVal);
-//        }
-//    };
-//
-//
-//    private final Comparator<Way> compareY = new Comparator<Way>(){
-//        public int compare(Way way1, Way way2) {
-//            return Double.compare(way1.yVal, way2.yVal);
-//        }
-//    };
-
     public KDTree() {
     }
 
@@ -52,6 +39,7 @@ public class KDTree implements Serializable {
         }
         Way current = root;
         Way parent = null;
+        int depth = 0;
         while(current != null){
             parent = current;
             if(isX){
@@ -61,11 +49,14 @@ public class KDTree implements Serializable {
                 if(way.yVal < current.yVal) current = current.left;
                 else current = current.right;
             }
+            depth++;
         }
         if(isX){
+            way.depth = depth;
             if(way.xVal < parent.xVal) parent.left = way;
             else parent.right = way;
         } else {
+            way.depth = depth;
             if(way.yVal < parent.yVal) parent.left = way;
             else parent.right = way;
         }
