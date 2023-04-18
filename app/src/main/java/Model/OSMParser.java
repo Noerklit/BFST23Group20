@@ -40,6 +40,8 @@ public class OSMParser {
     }
 
     private void mainOSMParsing(InputStream inputStream) {
+        //System.out.println("løl");
+        //System.exit(0);
         TaskTimer.recordTask("Begin OSM parsing");
         
         try {
@@ -101,6 +103,7 @@ public class OSMParser {
     private void parseNodes(XMLStreamReader2 input) throws XMLStreamException {
 
         allNodes = new ArrayList<Node>();
+        Node currentNode = null;
 
         while (input.hasNext()) {
             if (input.isStartElement()) {
@@ -110,9 +113,16 @@ public class OSMParser {
                     var id = queryLong(input, "id");
                     var lat = queryDouble(input, "lat");
                     var lon = queryDouble(input, "lon");
-                    allNodes.add(new Node(lat, lon, id));
+                    currentNode = new Node(lat, lon, id);
+                    allNodes.add(currentNode);
                 } else if (name == "tag") {
-                    
+                    String k = queryString(input, "k");
+                    String v = queryString(input, "v");
+                    if (k.startsWith("addr:")) {
+                        setAddressInfo(currentNode, k, v);
+                    } else if (k.equals("osak:identifier")) {
+                        //System.out.println(currentNode.getAddress());
+                    }
                 } else {
                     break;
                 }
@@ -122,6 +132,31 @@ public class OSMParser {
 
         TaskTimer.recordTask("Sort node array");
         Collections.sort(allNodes);
+    }
+
+    private void setAddressInfo(Node node, String k, String v) {
+        
+        if (k.equals("addr:country")) {
+            node.setCountry(v);
+        }
+        if (k.equals("addr:municipality")) {
+            node.setMunicipality(v);
+        }
+        if (k.equals("addr:place")) {
+            node.setPlace(v);
+        }
+        if (k.equals("addr:postcode")) {
+            node.setPostcode(v);
+        }
+        if (k.equals("addr:city")) {
+            node.setCity(v);
+        }
+        if (k.equals("addr:housenumber")) {
+            node.setHousenumber(v);
+        }
+        if (k.equals("addr:street")) {
+            node.setStreet(v);
+        }
     }
 
     private void parseWays(XMLStreamReader2 input) throws XMLStreamException {
