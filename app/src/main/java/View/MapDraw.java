@@ -144,15 +144,19 @@ public class MapDraw {
         if (isX) {
             inRange = left < current.xVal && current.xVal < right;
             tooLeft = current.xVal < left;
-            gc.moveTo(current.xVal, up);
-            gc.lineTo(current.xVal, down);
-            gc.stroke();
+            if (current.depth < 7){
+                gc.moveTo(current.xVal, up);
+                gc.lineTo(current.xVal, down);
+                gc.stroke();
+            }
         } else {
             inRange = up < current.yVal && current.yVal < down;
             tooLeft = current.yVal < down;
-            gc.moveTo(left,current.yVal);
-            gc.lineTo(right,current.yVal);
-            gc.stroke();
+            if (current.depth < 7){
+                gc.moveTo(left,current.yVal);
+                gc.lineTo(right,current.yVal);
+                gc.stroke();
+            }
         }
         if (inRange) {
             current.draw(gc, defaultColorMap, fidelity);
