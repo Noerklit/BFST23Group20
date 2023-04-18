@@ -43,7 +43,7 @@ public class MapDraw {
 
     Comparator<Way> cmp = new Comparator<Way>() {
         public int compare(Way o1, Way o2) {
-            return Double.compare(o1.xVal, o1.yVal);
+            return Double.compare(o1.coords.length, o1.coords.length)*-1;
         }
     };
 
@@ -104,18 +104,19 @@ public class MapDraw {
         
         gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
 
-//        for (var way : model.ways) {
-//            int mid = way.coords.length>>1;
-//            int trueMid = mid%2==0?mid:mid-1;
-//            double lon = way.coords[trueMid];
-//            double lat = way.coords[trueMid+1];
-//            boolean inHorizontal = left < lon && lon < right;
-//            boolean inVertical = up < lat && lat < down;
-//
-//            if (inHorizontal && inVertical) {
-//                way.draw(gc, defaultColorMap, fidelity);
-//            }
-//        }
+        Collections.sort(model.ways, cmp);
+        for (var way : model.ways) {
+            int mid = way.coords.length>>1;
+            int trueMid = mid%2==0?mid:mid-1;
+            double lon = way.coords[trueMid];
+            double lat = way.coords[trueMid+1];
+            boolean inHorizontal = left < lon && lon < right;
+            boolean inVertical = up < lat && lat < down;
+
+            if (inHorizontal && inVertical) {
+                way.draw(gc, defaultColorMap, fidelity);
+            }
+        }
 
         Way current = model.kdTree.root;
 

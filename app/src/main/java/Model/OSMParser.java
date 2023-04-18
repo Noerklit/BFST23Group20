@@ -174,11 +174,14 @@ public class OSMParser {
 
                     Way wayToAdd = new Way(nodesToWay, currentDrawType, wayId);
 
+
                     allWays.add(wayToAdd);
 
                     if (addWay) {
-                        ways.add(wayToAdd);
-                        kdTree.insert(wayToAdd, true);
+                        if (currentDrawType.toString().contains("landuse") || currentDrawType.toString().contains("natural") || currentDrawType.toString().contains("wet"))
+                            ways.add(wayToAdd);
+                        else
+                            kdTree.insert(wayToAdd, true);
                     }
                 }
             }
