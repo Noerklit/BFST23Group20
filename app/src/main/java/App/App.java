@@ -10,7 +10,7 @@ import Model.Model;
 import View.View;
 import Benchmark.TaskTimer;
 import Controller.Controller;
-import Parser.AddressParser;
+import Parser.AddressSearch;
 import Parser.Trie;
 
 

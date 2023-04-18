@@ -1,10 +1,11 @@
 package Parser;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 // https://www.youtube.com/watch?v=3CbFFVHQrk4
 
-public class TrieNode {
+public class TrieNode implements Serializable {
     // private static char[] SYMTABLE = "abcdefghijklmnopqrstuwvxyzæøå0123456789áćéǵíj́ḱḿńóṕŕśúẃýźǽǿ,.-_'`& ";
     private static int SIZE = 256; // SYMTABLE.length();
     

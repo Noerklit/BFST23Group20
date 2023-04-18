@@ -2,7 +2,7 @@ package View;
 
 import Benchmark.FrameRateTimer;
 import Model.Model;
-
+import Parser.AddressSearch;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -17,6 +17,8 @@ import javafx.event.EventHandler;
 
 import java.io.File;
 
+import org.checkerframework.checker.units.qual.mol;
+
 public class View {
 
     private Canvas canvas;
@@ -24,10 +26,12 @@ public class View {
     private MenuBar menuBar;
     private TextField searchbar;
     private Scene scene;
+    private Model model;
 
     public View(Model model, Stage primaryStage) {
         this.canvas = new Canvas(600, 500);
         
+        this.model = model;
         this.mapDraw = new MapDraw(model, canvas);
 
         this.scene = createGeneralUi();
@@ -160,5 +164,10 @@ public class View {
             double deltaHeight = newVal.doubleValue() - oldVal.doubleValue();
             mapDraw.resizeCanvasHeight(deltaHeight);
         });
+    }
+
+    public void search(String text) {
+        System.out.println("Now searching for: " + text);
+        model.searchAddresses(text);
     }
 }

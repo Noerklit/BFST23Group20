@@ -8,17 +8,13 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import App.App;
 import javafx.scene.input.KeyEvent;
-import Parser.AddressParser;
+import Parser.AddressSearch;
 
 public class Controller {
-    private String search;
     private double lastX;
     private double lastY;
-    AddressParser parser;
 
     public Controller(Model model, View view) {
-    
-    parser = new AddressParser(); 
 
     view.getCanvas().setOnMousePressed(e -> {
         lastX = e.getX();
@@ -56,12 +52,8 @@ public class Controller {
     // Searchbar
     view.getSearchbar()
         .setOnKeyPressed(event -> {
-            try {
-                System.out.println("Now searching for: " + view.getSearchbar().getText());
-                parser.getAddresses(view.getSearchbar().getText());
-            } catch (Exception e) {
-                System.out.println(e);
-            }
+            String searchText = view.getSearchbar().getText();
+            view.search(searchText);
     });
 
     view.getMenuBar()

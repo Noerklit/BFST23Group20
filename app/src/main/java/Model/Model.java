@@ -16,8 +16,11 @@ import java.util.*;
 import java.util.zip.ZipInputStream;
 
 import Benchmark.TaskTimer;
+import Parser.AddressSearch;
 
 public class Model implements Serializable {
+
+    private AddressSearch addressSearch;
 
     public List<Way> ways = new ArrayList<Way>();
     
@@ -35,6 +38,8 @@ public class Model implements Serializable {
     
 
     public Model(String filename) throws IOException {
+        addressSearch = new AddressSearch();
+
         if (filename.endsWith(".osm.zip")) {
             parseZIP(filename);
         } else if (filename.endsWith(".osm")) {
@@ -42,6 +47,7 @@ public class Model implements Serializable {
         } else {
             throw new IOException("Could not find .osm.zip or .osm file");
         }
+
         save(filename+".obj");
     }
 
@@ -68,6 +74,9 @@ public class Model implements Serializable {
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();
         maxlon = parser.getMaxlon();
+        addressSearch.addAddress("hello world");
+        addressSearch.addAddress("hej");
+        addressSearch.addAddress("bro");
     }
 
     private DrawType keyValToDrawType(String key, String val) {
@@ -114,5 +123,15 @@ public class Model implements Serializable {
         }
 
         return null;
+    }
+
+    public void searchAddresses(String text) {
+        System.out.println("About to");
+        try {
+            System.out.println("Will");
+            addressSearch.getAddresses(text);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
