@@ -52,7 +52,7 @@ public class Controller {
     // Searchbar
     view.getSearchbar()
         .setOnKeyTyped(event -> {
-            String searchText = view.getSearchbar().getText();
+            String searchText = view.getSearchbar().getText().toLowerCase();
             if (!searchText.equals("")) {
                 view.search(searchText);
             }

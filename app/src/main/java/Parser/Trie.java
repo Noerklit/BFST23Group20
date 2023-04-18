@@ -37,7 +37,7 @@ public class Trie implements Serializable {
         }
     }
 
-
+    // Assumes word isn't an empty string
     public List<String> autoComplete(String word) {
         returnStrings = new ArrayList<>();
         
