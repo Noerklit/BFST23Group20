@@ -174,11 +174,10 @@ public class OSMParser {
 
                     Way wayToAdd = new Way(nodesToWay, currentDrawType, wayId);
 
-
                     allWays.add(wayToAdd);
 
                     if (addWay) {
-                        if (currentDrawType.toString().contains("landuse") || currentDrawType.toString().contains("natural") || currentDrawType.toString().contains("wet"))
+                        if ((currentDrawType.toString().contains("landuse") || currentDrawType.toString().contains("natural") || currentDrawType.toString().contains("wet")) && !currentDrawType.toString().contains("building"))
                             ways.add(wayToAdd);
                         else
                             kdTree.insert(wayToAdd, true);

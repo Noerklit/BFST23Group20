@@ -15,7 +15,7 @@ public class Way implements Serializable, Comparable<Way> {
     public double xVal;
     public double yVal;
 
-    Long id;
+    public Long id;
     public Way left = null;
     public Way right = null;
 

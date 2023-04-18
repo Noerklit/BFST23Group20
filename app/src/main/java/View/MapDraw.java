@@ -43,7 +43,13 @@ public class MapDraw {
 
     Comparator<Way> cmp = new Comparator<Way>() {
         public int compare(Way o1, Way o2) {
-            return Double.compare(o1.coords.length, o1.coords.length)*-1;
+            if (o1.coords.length < o2.coords.length){
+                return 1;
+            }
+            if (o1.coords.length > o2.coords.length){
+                return -1;
+            }
+            return 0;
         }
     };
 
@@ -62,13 +68,13 @@ public class MapDraw {
         debugCutoffFactor = .1;
 
         createColorMap();
-        
+
         calculateFidelity();
         System.out.println(model.maxlat);
         pan(-0.56*model.minlon, model.maxlat);
         zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
         scalingConst = (model.maxlat - model.minlat) / canvas.getHeight();
-
+        Collections.sort(model.ways, cmp);
         redraw();
     }
 
@@ -82,7 +88,7 @@ public class MapDraw {
         }
         //gc.setFill(Color.web("#6e8dff")); Blåt canvas
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        
+
         gc.setTransform(trans);
 
         if (debugMode) {
@@ -101,10 +107,9 @@ public class MapDraw {
 
         double left = getScreenLon(0 + cutoffFactor);
         double right = getScreenLon(1 - cutoffFactor);
-        
+
         gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
 
-        Collections.sort(model.ways, cmp);
         for (var way : model.ways) {
             int mid = way.coords.length>>1;
             int trueMid = mid%2==0?mid:mid-1;
@@ -116,6 +121,7 @@ public class MapDraw {
             if (inHorizontal && inVertical) {
                 way.draw(gc, defaultColorMap, fidelity);
             }
+
         }
 
         Way current = model.kdTree.root;
