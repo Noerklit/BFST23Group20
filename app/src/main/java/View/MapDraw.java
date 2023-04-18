@@ -165,7 +165,7 @@ public class MapDraw {
         redraw();
     }
     public void resizeCanvasHeight(double delta) {
-        double newCanvasHeight = canvas.getWidth() + delta;
+        double newCanvasHeight = canvas.getHeight() + delta;
         canvas.setHeight(newCanvasHeight);
         pan(0, delta/2);
         redraw();
