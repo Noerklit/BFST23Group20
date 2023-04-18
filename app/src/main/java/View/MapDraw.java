@@ -133,18 +133,27 @@ public class MapDraw {
     private Way traverse(Way current, double left, double right, double up, double down, boolean isX) {
         boolean inRange;
         boolean tooLeft;
+        gc.setLineWidth(1/Math.sqrt(trans.determinant()));
+        gc.setStroke(Color.web("#6e8dff"));
+        gc.beginPath();
         if (current == null) {
             return null;
         }
         boolean inHorizontal = left < current.xVal && current.xVal < right;
         boolean inVertical = up > current.yVal && current.yVal > down;
-        inRange = left < current.xVal && current.xVal < right;
-        tooLeft = current.xVal < left;
-//        if (isX) {
-//        } else {
-//            inRange = up > current.yVal && current.yVal > down;
-//            tooLeft = current.yVal < down;
-//        }
+        if (isX) {
+            inRange = left < current.xVal && current.xVal < right;
+            tooLeft = current.xVal < left;
+            gc.moveTo(current.xVal, up);
+            gc.lineTo(current.xVal, down);
+            gc.stroke();
+        } else {
+            inRange = up < current.yVal && current.yVal < down;
+            tooLeft = current.yVal < down;
+            gc.moveTo(left,current.yVal);
+            gc.lineTo(right,current.yVal);
+            gc.stroke();
+        }
         if (inRange) {
             current.draw(gc, defaultColorMap, fidelity);
             traverse(current.left, left, right, up, down, !isX);
