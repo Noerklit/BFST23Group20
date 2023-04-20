@@ -4,6 +4,7 @@ import Benchmark.FrameRateTimer;
 import Model.Model;
 import Parser.AddressSearch;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
@@ -53,6 +54,7 @@ public class View {
 //        TextField textField = new TextField("");
         this.menuBar = createMenuBar();
         this.searchbar = createSearchBar();
+        setSearchResults(null);
         var hBoxMenu = new HBox(menuBar,searchbar);
         hBoxMenu.setAlignment(Pos.CENTER);
 
@@ -90,9 +92,11 @@ public class View {
         return chooseFile;
     }
 
-    public TextField createSearchBar(){
+    private TextField createSearchBar(){
         TextField searchbar = new TextField("Search...");
         searchbar.setAlignment(Pos.CENTER);
+        ContextMenu contextMenu = new ContextMenu();
+        searchbar.setContextMenu(contextMenu);
 
         return searchbar;
     }
@@ -109,6 +113,36 @@ public class View {
 
     public Canvas getCanvas() {
         return canvas;
+    }
+
+    private void setSearchResults(List<String> itemStrings) {
+        ContextMenu contextMenu = searchbar.getContextMenu();
+        var contextMenuItems = contextMenu.getItems();
+        contextMenuItems.clear();
+
+        if (itemStrings != null) {
+            for (String itemString : itemStrings) {
+                MenuItem menuItem = new MenuItem(itemString);
+                menuItem.setOnAction(event -> {
+                    searchbar.setText(itemString);
+                    searchbar.positionCaret(itemString.length());
+                });
+                contextMenuItems.add(menuItem);
+            }
+        }
+
+        if (contextMenuItems.size() == 0) {
+            MenuItem menuItem = new MenuItem("No results");
+            contextMenuItems.add(menuItem);
+        }
+    }
+    public void showSearchResults() {
+        ContextMenu contextMenu = searchbar.getContextMenu();
+        contextMenu.show(searchbar, Side.BOTTOM, 0, 0);
+    }
+    public void hideSearchResults() {
+        ContextMenu contextMenu = searchbar.getContextMenu();
+        contextMenu.hide();
     }
 
     public void panMap(double dx, double dy) {
@@ -168,13 +202,11 @@ public class View {
     }
 
     public void search(String text) {
-        System.out.println("Now searching for: \"" + text + "\"");
-        List<String> addresses = model.searchAddresses(text);
-
-        if (addresses == null) return;
-
-        for (String address : addresses) {
-            System.out.println("Res: \"" + address + "\"");
+        if (text.equals("")) {
+            setSearchResults(null);
+        } else {
+            List<String> addresses = model.searchAddresses(text);
+            setSearchResults(addresses);
         }
     }
 }

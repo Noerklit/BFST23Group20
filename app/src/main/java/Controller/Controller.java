@@ -50,11 +50,20 @@ public class Controller {
     });
 
     // Searchbar
+    view.getSearchbar().setOnMouseClicked(event -> {
+        view.showSearchResults();
+    });
+    /*/
+    view.getSearchbar().setOnMouseExited(event -> {
+        view.hideSearchResults();
+    });
+    //*/
     view.getSearchbar()
         .setOnKeyTyped(event -> {
-            String searchText = view.getSearchbar().getText().toLowerCase();
-            if (!searchText.equals("")) {
+            String searchText = view.getSearchbar().getText();//.toLowerCase();
+            if (true) {
                 view.search(searchText);
+                view.showSearchResults();
             }
     });
 

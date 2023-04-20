@@ -76,53 +76,10 @@ public class Model implements Serializable {
         maxlon = parser.getMaxlon();
         addressSearch.addAddress("hello world");
         addressSearch.addAddress("hej");
+        addressSearch.addAddress("helium");
+        addressSearch.addAddress("hole");
         addressSearch.addAddress("bro");
-    }
-
-    private DrawType keyValToDrawType(String key, String val) {
-
-        switch (key) {
-            case "building":
-                return DrawType.building;
-            case "highway":
-                switch (val) {
-                    case "motorway":
-                        return DrawType.motorway;
-                    case "trunk":
-                        return DrawType.trunk;
-                    case "primary":
-                        return DrawType.primary;
-                    case "secondary":
-                        return DrawType.secondary;
-                    case "tertiary":
-                        return DrawType.tertiary;
-                    case "unclassified":
-                        return DrawType.unclassified;
-                    case "residential":
-                        return DrawType.residential;
-                    case "living_street":
-                        return DrawType.livingStreet;
-                    case "service":
-                        return DrawType.service;
-                    
-                }
-                break;
-            case "landuse":
-                switch(val) {
-                    case "forest":
-                        return DrawType.landuseFarmland;
-                    case "residential":
-                        return DrawType.landuseResidential; //Currently residential roads, not residential landuse.
-                }
-                break;
-        }
-
-        switch (val) {
-            case "coastline":
-                return DrawType.coastline;
-        }
-
-        return null;
+        addressSearch.addAddress("inhale helium");
     }
 
     public List<String> searchAddresses(String text) {
