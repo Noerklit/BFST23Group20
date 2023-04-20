@@ -139,12 +139,11 @@ public class MapDraw {
         if (current == null) {
             return null;
         }
-        boolean inHorizontal = left < current.xVal && current.xVal < right;
-        boolean inVertical = up > current.yVal && current.yVal > down;
+
         if (isX) {
             inRange = left < current.xVal && current.xVal < right;
             tooLeft = current.xVal < left;
-            if (current.depth < 7){
+            if (current.depth < 5){
                 gc.moveTo(current.xVal, up);
                 gc.lineTo(current.xVal, down);
                 gc.stroke();
@@ -152,7 +151,7 @@ public class MapDraw {
         } else {
             inRange = up < current.yVal && current.yVal < down;
             tooLeft = current.yVal < down;
-            if (current.depth < 7){
+            if (current.depth < 5){
                 gc.moveTo(left,current.yVal);
                 gc.lineTo(right,current.yVal);
                 gc.stroke();
