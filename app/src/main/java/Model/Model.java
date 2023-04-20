@@ -1,14 +1,11 @@
 package Model;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -17,14 +14,14 @@ import java.util.zip.ZipInputStream;
 
 import Benchmark.TaskTimer;
 import KDTree.KDTree;
-import KDTree.Quickselect;
 
 public class Model implements Serializable {
 
     public List<Way> ways = new ArrayList<Way>();
 
     public double minlat, maxlat, minlon, maxlon;
-    public KDTree kdTree;
+    public KDTree wayKDTree;
+    public KDTree backgroundKdtree;
 
     public static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException {
         if (filename.endsWith(".obj")) {
@@ -101,7 +98,8 @@ public class Model implements Serializable {
     private void parseOSM(InputStream inputStream) {
         OSMParser parser = new OSMParser(inputStream);
         ways = parser.getWays();
-        kdTree = parser.kdTree;
+        wayKDTree = parser.wayKDTree;
+        backgroundKdtree = parser.backgroundKdtree;
         minlat = parser.getMinlat();
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();

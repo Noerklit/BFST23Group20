@@ -1,13 +1,9 @@
 package View;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
-import Benchmark.TaskTimer;
-import KDTree.KDTree;
-import KDTree.Quickselect;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -69,12 +65,14 @@ public class MapDraw {
 
         createColorMap();
 
+        Collections.sort(model.ways, cmp);
         calculateFidelity();
         System.out.println(model.maxlat);
         pan(-0.56*model.minlon, model.maxlat);
         zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
         scalingConst = (model.maxlat - model.minlat) / canvas.getHeight();
-        Collections.sort(model.ways, cmp);
+//        pan(-100,-100);
+//        zoom(380, 340, 40);
         redraw();
     }
 
@@ -109,8 +107,9 @@ public class MapDraw {
         double right = getScreenLon(1 - cutoffFactor);
 
         gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
-
-        for (var way : model.ways) {
+//        System.out.println("hej med dig");
+        for (int i = model.ways.size()-1; i>0; i--) {
+            var way = model.ways.get(i);
             int mid = way.coords.length>>1;
             int trueMid = mid%2==0?mid:mid-1;
             double lon = way.coords[trueMid];
@@ -120,53 +119,76 @@ public class MapDraw {
 
             if (inHorizontal && inVertical) {
                 way.draw(gc, defaultColorMap, fidelity);
+            } else if (way.getDrawType() == DrawType.coastline) {
+                way.draw(gc, defaultColorMap, fidelity);
             }
 
         }
-
-        Way current = model.kdTree.root;
-
-        traverse(current, left, right, up, down);
+//        System.out.println("hej igen");
+        Way rootBackground = model.backgroundKdtree.root;
+        Way rootWay = model.wayKDTree.root;
+        traverse(rootBackground, left, right, up, down, 0);
+        traverse(rootWay, left, right, up, down, 0);
+//        System.out.println(getTreeDepth(current,0));
+//        System.out.println("traverse done");
         FrameRateTimer.endFrame();
     }
 
-    private Way traverse(Way current, double left, double right, double up, double down) {
+    private void traverse(Way current, double left, double right, double up, double down, int recLimit) {
         boolean inRange;
-        boolean tooLeft;
-        gc.setLineWidth(1/Math.sqrt(trans.determinant()));
-        gc.setStroke(Color.web("#6e8dff"));
-        gc.beginPath();
+        boolean tooSmall;
+//        gc.setLineWidth(1/Math.sqrt(trans.determinant()));
+//        gc.setStroke(Color.web("#6e8dff"));
+//        gc.beginPath();
+//        if (recLimit > 30) {
+//            return;
+//        }
         if (current == null) {
-            return null;
+//            System.out.println("igen igen");
+            return;
         }
 
         if (current.depth%2==0) {
             inRange = left < current.xVal && current.xVal < right;
-            tooLeft = current.xVal < left;
-            if (current.depth < 10){
-                gc.moveTo(current.xVal, up);
-                gc.lineTo(current.xVal, down);
-                gc.stroke();
-            }
+            tooSmall = current.xVal < left;
+//            if (current.depth < 10){
+//                gc.moveTo(current.xVal, up);
+//                gc.lineTo(current.xVal, down);
+//                gc.stroke();
+//            }
         } else {
             inRange = up < current.yVal && current.yVal < down;
-            tooLeft = current.yVal < up;
-            if (current.depth < 10){
-                gc.moveTo(left,current.yVal);
-                gc.lineTo(right,current.yVal);
-                gc.stroke();
-            }
+            tooSmall = current.yVal > down;
+//            if (current.depth < 10){
+//                gc.moveTo(left,current.yVal);
+//                gc.lineTo(right,current.yVal);
+//                gc.stroke();
+//            }
         }
         if (inRange) {
+//            System.out.println("hello there");
             current.draw(gc, defaultColorMap, fidelity);
-            traverse(current.left, left, right, up, down);
-            traverse(current.right, left, right, up, down);
-            return current;
+            traverse(current.left, left, right, up, down, recLimit+1);
+            traverse(current.right, left, right, up, down, recLimit+1);
+            return;
         }
-        if (tooLeft) {
-            return traverse(current.right, left, right, up, down);
+        if (tooSmall) {
+            traverse(current.right, left, right, up, down, recLimit+1);
+        } else {
+            traverse(current.left, left, right, up, down, recLimit +1);
         }
-        return traverse(current.left, left, right, up, down);
+    }
+
+    private int getTreeDepth(Way current, int largest) {
+        if (current == null) {
+            return largest;
+        }
+        if (current.depth > largest) {
+            largest = current.depth;
+        }
+        largest = getTreeDepth(current.left, largest);
+        largest = getTreeDepth(current.right, largest);
+        return largest;
     }
     
     

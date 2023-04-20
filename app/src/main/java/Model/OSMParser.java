@@ -23,10 +23,12 @@ public class OSMParser {
 
     private ArrayList<Node> allNodes;
     private ArrayList<Way> allWays;
-    public KDTree kdTree;
+    public KDTree wayKDTree;
+    public KDTree backgroundKdtree;
 
     public OSMParser(InputStream inputStream) {
-        kdTree = new KDTree();
+        wayKDTree = new KDTree();
+        backgroundKdtree = new KDTree();
         mainOSMParsing(inputStream);
     }
 
@@ -177,10 +179,15 @@ public class OSMParser {
                     allWays.add(wayToAdd);
 
                     if (addWay) {
-                        if ((currentDrawType.toString().contains("landuse") || currentDrawType.toString().contains("natural") || currentDrawType.toString().contains("wet")) && !currentDrawType.toString().contains("building"))
-                            ways.add(wayToAdd);
+                        if (
+                            (currentDrawType.toString().contains("landuse") ||
+                            currentDrawType.toString().contains("natural") ||
+                            currentDrawType.toString().contains("wet") ||
+                            currentDrawType == DrawType.coastline) &&
+                            !currentDrawType.toString().contains("building"))
+                            backgroundKdtree.insert(wayToAdd);
                         else
-                            kdTree.insert(wayToAdd);
+                            wayKDTree.insert(wayToAdd);
                     }
                 }
             }
@@ -242,7 +249,8 @@ public class OSMParser {
                 if  (name == "relation" && addRelation) {
                     for(Way way : outerWays){
                         way.drawType = currentDrawType;
-                        ways.add(way);
+                        backgroundKdtree.insert(way);
+//                        ways.add(way);
                     }
                 }
             }

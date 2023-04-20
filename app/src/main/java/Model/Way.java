@@ -78,4 +78,8 @@ public class Way implements Serializable, Comparable<Way> {
     public int compareTo(Way otherWay) {
         return Long.compare(id, otherWay.id);
     }
+
+    public DrawType getDrawType() {
+        return drawType;
+    }
 }
