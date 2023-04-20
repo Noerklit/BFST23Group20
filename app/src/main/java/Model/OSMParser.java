@@ -10,8 +10,8 @@ import org.codehaus.stax2.*;
 import Benchmark.TaskTimer;
 
 public class OSMParser {
-
     private List<Way> ways = new ArrayList<Way>();
+    private List<Way> closedOuterWays = new ArrayList<Way>();
 
     private double minlat, maxlat, minlon, maxlon;
 
@@ -25,7 +25,9 @@ public class OSMParser {
     public List<Way> getWays() {
         return ways;
     }
-
+    public List<Way> getOuterWays() {
+        return closedOuterWays;
+    }
     public double getMinlat() {
         return minlat;
     }
@@ -202,6 +204,7 @@ public class OSMParser {
                     ArrayList<Node> empty = new ArrayList<>();
 
                     if ((type.equals("way")) && (role.equals("outer"))) {
+                        //System.out.println("Now binary searching with " + ref);
                         var index = Collections.binarySearch(allWays, new Way(empty,null, ref));
 
                         if (index >= 0) {
@@ -226,11 +229,19 @@ public class OSMParser {
                     break;
                 }
             } else if (input.isEndElement()) {
+                // var name = input.getLocalName();
+                // if  (name == "relation" && addRelation) {
+                //     for(Way way : outerWays){
+                //         way.drawType = currentDrawType;
+                //         ways.add(way);
+                //     }
+                // }
                 var name = input.getLocalName();
                 if  (name == "relation" && addRelation) {
-                    for(Way way : outerWays){
-                        way.drawType = currentDrawType;
-                        ways.add(way);
+                    closedOuterWays = Multipolygon.outerRingAssignment(outerWays);
+                    for (Way wayXX : closedOuterWays) {
+                        wayXX.drawType = currentDrawType;
+                        ways.add(wayXX);
                     }
                 }
             }

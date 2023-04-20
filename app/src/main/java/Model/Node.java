@@ -1,6 +1,7 @@
 package Model;
+import java.io.Serializable;
 
-public class Node implements Comparable<Node> {
+public class Node implements Comparable<Node>, Serializable {
     double lat, lon;
     Long id;
 
@@ -12,5 +13,9 @@ public class Node implements Comparable<Node> {
     @Override
     public int compareTo(Node otherNode){
         return Long.compare(id, otherNode.id);
+    }
+
+    public long getId() {
+        return id;
     }
 }

@@ -87,6 +87,19 @@ public class MapDraw {
         
         gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
 
+        for (var way : model.closedOuterWays) {
+            int mid = way.coords.length/2;
+            int trueMid = mid%2==0?mid:mid-1;
+            double lon = way.coords[trueMid];
+            double lat = way.coords[trueMid+1];
+            boolean inHorizontal = left < lon && lon < right;
+            boolean inVertical = up < lat && lat < down;
+
+            if (inHorizontal && inVertical) {
+                way.draw(gc, defaultColorMap, fidelity);
+            }
+        }
+
         for (var way : model.ways) {
             int mid = way.coords.length/2;
             int trueMid = mid%2==0?mid:mid-1;
@@ -99,6 +112,7 @@ public class MapDraw {
                 way.draw(gc, defaultColorMap, fidelity);
             }
         }
+
         FrameRateTimer.endFrame();
     }
     

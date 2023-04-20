@@ -12,23 +12,58 @@ public class Way implements Serializable, Comparable<Way> {
     DrawType drawType;
 
     Long id;
+    Long firstNodeId;
+    Long lastNodeId;
+    ArrayList<Node> way;
 
     public Way(ArrayList<Node> way, DrawType drawType, Long id) {
-            coords = new double[way.size() * 2];
-            for (int i = 0; i < way.size(); ++i) {
-                var node = way.get(i);
-                coords[2 * i] = 0.56 * node.lon;
-                coords[2 * i + 1] = -node.lat;
-            }
-            this.drawType = drawType;
-            this.id = id;
+        coords = new double[way.size() * 2];
+        for (int i = 0; i < way.size(); ++i) {
+            var node = way.get(i);
+            coords[2 * i] = 0.56 * node.lon;
+            coords[2 * i + 1] = -node.lat;
+        }
+        this.drawType = drawType;
+        this.id = id;
+        if (way.size()>0){
+            firstNodeId = way.get(0).getId();
+            lastNodeId = way.get(way.size()-1).getId();
+        }
 
+        this.way = new ArrayList<>(way);
+    }
+
+    public void addNodes(ArrayList<Node> test, ArrayList<Node> toAdd) {
+        way = new ArrayList<>(toAdd);
+
+        for (Node e : test) {
+            way.add(e);
+        }
+        firstNodeId = way.get(0).getId();
+        lastNodeId = way.get(way.size()-1).getId();
+    }
+    
+    public ArrayList<Node> getNodeList() {
+        return way;
+    }
+
+    public long getFirstNodeId() {
+        return firstNodeId;
+    }
+
+    public long getLastNodeId() {
+        return lastNodeId;
     }
 
 
-
     public void draw(GraphicsContext gc, HashMap<DrawType, Color> colorMap, int fidelity) {
+        if (drawType == null) {
+            //System.out.println("HIT ME");
+            //drawType = DrawType.coastline;
+        }
+
         Color color = colorMap.get(drawType);
+
         if(drawType.fidelity <= fidelity) {
             makePath(gc, fidelity);
             if(drawType.shouldFill) {
