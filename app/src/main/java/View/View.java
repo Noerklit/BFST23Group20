@@ -94,7 +94,8 @@ public class View {
 
     private TextField createSearchBar(){
         TextField searchbar = new TextField("Search...");
-        searchbar.setAlignment(Pos.CENTER);
+        //searchbar.setAlignment(Pos.CENTER);
+        searchbar.setMinWidth(canvas.getWidth() - 300);
         ContextMenu contextMenu = new ContextMenu();
         searchbar.setContextMenu(contextMenu);
 
@@ -114,20 +115,25 @@ public class View {
     public Canvas getCanvas() {
         return canvas;
     }
-
     private void setSearchResults(List<String> itemStrings) {
+        setSearchResults(itemStrings, Integer.MAX_VALUE);
+    }
+    private void setSearchResults(List<String> itemStrings, int cap) {
         ContextMenu contextMenu = searchbar.getContextMenu();
         var contextMenuItems = contextMenu.getItems();
         contextMenuItems.clear();
 
         if (itemStrings != null) {
+            int itemCount = 0;
             for (String itemString : itemStrings) {
-                MenuItem menuItem = new MenuItem(itemString);
+                itemCount++;
+                MenuItem menuItem = new MenuItem(itemCount + ": " + itemString);
                 menuItem.setOnAction(event -> {
                     searchbar.setText(itemString);
                     searchbar.positionCaret(itemString.length());
                 });
                 contextMenuItems.add(menuItem);
+                if (itemCount >= cap) break;
             }
         }
 
@@ -206,7 +212,7 @@ public class View {
             setSearchResults(null);
         } else {
             List<String> addresses = model.searchAddresses(text);
-            setSearchResults(addresses);
+            setSearchResults(addresses, 21);
         }
     }
 }
