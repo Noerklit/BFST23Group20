@@ -74,12 +74,9 @@ public class Model implements Serializable {
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();
         maxlon = parser.getMaxlon();
-        addressSearch.addAddress("hello world");
-        addressSearch.addAddress("hej");
-        addressSearch.addAddress("helium");
-        addressSearch.addAddress("hole");
-        addressSearch.addAddress("bro");
-        addressSearch.addAddress("inhale helium");
+        for (String address : parser.getAddresses()) {
+            addressSearch.addAddress(address);
+        }
     }
 
     public List<String> searchAddresses(String text) {

@@ -18,6 +18,8 @@ public class OSMParser {
     private ArrayList<Node> allNodes;
     private ArrayList<Way> allWays;
 
+    private ArrayList<String> addresses;
+
     public OSMParser(InputStream inputStream) {
         mainOSMParsing(inputStream);
     }
@@ -37,6 +39,10 @@ public class OSMParser {
     }
     public double getMaxlon() {
         return maxlon;
+    }
+
+    public List<String> getAddresses() {
+        return addresses;
     }
 
     private void mainOSMParsing(InputStream inputStream) {
@@ -103,6 +109,7 @@ public class OSMParser {
     private void parseNodes(XMLStreamReader2 input) throws XMLStreamException {
 
         allNodes = new ArrayList<Node>();
+        addresses = new ArrayList<String>();
         Node currentNode = null;
 
         while (input.hasNext()) {
@@ -121,7 +128,7 @@ public class OSMParser {
                     if (k.startsWith("addr:")) {
                         setAddressInfo(currentNode, k, v);
                     } else if (k.equals("osak:identifier")) {
-                        //System.out.println(currentNode.getAddress());
+                        addresses.add(currentNode.getAddress());
                     }
                 } else {
                     break;

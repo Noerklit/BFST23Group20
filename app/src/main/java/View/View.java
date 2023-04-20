@@ -126,6 +126,11 @@ public class View {
         if (itemStrings != null) {
             int itemCount = 0;
             for (String itemString : itemStrings) {
+                if (itemCount >= cap) {
+                    MenuItem menuItem = new MenuItem("--- Cap ---");
+                    contextMenuItems.add(menuItem);
+                    break;
+                }
                 itemCount++;
                 MenuItem menuItem = new MenuItem(itemCount + ": " + itemString);
                 menuItem.setOnAction(event -> {
@@ -133,7 +138,6 @@ public class View {
                     searchbar.positionCaret(itemString.length());
                 });
                 contextMenuItems.add(menuItem);
-                if (itemCount >= cap) break;
             }
         }
 
