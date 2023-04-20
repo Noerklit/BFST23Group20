@@ -180,7 +180,7 @@ public class OSMParser {
                         if ((currentDrawType.toString().contains("landuse") || currentDrawType.toString().contains("natural") || currentDrawType.toString().contains("wet")) && !currentDrawType.toString().contains("building"))
                             ways.add(wayToAdd);
                         else
-                            kdTree.insert(wayToAdd, true);
+                            kdTree.insert(wayToAdd);
                     }
                 }
             }

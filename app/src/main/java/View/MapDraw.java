@@ -126,11 +126,11 @@ public class MapDraw {
 
         Way current = model.kdTree.root;
 
-        traverse(current, left, right, up, down, true);
+        traverse(current, left, right, up, down);
         FrameRateTimer.endFrame();
     }
 
-    private Way traverse(Way current, double left, double right, double up, double down, boolean isX) {
+    private Way traverse(Way current, double left, double right, double up, double down) {
         boolean inRange;
         boolean tooLeft;
         gc.setLineWidth(1/Math.sqrt(trans.determinant()));
@@ -140,18 +140,18 @@ public class MapDraw {
             return null;
         }
 
-        if (isX) {
+        if (current.depth%2==0) {
             inRange = left < current.xVal && current.xVal < right;
             tooLeft = current.xVal < left;
-            if (current.depth < 5){
+            if (current.depth < 10){
                 gc.moveTo(current.xVal, up);
                 gc.lineTo(current.xVal, down);
                 gc.stroke();
             }
         } else {
             inRange = up < current.yVal && current.yVal < down;
-            tooLeft = current.yVal < down;
-            if (current.depth < 5){
+            tooLeft = current.yVal < up;
+            if (current.depth < 10){
                 gc.moveTo(left,current.yVal);
                 gc.lineTo(right,current.yVal);
                 gc.stroke();
@@ -159,14 +159,14 @@ public class MapDraw {
         }
         if (inRange) {
             current.draw(gc, defaultColorMap, fidelity);
-            traverse(current.left, left, right, up, down, !isX);
-            traverse(current.right, left, right, up, down, !isX);
+            traverse(current.left, left, right, up, down);
+            traverse(current.right, left, right, up, down);
             return current;
         }
         if (tooLeft) {
-            return traverse(current.right, left, right, up, down, !isX);
+            return traverse(current.right, left, right, up, down);
         }
-        return traverse(current.left, left, right, up, down, !isX);
+        return traverse(current.left, left, right, up, down);
     }
     
     

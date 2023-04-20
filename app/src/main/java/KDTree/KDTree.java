@@ -37,12 +37,12 @@ public class KDTree implements Serializable {
     /**
      *
      * @param way2Insert the way we want to insert in the KD-tree
-     * @param isX is the way we are trying to insert on a x- or y- level
      * @return the root of the tree
      */
-    public Way insert(Way way2Insert, boolean isX){
+    public Way insert(Way way2Insert){
         if(root == null) {
             root = way2Insert;
+            root.depth = 0;
             return root;
         }
         Way parent = null;
@@ -50,7 +50,7 @@ public class KDTree implements Serializable {
         int depth = 0;
         while(current != null){
             parent = current;
-            if(isX){
+            if(depth%2==0){
                 if(way2Insert.xVal < current.xVal) current = current.left;
                 else current = current.right;
             } else {
@@ -59,7 +59,7 @@ public class KDTree implements Serializable {
             }
             depth++;
         }
-        if(isX){
+        if(depth%2!=0){
             way2Insert.depth = depth;
             if(way2Insert.xVal < parent.xVal) parent.left = way2Insert;
             else parent.right = way2Insert;
