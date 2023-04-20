@@ -45,19 +45,35 @@ public class Trie implements Serializable {
     
         char[] characterArrWord = word.toCharArray();
 
-        // Check if it even exists
-        if (current.getChild(characterArrWord[0]) == null) {
-            return null;
-        }
+        String autoCompletedWord = "";
 
         // Get end of string
         for ( char c : characterArrWord ) {
+            char upperCaseC = Character.toUpperCase(c);
             if ( current.getChild(c) != null ) {
                 current = current.getChild(c);
+                autoCompletedWord += c;
+            } else if (current.getChild(upperCaseC) != null) {
+                current = current.getChild(upperCaseC);
+                autoCompletedWord += upperCaseC;
+            } else if (current.getChild('.') != null) { // Doesn't work completely yet
+                current = current.getChild('.');
+                autoCompletedWord += '.';
+            } else {
+                return null;
             }
         }
           
-        getSuggestions(current, word);
+        getSuggestions(current, autoCompletedWord);
         return returnStrings;
+    }
+
+    private boolean tempName(char c, TrieNode current, String autoCompletedWord) {
+        if ( current.getChild(c) != null ) {
+            current = current.getChild(c);
+            autoCompletedWord += c;
+            return true;
+        }
+        return false;
     }
 }
