@@ -41,8 +41,9 @@ public class KDTree implements Serializable {
      */
     public Way insert(Way way2Insert){
         if(root == null) {
+            way2Insert.depth = 0;
             root = way2Insert;
-            root.depth = 0;
+            // root.depth = 0;
             return root;
         }
         Way parent = null;
