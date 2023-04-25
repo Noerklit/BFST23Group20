@@ -131,7 +131,7 @@ public class MapDraw {
         gc.beginPath();
         traverse(rootBackground, left, right, up, down);
         traverse(rootWay, left, right, up, down);
-        traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
+        //traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
 
         FrameRateTimer.endFrame();
     }
