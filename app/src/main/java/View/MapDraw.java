@@ -124,61 +124,143 @@ public class MapDraw {
             }
 
         }
-//        System.out.println("hej igen");
+
         Way rootBackground = model.backgroundKdtree.root;
         Way rootWay = model.wayKDTree.root;
-        traverse(rootBackground, left, right, up, down, 0);
-        traverse(rootWay, left, right, up, down, 0);
-//        System.out.println(getTreeDepth(current,0));
-//        System.out.println("traverse done");
+        gc.setLineWidth(1/Math.sqrt(trans.determinant()));
+        gc.beginPath();
+        traverse(rootBackground, left, right, up, down);
+        traverse(rootWay, left, right, up, down);
+        traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
+
         FrameRateTimer.endFrame();
     }
 
-    private void traverse(Way current, double left, double right, double up, double down, int recLimit) {
+    private void traverse(
+            Way current,
+            double left,
+            double right,
+            double up,
+            double down)
+    {
         boolean inRange;
         boolean tooSmall;
-//        gc.setLineWidth(1/Math.sqrt(trans.determinant()));
-//        gc.setStroke(Color.web("#6e8dff"));
-//        gc.beginPath();
-//        if (recLimit > 30) {
-//            return;
-//        }
         if (current == null) {
-//            System.out.println("igen igen");
             return;
         }
 
         if (current.depth%2==0) {
             inRange = left < current.xVal && current.xVal < right;
             tooSmall = current.xVal < left;
-//            if (current.depth < 10){
-//                gc.moveTo(current.xVal, up);
-//                gc.lineTo(current.xVal, down);
-//                gc.stroke();
-//            }
         } else {
             inRange = up < current.yVal && current.yVal < down;
             tooSmall = current.yVal > down;
-//            if (current.depth < 10){
-//                gc.moveTo(left,current.yVal);
-//                gc.lineTo(right,current.yVal);
-//                gc.stroke();
-//            }
         }
         if (inRange) {
-//            System.out.println("hello there");
             current.draw(gc, defaultColorMap, fidelity);
-            traverse(current.left, left, right, up, down, recLimit+1);
-            traverse(current.right, left, right, up, down, recLimit+1);
+            traverse(current.left, left, right, up, down);
+            traverse(current.right, left, right, up, down);
             return;
         }
         if (tooSmall) {
-            traverse(current.right, left, right, up, down, recLimit+1);
+            traverse(current.right, left, right, up, down);
         } else {
-            traverse(current.left, left, right, up, down, recLimit +1);
+            traverse(current.left, left, right, up, down);
         }
     }
+    private void traverseDebug(
+            Way current,
+            double left,
+            double right,
+            double up,
+            double down,
+            double leftDraw,
+            double rightDraw,
+            double upDraw,
+            double downDraw,
+            int depthDraw)
+    {
+        boolean inRange;
+        boolean tooSmall;
+        if (current == null) {
+            return;
+        }
+        depthDraw = (current.getDrawType().fidelity+1)*2;
+//        int currFidelity = 20;
 
+        if (current.depth%2==0) {
+            inRange = left < current.xVal && current.xVal < right;
+            tooSmall = current.xVal < left;
+            if (current.depth < depthDraw){
+//                System.out.println("left: " + left + " right: " + right + " up: " + up + " Down: " + down);
+//                System.out.println(current.getDrawType());
+//                gc.stroke();
+                gc.setStroke(Color.web("#ff0000"));
+                gc.moveTo(current.xVal, upDraw);
+                gc.lineTo(current.xVal, downDraw);
+                gc.stroke();
+            }
+        } else {
+            inRange = up < current.yVal && current.yVal < down;
+            tooSmall = current.yVal > down;
+            if (current.depth < depthDraw){
+//                System.out.println("left: " + left + " right: " + right + " up: " + up + " Down: " + down);
+//                System.out.println(current.getDrawType());
+                gc.setStroke(Color.web("#ff0000"));
+                gc.moveTo(leftDraw,current.yVal);
+                gc.lineTo(rightDraw,current.yVal);
+                gc.stroke();
+            }
+        }
+        if (inRange) {
+            traverseDebug(
+                    current.left,
+                    left,
+                    right,
+                    up,
+                    down,
+                    leftDraw,
+                    current.xVal,
+                    upDraw,
+                    current.yVal,
+                    depthDraw);
+            traverseDebug(
+                    current.right,
+                    left,
+                    right,
+                    up,
+                    down,
+                    current.xVal,
+                    rightDraw,
+                    current.yVal,
+                    downDraw, depthDraw);
+            return;
+        }
+        if (tooSmall) {
+            traverseDebug(
+                    current.right,
+                    left,
+                    right,
+                    up,
+                    down,
+                    current.xVal,
+                    right,
+                    current.yVal,
+                    down, depthDraw);
+        } else {
+            traverseDebug(
+                    current.left,
+                    left,
+                    right,
+                    up,
+                    down,
+                    left,
+                    current.xVal,
+                    up,
+                    current.yVal,
+                    depthDraw);
+        }
+    }
     private int getTreeDepth(Way current, int largest) {
         if (current == null) {
             return largest;
