@@ -14,12 +14,12 @@ import Benchmark.TaskTimer;
 public class OSMParser {
     Comparator<Way> cmp = new Comparator<Way>() {
         public int compare(Way o1, Way o2) {
-            return Double.compare(o1.xVal, o2.xVal) *-1;
+            return Float.compare(o1.xVal, o2.xVal) *-1;
         }
     };
     private List<Way> ways = new ArrayList<Way>();
 
-    private double minlat, maxlat, minlon, maxlon;
+    private float minlat, maxlat, minlon, maxlon;
 
     private ArrayList<Node> allNodes;
     private ArrayList<Way> allWays;
@@ -37,16 +37,16 @@ public class OSMParser {
         return ways;
     }
 
-    public double getMinlat() {
+    public float getMinlat() {
         return minlat;
     }
-    public double getMaxlat() {
+    public float getMaxlat() {
         return maxlat;
     }
-    public double getMinlon() {
+    public float getMinlon() {
         return minlon;
     }
-    public double getMaxlon() {
+    public float getMaxlon() {
         return maxlon;
     }
 
@@ -97,10 +97,10 @@ public class OSMParser {
             if (input.isStartElement()) {
                 var name = input.getLocalName();
                 if (name == "bounds") {
-                    minlat = queryDouble(input, "minlat");
-                    maxlat = queryDouble(input, "maxlat");
-                    minlon = queryDouble(input, "minlon");
-                    maxlon = queryDouble(input, "maxlon");
+                    minlat = queryFloat(input, "minlat");
+                    maxlat = queryFloat(input, "maxlat");
+                    minlon = queryFloat(input, "minlon");
+                    maxlon = queryFloat(input, "maxlon");
                 } else {
                     break;
                 }
@@ -119,8 +119,8 @@ public class OSMParser {
                 if (name == "node") {
                     TaskTimer.incrementSubtask();
                     var id = queryLong(input, "id");
-                    var lat = queryDouble(input, "lat");
-                    var lon = queryDouble(input, "lon");
+                    var lat = queryFloat(input, "lat");
+                    var lon = queryFloat(input, "lon");
                     allNodes.add(new Node(lat, lon, id));
                 } else if (name == "tag") {
                     
@@ -262,8 +262,8 @@ public class OSMParser {
     private String queryString(XMLStreamReader2 input, String localName) {
         return input.getAttributeValue(null, localName);
     }
-    private double queryDouble(XMLStreamReader2 input, String localName) {
-        return Double.parseDouble(queryString(input, localName));
+    private float queryFloat(XMLStreamReader2 input, String localName) {
+        return Float.parseFloat(queryString(input, localName));
     }
     private long queryLong(XMLStreamReader2 input, String localName) {
         return Long.parseLong(queryString(input, localName));
@@ -275,27 +275,13 @@ public class OSMParser {
             case "building":
                 return DrawType.building;
             case "highway":
-                switch (val) {
-                    case "motorway":
-                        return DrawType.motorway;
-                    case "trunk":
-                        return DrawType.trunk;
-                    case "primary":
-                        return DrawType.primary;
-                    case "secondary":
-                        return DrawType.secondary;
-                    case "tertiary":
-                        return DrawType.tertiary;
-                    case "unclassified":
-                        return DrawType.unclassified;
-                    case "residential":
-                        return DrawType.residential;
-                    case "living_street":
-                        return DrawType.livingStreet;
-                    case "service":
-                        return DrawType.service;
+                try
+                {
+                    return DrawType.valueOf(val);
+                } catch (Exception e)
+                {
+                    break;
                 }
-                break;
             case "landuse":
                 switch(val) {
                     case "farmland":

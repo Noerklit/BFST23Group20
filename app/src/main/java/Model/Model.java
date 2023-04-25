@@ -128,7 +128,7 @@ public class Model implements Serializable {
                     case "residential":
                         return DrawType.residential;
                     case "living_street":
-                        return DrawType.livingStreet;
+                        return DrawType.living_street;
                     case "service":
                         return DrawType.service;
 

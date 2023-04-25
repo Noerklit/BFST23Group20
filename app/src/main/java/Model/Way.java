@@ -8,12 +8,12 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Way implements Serializable, Comparable<Way> {
-    public double[] coords;
+    public float[] coords;
     DrawType drawType;
 
     int trueMid;
-    public double xVal;
-    public double yVal;
+    public float xVal;
+    public float yVal;
 
     public Long id;
     public Way left = null;
@@ -21,10 +21,10 @@ public class Way implements Serializable, Comparable<Way> {
     public int depth;
 
     public Way(ArrayList<Node> way, DrawType drawType, Long id) {
-            coords = new double[way.size() * 2];
+            coords = new float[way.size() * 2];
             for (int i = 0; i < way.size(); ++i) {
                 var node = way.get(i);
-                coords[2 * i] = 0.56 * node.lon;
+                coords[2 * i] = (float)0.56 * node.lon;
                 coords[2 * i + 1] = -node.lat;
             }
             this.drawType = drawType;

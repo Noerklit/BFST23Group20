@@ -1,10 +1,10 @@
 package Model;
 
 public class Node implements Comparable<Node> {
-    double lat, lon;
+    float lat, lon;
     Long id;
 
-    public Node(double lat, double lon, Long id) {
+    public Node(float lat, float lon, Long id) {
         this.lat = lat;
         this.lon = lon;
         this.id = id;

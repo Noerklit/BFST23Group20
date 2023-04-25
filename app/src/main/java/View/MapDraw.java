@@ -408,7 +408,7 @@ public class MapDraw {
         defaultColorMap.put(DrawType.unclassified, Color.RED); // Red
         defaultColorMap.put(DrawType.residential, Color.LAVENDER); // Lavender?
 
-        defaultColorMap.put(DrawType.livingStreet, Color.web("#EDEDED")); // Blue-ish-white
+        defaultColorMap.put(DrawType.living_street, Color.web("#EDEDED")); // Blue-ish-white
         defaultColorMap.put(DrawType.service,Color.DARKMAGENTA); // Dark magenta
 
         defaultColorMap.put(DrawType.building,Color.web("#858585")); // grey
