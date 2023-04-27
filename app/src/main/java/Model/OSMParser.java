@@ -185,13 +185,13 @@ public class OSMParser {
                             if (drawtypeString.equals("coastli")){
                                 coastlines.add(wayToAdd);
                             }
-                            else if (drawtypeString.equals("buildin")) {
+                            else if (drawtypeString.equals("buildin") || currentDrawType.toString().equals("naturalWater")) {
                                 buildingKdtree.insert(wayToAdd);
                             }
                             else if ((drawtypeString.equals("landuse") ||
                                 drawtypeString.equals("natural") ||
                                 drawtypeString.equals("wetland") ||
-                                drawtypeString.equals("leisure")||
+                                drawtypeString.equals("leisure") ||
                                 currentDrawType == DrawType.coastline) &&
                                 !drawtypeString.equals("buildin")){
                                 backgroundKdtree.insert(wayToAdd);
