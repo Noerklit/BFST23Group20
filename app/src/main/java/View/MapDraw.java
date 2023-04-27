@@ -28,7 +28,7 @@ public class MapDraw {
     public static HashMap<DrawType, Color> defaultColorMap;
     public static int fidelity;
 
-    private boolean darkMode, debugMode;
+    private boolean darkMode, debugMode, viewMode;
 
     private final double defaultCutoffFactor;
     private  double debugCutoffFactor;
@@ -42,6 +42,7 @@ public class MapDraw {
         this.canvas = canvas;
         this.darkMode = false;
         this.debugMode = false;
+        this.viewMode = false;
 
         this.trans = new Affine();
         this.gc = canvas.getGraphicsContext2D();
@@ -94,9 +95,14 @@ public class MapDraw {
 
         gc.setLineWidth(1/Math.sqrt(trans.determinant()));
         gc.beginPath();
-        model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
-        model.wayKDTree.drawTree(left, right, up, down, fidelity);
-        model.buildingKdtree.drawTree(left, right, up, down, fidelity);
+
+        if(viewMode){
+            model.wayKDTree.drawTree(left, right, up, down, fidelity);
+        } else {
+            model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
+            model.wayKDTree.drawTree(left, right, up, down, fidelity);
+            model.buildingKdtree.drawTree(left, right, up, down, fidelity);
+        }
 
         //traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
 
@@ -280,6 +286,11 @@ public class MapDraw {
     
     public void setDarkMode(boolean darkMode) {
         this.darkMode = darkMode;
+    }
+
+    public void setViewMode(boolean viewMode){
+        this.viewMode = viewMode;
+        redraw();
     }
 
     public void toggleDebug() {
