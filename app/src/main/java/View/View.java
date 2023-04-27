@@ -61,6 +61,17 @@ public class View {
         return new Scene(vBox);
     }
 
+
+    private Menu chooseViewWidget(){
+        MenuItem showRoads = new MenuItem("Show roads only");
+        MenuItem showCompleteMap = new MenuItem("Show complete map");
+        Menu chooseView = new Menu("Choose view");
+        chooseView.getItems().add(showRoads);
+        chooseView.getItems().add(showCompleteMap);
+
+        return chooseView;
+    }
+
     private Menu chooseDarkWidget(){
         MenuItem on = new MenuItem("on");
         MenuItem off = new MenuItem("off");
@@ -95,8 +106,9 @@ public class View {
     private MenuBar createMenuBar(){
         Menu chooseDarkMode = chooseDarkWidget();
         Menu chooseFile = chooseFileWidget();
+        Menu chooseView = chooseViewWidget();
 
-        var mb = new MenuBar(chooseDarkMode, chooseFile);
+        var mb = new MenuBar(chooseDarkMode, chooseFile, chooseView);
 
         mb.setStyle("-fx-background-color: #5a9fb0");
         return mb;
@@ -134,6 +146,19 @@ public class View {
                 return;
         }
     }
+
+    public void setViewRoads(String toggle){
+        switch (toggle){
+            case "Show roads only":
+                mapDraw.setViewMode(true);
+                return;
+            case "Show complete map":
+                mapDraw.setViewMode(false);
+                return;
+        }
+
+    }
+
     public void toggleDebug(){
         mapDraw.toggleDebug();
         //updateCanvasSize();

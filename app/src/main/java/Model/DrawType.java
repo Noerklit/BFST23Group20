@@ -9,13 +9,14 @@ public enum DrawType {
     landuseForest(0,true),
     wetland(0,true),
     landuseMeadow(0,true),
-    landuseSand(0,true),
     landuseBeach(0,true),
     landuseFarmyard(0,true),
     landuseIndustrial(0,true),
     landuseRecreationground(0,true),
     naturalHeath(0,true),
     naturalWater(0,true),
+    naturalSand(0,true),
+    leisurePark(0,true),
 
 
     primary(1, false),
@@ -25,7 +26,7 @@ public enum DrawType {
     unclassified(2, false),
     residential(2, false),
 
-    livingStreet(3, false),
+    living_street(3, false),
     service(3, false),
 
     building(4, true),

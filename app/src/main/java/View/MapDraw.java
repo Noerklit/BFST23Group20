@@ -1,5 +1,7 @@
 package View;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import javafx.scene.canvas.Canvas;
@@ -11,21 +13,22 @@ import javafx.scene.text.Text;
 
 import Model.Model;
 import Model.DrawType;
+import Model.Way;
 import Benchmark.FrameRateTimer;
 
 public class MapDraw {
     private Canvas canvas;
-    private GraphicsContext gc;
+    public static GraphicsContext gc;
 
     private double scalingConst;
 
     private Affine trans;
 
     private Model model;
-    private HashMap<DrawType, Color> defaultColorMap;
-    private int fidelity;
+    public static HashMap<DrawType, Color> defaultColorMap;
+    public static int fidelity;
 
-    private boolean darkMode, debugMode;
+    private boolean darkMode, debugMode, viewMode;
 
     private final double defaultCutoffFactor;
     private  double debugCutoffFactor;
@@ -33,11 +36,13 @@ public class MapDraw {
 
     private Text debugText;
 
+
     public MapDraw(Model model, Canvas canvas) {
         this.model = model;
         this.canvas = canvas;
         this.darkMode = false;
         this.debugMode = false;
+        this.viewMode = false;
 
         this.trans = new Affine();
         this.gc = canvas.getGraphicsContext2D();
@@ -46,12 +51,13 @@ public class MapDraw {
         debugCutoffFactor = .1;
 
         createColorMap();
-        
+
         calculateFidelity();
-        System.out.println(model.maxlat);
         pan(-0.56*model.minlon, model.maxlat);
         zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
         scalingConst = (model.maxlat - model.minlat) / canvas.getHeight();
+//        pan(-100,-100);
+//        zoom(380, 340, 40);
         redraw();
     }
 
@@ -65,7 +71,7 @@ public class MapDraw {
         }
         //gc.setFill(Color.web("#6e8dff")); Blåt canvas
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        
+
         gc.setTransform(trans);
 
         if (debugMode) {
@@ -84,22 +90,131 @@ public class MapDraw {
 
         double left = getScreenLon(0 + cutoffFactor);
         double right = getScreenLon(1 - cutoffFactor);
-        
+
         gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
 
-        for (var way : model.ways) {
-            int mid = way.coords.length/2;
-            int trueMid = mid%2==0?mid:mid-1;
-            double lon = way.coords[trueMid];
-            double lat = way.coords[trueMid+1];
-            boolean inHorizontal = left < lon && lon < right;
-            boolean inVertical = up < lat && lat < down;
+        gc.setLineWidth(1/Math.sqrt(trans.determinant()));
+        gc.beginPath();
 
-            if (inHorizontal && inVertical) {
-                way.draw(gc, defaultColorMap, fidelity);
+        for (Way coast: model.coastlines)
+            coast.draw();
+        if(viewMode){
+            model.wayKDTree.drawTree(left, right, up, down, fidelity);
+        } else {
+            model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
+            model.wayKDTree.drawTree(left, right, up, down, fidelity);
+            model.buildingKdtree.drawTree(left, right, up, down, fidelity);
+        }
+
+        //traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
+
+        FrameRateTimer.endFrame();
+    }
+
+
+    private void traverseDebug(
+            Way current,
+            double left,
+            double right,
+            double up,
+            double down,
+            double leftDraw,
+            double rightDraw,
+            double upDraw,
+            double downDraw,
+            int depthDraw)
+    {
+        boolean inRange;
+        boolean tooSmall;
+        if (current == null) {
+            return;
+        }
+        depthDraw = (current.getDrawType().fidelity+1)*2;
+//        int currFidelity = 20;
+
+        if (current.depth%2==0) {
+            inRange = left < current.xVal && current.xVal < right;
+            tooSmall = current.xVal < left;
+            if (current.depth < depthDraw){
+//                System.out.println("left: " + left + " right: " + right + " up: " + up + " Down: " + down);
+//                System.out.println(current.getDrawType());
+//                gc.stroke();
+                gc.setStroke(Color.web("#ff0000"));
+                gc.moveTo(current.xVal, upDraw);
+                gc.lineTo(current.xVal, downDraw);
+                gc.stroke();
+            }
+        } else {
+            inRange = up < current.yVal && current.yVal < down;
+            tooSmall = current.yVal > down;
+            if (current.depth < depthDraw){
+//                System.out.println("left: " + left + " right: " + right + " up: " + up + " Down: " + down);
+//                System.out.println(current.getDrawType());
+                gc.setStroke(Color.web("#ff0000"));
+                gc.moveTo(leftDraw,current.yVal);
+                gc.lineTo(rightDraw,current.yVal);
+                gc.stroke();
             }
         }
-        FrameRateTimer.endFrame();
+        if (inRange) {
+            traverseDebug(
+                    current.left,
+                    left,
+                    right,
+                    up,
+                    down,
+                    leftDraw,
+                    current.xVal,
+                    upDraw,
+                    current.yVal,
+                    depthDraw);
+            traverseDebug(
+                    current.right,
+                    left,
+                    right,
+                    up,
+                    down,
+                    current.xVal,
+                    rightDraw,
+                    current.yVal,
+                    downDraw, depthDraw);
+            return;
+        }
+        if (tooSmall) {
+            traverseDebug(
+                    current.right,
+                    left,
+                    right,
+                    up,
+                    down,
+                    current.xVal,
+                    right,
+                    current.yVal,
+                    down, depthDraw);
+        } else {
+            traverseDebug(
+                    current.left,
+                    left,
+                    right,
+                    up,
+                    down,
+                    left,
+                    current.xVal,
+                    up,
+                    current.yVal,
+                    depthDraw);
+        }
+    }
+    private int getTreeDepth(Way current, int largest) {
+        if (current == null) {
+            return largest;
+        }
+        if (current.depth > largest) {
+            largest = current.depth;
+        }
+        largest = getTreeDepth(current.left, largest);
+        largest = getTreeDepth(current.right, largest);
+        return largest;
     }
     
     
@@ -173,6 +288,12 @@ public class MapDraw {
     
     public void setDarkMode(boolean darkMode) {
         this.darkMode = darkMode;
+        redraw();
+    }
+
+    public void setViewMode(boolean viewMode){
+        this.viewMode = viewMode;
+        redraw();
     }
 
     public void toggleDebug() {
@@ -216,18 +337,18 @@ public class MapDraw {
         defaultColorMap.put(DrawType.trunk, Color.web("#FCC0AC")); // salmon
         defaultColorMap.put(DrawType.coastline, Color.web("#000000")); //Black
       
-        defaultColorMap.put(DrawType.landuseFarmland, Color.web("#f0f4d4")); // Beige
-        defaultColorMap.put(DrawType.landuseResidential, Color.web("#cecfcc")); // Light grey
-        defaultColorMap.put(DrawType.landuseForest,Color.web("8cbc7c")); //forest green
-        defaultColorMap.put(DrawType.wetland, Color.BLUE); //Grim blå, skal skiftes
-        defaultColorMap.put(DrawType.landuseMeadow,Color.web("d0ecb4")); //Very light green
-        defaultColorMap.put(DrawType.landuseSand,Color.web("f8ecc4")); // Yellow-orange
-        defaultColorMap.put(DrawType.landuseSand, Color.web("fff4bc")); // Yellow
-        defaultColorMap.put(DrawType.landuseFarmyard, Color.web("f0c49c")); // Mix between Salmon and Clay?
-        defaultColorMap.put(DrawType.landuseIndustrial, Color.web("e8d4e4")); // Light purple
-        defaultColorMap.put(DrawType.landuseRecreationground, Color.web("e0fce4")); // Turquoise green?
-        defaultColorMap.put(DrawType.naturalHeath,Color.web("d8dc9c")); // Light brown
-        defaultColorMap.put(DrawType.naturalWater,Color.web("3EBDDC")); // Light blue
+        defaultColorMap.put(DrawType.landuseFarmland, Color.web("#eef0d5")); // correct Beige/green
+        defaultColorMap.put(DrawType.landuseResidential, Color.web("#dadada")); // correct Light grey
+        defaultColorMap.put(DrawType.landuseForest,Color.web("9dca8a")); //correct forest green
+        defaultColorMap.put(DrawType.wetland, Color.web("caf0d6")); //corret blå/grøn
+        defaultColorMap.put(DrawType.landuseMeadow,Color.web("cdebb0")); //correct green
+        defaultColorMap.put(DrawType.landuseFarmyard, Color.web("eacca4")); // correct between Salmon and Clay
+        defaultColorMap.put(DrawType.landuseIndustrial, Color.web("e6d1e3")); // correct Light purple
+        defaultColorMap.put(DrawType.landuseRecreationground, Color.web("dffce2")); // correct Turquoise green?
+        defaultColorMap.put(DrawType.naturalHeath,Color.web("d6d99f")); // correct Light brown/green
+        defaultColorMap.put(DrawType.naturalWater,Color.web("aad3df")); // correct Light blue
+        defaultColorMap.put(DrawType.naturalSand,Color.web("f5e9c6")); //correct beige
+        defaultColorMap.put(DrawType.leisurePark,Color.web("cdf7c9")); // correct light grass green
 
 
         defaultColorMap.put(DrawType.primary, Color.web("#FDD7A1")); // light orange
@@ -237,7 +358,7 @@ public class MapDraw {
         defaultColorMap.put(DrawType.unclassified, Color.RED); // Red
         defaultColorMap.put(DrawType.residential, Color.LAVENDER); // Lavender?
 
-        defaultColorMap.put(DrawType.livingStreet, Color.web("#EDEDED")); // Blue-ish-white
+        defaultColorMap.put(DrawType.living_street, Color.web("#EDEDED")); // Blue-ish-white
         defaultColorMap.put(DrawType.service,Color.DARKMAGENTA); // Dark magenta
 
         defaultColorMap.put(DrawType.building,Color.web("#858585")); // grey

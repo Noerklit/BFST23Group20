@@ -1,14 +1,11 @@
 package Model;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -16,12 +13,15 @@ import java.util.*;
 import java.util.zip.ZipInputStream;
 
 import Benchmark.TaskTimer;
+import KDTree.KDTree;
 
 public class Model implements Serializable {
 
     public List<Way> ways = new ArrayList<Way>();
-    
+    public List<Way> coastlines;
+
     public double minlat, maxlat, minlon, maxlon;
+    public KDTree wayKDTree, backgroundKdtree, buildingKdtree;
 
     public static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException {
         if (filename.endsWith(".obj")) {
@@ -32,7 +32,7 @@ public class Model implements Serializable {
         }
         return new Model(filename);
     }
-    
+
 
     public Model(String filename) throws IOException {
         if (filename.endsWith(".osm.zip")) {
@@ -91,13 +91,17 @@ public class Model implements Serializable {
             System.out.println("");
         }
 
-        
+
         return "";
     }
 
     private void parseOSM(InputStream inputStream) {
         OSMParser parser = new OSMParser(inputStream);
         ways = parser.getWays();
+        wayKDTree = parser.wayKDTree;
+        backgroundKdtree = parser.backgroundKdtree;
+        buildingKdtree = parser.buildingKdtree;
+        coastlines = parser.coastlines;
         minlat = parser.getMinlat();
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();
@@ -126,10 +130,10 @@ public class Model implements Serializable {
                     case "residential":
                         return DrawType.residential;
                     case "living_street":
-                        return DrawType.livingStreet;
+                        return DrawType.living_street;
                     case "service":
                         return DrawType.service;
-                    
+
                 }
                 break;
             case "landuse":

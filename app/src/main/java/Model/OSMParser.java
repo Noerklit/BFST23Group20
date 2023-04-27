@@ -5,20 +5,31 @@ import java.io.InputStream;
 import java.util.*;
 
 import javax.xml.stream.XMLStreamException;
+
+import KDTree.KDTree;
 import org.codehaus.stax2.*;
 
 import Benchmark.TaskTimer;
 
 public class OSMParser {
-
+    Comparator<Way> cmp = new Comparator<Way>() {
+        public int compare(Way o1, Way o2) {
+            return Float.compare(o1.xVal, o2.xVal) * -1;
+        }
+    };
     private List<Way> ways = new ArrayList<Way>();
 
-    private double minlat, maxlat, minlon, maxlon;
+    private float minlat, maxlat, minlon, maxlon;
 
     private ArrayList<Node> allNodes;
     private ArrayList<Way> allWays;
+    public ArrayList<Way> coastlines;
+    public KDTree wayKDTree, backgroundKdtree, buildingKdtree;
 
     public OSMParser(InputStream inputStream) {
+        wayKDTree = new KDTree();
+        backgroundKdtree = new KDTree();
+        buildingKdtree = new KDTree();
         mainOSMParsing(inputStream);
     }
 
@@ -26,22 +37,25 @@ public class OSMParser {
         return ways;
     }
 
-    public double getMinlat() {
+    public float getMinlat() {
         return minlat;
     }
-    public double getMaxlat() {
+
+    public float getMaxlat() {
         return maxlat;
     }
-    public double getMinlon() {
+
+    public float getMinlon() {
         return minlon;
     }
-    public double getMaxlon() {
+
+    public float getMaxlon() {
         return maxlon;
     }
 
     private void mainOSMParsing(InputStream inputStream) {
         TaskTimer.recordTask("Begin OSM parsing");
-        
+
         try {
             var input = getXMLReader(inputStream);
 
@@ -56,7 +70,7 @@ public class OSMParser {
 
             TaskTimer.recordTask("Relations");
             parseRelations(input);
-            
+
             TaskTimer.recordTask("Finalize parsing");
 
         } catch (XMLStreamException e) {
@@ -65,9 +79,9 @@ public class OSMParser {
     }
 
     private XMLStreamReader2 getXMLReader(InputStream inputStream) throws XMLStreamException {
-        var stax = (XMLInputFactory2)XMLInputFactory2.newInstance();
+        var stax = (XMLInputFactory2) XMLInputFactory2.newInstance();
         stax.configureForSpeed();
-        var input = (XMLStreamReader2)stax.createXMLStreamReader(inputStream);
+        var input = (XMLStreamReader2) stax.createXMLStreamReader(inputStream);
         return input;
     }
 
@@ -75,21 +89,22 @@ public class OSMParser {
         while (input.hasNext()) {
             if (input.hasName()) {
                 var name = input.getLocalName();
-                if (name == "bounds") return;
+                if (name == "bounds")
+                    return;
             }
             input.next();
         }
     }
-    
+
     private void parseBounds(XMLStreamReader2 input) throws XMLStreamException {
         while (input.hasNext()) {
             if (input.isStartElement()) {
                 var name = input.getLocalName();
                 if (name == "bounds") {
-                    minlat = queryDouble(input, "minlat");
-                    maxlat = queryDouble(input, "maxlat");
-                    minlon = queryDouble(input, "minlon");
-                    maxlon = queryDouble(input, "maxlon");
+                    minlat = queryFloat(input, "minlat");
+                    maxlat = queryFloat(input, "maxlat");
+                    minlon = queryFloat(input, "minlon");
+                    maxlon = queryFloat(input, "maxlon");
                 } else {
                     break;
                 }
@@ -100,7 +115,7 @@ public class OSMParser {
 
     private void parseNodes(XMLStreamReader2 input) throws XMLStreamException {
 
-        allNodes = new ArrayList<Node>();
+        allNodes = new ArrayList<>();
 
         while (input.hasNext()) {
             if (input.isStartElement()) {
@@ -108,11 +123,11 @@ public class OSMParser {
                 if (name == "node") {
                     TaskTimer.incrementSubtask();
                     var id = queryLong(input, "id");
-                    var lat = queryDouble(input, "lat");
-                    var lon = queryDouble(input, "lon");
+                    var lat = queryFloat(input, "lat");
+                    var lon = queryFloat(input, "lon");
                     allNodes.add(new Node(lat, lon, id));
                 } else if (name == "tag") {
-                    
+
                 } else {
                     break;
                 }
@@ -127,6 +142,7 @@ public class OSMParser {
     private void parseWays(XMLStreamReader2 input) throws XMLStreamException {
 
         allWays = new ArrayList<Way>();
+        coastlines = new ArrayList<>();
         var nodesToWay = new ArrayList<Node>();
 
         var addWay = false;
@@ -168,7 +184,26 @@ public class OSMParser {
                     allWays.add(wayToAdd);
 
                     if (addWay) {
-                        ways.add(wayToAdd);
+                        try {
+                            String drawtypeString = currentDrawType.toString().substring(0, 7);
+                            if (drawtypeString.equals("coastli")) {
+                                coastlines.add(wayToAdd);
+                            } else if (drawtypeString.equals("buildin")
+                                    || currentDrawType.toString().equals("naturalWater")) {
+                                buildingKdtree.insert(wayToAdd);
+                            } else if ((drawtypeString.equals("landuse") ||
+                                    drawtypeString.equals("natural") ||
+                                    drawtypeString.equals("wetland") ||
+                                    drawtypeString.equals("leisure") ||
+                                    currentDrawType == DrawType.coastline) &&
+                                    !drawtypeString.equals("buildin")) {
+                                backgroundKdtree.insert(wayToAdd);
+                            } else {
+                                wayKDTree.insert(wayToAdd);
+                            }
+                        } catch (Exception e) {
+                            wayKDTree.insert(wayToAdd);
+                        }
                     }
                 }
             }
@@ -198,17 +233,18 @@ public class OSMParser {
                     var type = queryString(input, "type");
                     var ref = queryLong(input, "ref");
                     var role = queryString(input, "role");
-                
+
                     ArrayList<Node> empty = new ArrayList<>();
 
                     if ((type.equals("way")) && (role.equals("outer"))) {
-                        var index = Collections.binarySearch(allWays, new Way(empty,null, ref));
+                        var index = Collections.binarySearch(allWays, new Way(empty, null, ref));
 
                         if (index >= 0) {
                             var singleOuterWay = allWays.get(index);
 
-                            //Some relations does not have drawtype (fx Coastline), this makes sure we dont draw realtion way where the ways have drawtypes
-                            if (singleOuterWay.drawType == null){
+                            // Some relations does not have drawtype (fx Coastline), this makes sure we dont
+                            // draw realtion way where the ways have drawtypes
+                            if (singleOuterWay.drawType == null) {
                                 outerWays.add(singleOuterWay);
                             }
                         }
@@ -227,24 +263,29 @@ public class OSMParser {
                 }
             } else if (input.isEndElement()) {
                 var name = input.getLocalName();
-                if  (name == "relation" && addRelation) {
-                    for(Way way : outerWays){
+                if (name == "relation" && addRelation) {
+                    for (Way way : outerWays) {
                         way.drawType = currentDrawType;
-                        ways.add(way);
+                        if (way.drawType == DrawType.building)
+                            buildingKdtree.insert(way);
+                        else
+                            backgroundKdtree.insert(way);
                     }
                 }
             }
             input.next();
         }
-        Collections.reverse(ways);
+        // Collections.reverse(ways);
     }
 
     private String queryString(XMLStreamReader2 input, String localName) {
         return input.getAttributeValue(null, localName);
     }
-    private double queryDouble(XMLStreamReader2 input, String localName) {
-        return Double.parseDouble(queryString(input, localName));
+
+    private float queryFloat(XMLStreamReader2 input, String localName) {
+        return Float.parseFloat(queryString(input, localName));
     }
+
     private long queryLong(XMLStreamReader2 input, String localName) {
         return Long.parseLong(queryString(input, localName));
     }
@@ -255,39 +296,21 @@ public class OSMParser {
             case "building":
                 return DrawType.building;
             case "highway":
-                switch (val) {
-                    case "motorway":
-                        return DrawType.motorway;
-                    case "trunk":
-                        return DrawType.trunk;
-                    case "primary":
-                        return DrawType.primary;
-                    case "secondary":
-                        return DrawType.secondary;
-                    case "tertiary":
-                        return DrawType.tertiary;
-                    case "unclassified":
-                        return DrawType.unclassified;
-                    case "residential":
-                        return DrawType.residential;
-                    case "living_street":
-                        return DrawType.livingStreet;
-                    case "service":
-                        return DrawType.service;
+                try {
+                    return DrawType.valueOf(val);
+                } catch (Exception e) {
+                    break;
                 }
-                break;
             case "landuse":
-                switch(val) {
+                switch (val) {
                     case "farmland":
                         return DrawType.landuseFarmland;
                     case "residential":
-                        return DrawType.landuseResidential; //Currently residential roads, not residential landuse.
+                        return DrawType.landuseResidential; // Currently residential roads, not residential landuse.
                     case "forest":
                         return DrawType.landuseForest;
                     case "meadow":
                         return DrawType.landuseMeadow;
-                    case "sand":
-                        return DrawType.landuseSand;
                     case "beach":
                         return DrawType.landuseBeach;
                     case "farmyard":
@@ -298,6 +321,12 @@ public class OSMParser {
                         return DrawType.landuseRecreationground;
                 }
                 break;
+            case "leisure":
+                switch (val) {
+                    case "park":
+                        return DrawType.leisurePark;
+                }
+                break;
             case "natural":
                 switch (val) {
                     case "wetland":
@@ -306,6 +335,8 @@ public class OSMParser {
                         return DrawType.naturalHeath;
                     case "water":
                         return DrawType.naturalWater;
+                    case "sand":
+                        return DrawType.naturalSand;
                 }
         }
 

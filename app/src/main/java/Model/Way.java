@@ -4,31 +4,47 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import View.MapDraw;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Way implements Serializable, Comparable<Way> {
-    public double[] coords;
+    public float[] coords;
     DrawType drawType;
 
-    Long id;
+    int trueMid;
+    public float xVal;
+    public float yVal;
+
+    public Long id;
+    public Way left = null;
+    public Way right = null;
+    public int depth;
 
     public Way(ArrayList<Node> way, DrawType drawType, Long id) {
-            coords = new double[way.size() * 2];
+            coords = new float[way.size() * 2];
             for (int i = 0; i < way.size(); ++i) {
                 var node = way.get(i);
-                coords[2 * i] = 0.56 * node.lon;
+                coords[2 * i] = (float)0.56 * node.lon;
                 coords[2 * i + 1] = -node.lat;
             }
             this.drawType = drawType;
             this.id = id;
-
+            // right bitshift divides by 2
+            var mid = coords.length>>1;
+            trueMid = mid%2==0 ? mid : mid-1;
+            if (way.size()>0){
+                xVal = coords[trueMid];
+                yVal = coords[trueMid+1];
+            }
     }
 
 
 
-    public void draw(GraphicsContext gc, HashMap<DrawType, Color> colorMap, int fidelity) {
-        Color color = colorMap.get(drawType);
+    public void draw() {
+        GraphicsContext gc = MapDraw.gc;
+        Color color = MapDraw.defaultColorMap.get(drawType);
+        int fidelity = MapDraw.fidelity;
         if(drawType.fidelity <= fidelity) {
             makePath(gc, fidelity);
             if(drawType.shouldFill) {
@@ -64,5 +80,9 @@ public class Way implements Serializable, Comparable<Way> {
     @Override
     public int compareTo(Way otherWay) {
         return Long.compare(id, otherWay.id);
+    }
+
+    public DrawType getDrawType() {
+        return drawType;
     }
 }

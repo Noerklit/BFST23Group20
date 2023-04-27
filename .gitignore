@@ -169,3 +169,4 @@ app/data/*
 !app/data/bornholm.osm.zip
 file-to-load.txt
 choosefile.class
+/.idea/git_toolbox_prj.xml
