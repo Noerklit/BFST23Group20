@@ -23,6 +23,7 @@ public class OSMParser {
 
     private ArrayList<Node> allNodes;
     private ArrayList<Way> allWays;
+    public ArrayList<Way> coastlines;
     public KDTree wayKDTree, backgroundKdtree, buildingKdtree;
 
     public OSMParser(InputStream inputStream) {
@@ -137,6 +138,7 @@ public class OSMParser {
     private void parseWays(XMLStreamReader2 input) throws XMLStreamException {
 
         allWays = new ArrayList<Way>();
+        coastlines = new ArrayList<>();
         var nodesToWay = new ArrayList<Node>();
 
         var addWay = false;
@@ -180,17 +182,22 @@ public class OSMParser {
                     if (addWay) {
                         try {
                             String drawtypeString = currentDrawType.toString().substring(0, 7);
-                            if ((drawtypeString.equals("landuse") ||
+                            if (drawtypeString.equals("coastli")){
+                                coastlines.add(wayToAdd);
+                            }
+                            else if (drawtypeString.equals("buildin")) {
+                                buildingKdtree.insert(wayToAdd);
+                            }
+                            else if ((drawtypeString.equals("landuse") ||
                                 drawtypeString.equals("natural") ||
                                 drawtypeString.equals("wetland") ||
                                 currentDrawType == DrawType.coastline) &&
                                 !drawtypeString.equals("buildin")){
                                 backgroundKdtree.insert(wayToAdd);
                             }
-                            else if (drawtypeString.equals("buildin")) {
-                                buildingKdtree.insert(wayToAdd);
-                            } else
+                            else {
                                 wayKDTree.insert(wayToAdd);
+                            }
                         } catch (Exception e)
                         {
                             wayKDTree.insert(wayToAdd);

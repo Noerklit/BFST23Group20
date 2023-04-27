@@ -94,6 +94,8 @@ public class MapDraw {
 
         gc.setLineWidth(1/Math.sqrt(trans.determinant()));
         gc.beginPath();
+        for(Way coast: model.coastlines)
+            coast.draw();
         model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
         model.wayKDTree.drawTree(left, right, up, down, fidelity);
         model.buildingKdtree.drawTree(left, right, up, down, fidelity);
