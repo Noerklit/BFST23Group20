@@ -1,17 +1,8 @@
 package KDTree;
 
-import Model.Model;
-import Model.Way;
-import View.MapDraw;
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.lang.Math;
 
-// import edu.princeton.cs.algs4.Edge;
+import Model.Way;
 import edu.princeton.cs.algs4.Edge;
 import edu.princeton.cs.algs4.EdgeWeightedGraph;
 
@@ -112,7 +103,7 @@ public class KDTree implements Serializable {
     }
 
     public EdgeWeightedGraph traverse(){
-        EdgeWeightedGraph graph = new EdgeWeightedGraph(7000);
+        EdgeWeightedGraph graph = new EdgeWeightedGraph(300000);
         traverse(root, graph);
         return graph;
     }
@@ -121,31 +112,28 @@ public class KDTree implements Serializable {
         if (curr == null)
             return;
       
-        for (int i = 0; i < curr.coords.length/4; i+=2) {
-            try {
-                float source_x = curr.coords[i];
-                float source_y = curr.coords[i+1];
-                float dest_x = curr.coords[i+2];
-                float dest_y = curr.coords[i+3];
+        for (int i = 0; i < (curr.coords.length/4); i++) {
+            float source_x = curr.coords[i];
+            float source_y = curr.coords[i+1];
+            float dest_x = curr.coords[i+2];
+            float dest_y = curr.coords[i+3];
 
-                Long id_from = curr.ids[i];
-                Long id_to = curr.ids[i+2];
+            Long id_from = curr.ids[i];
+            Long id_to = curr.ids[i+1];
 
-                double delta_x = dest_x-source_x;
-                double delta_y = dest_y-source_y;
+            double delta_x = dest_x-source_x;
+            double delta_y = dest_y-source_y;
 
-                double weight = Math.sqrt(delta_x * delta_x + delta_y * delta_y);
+            double weight = Math.sqrt(delta_x * delta_x + delta_y * delta_y);
 
-                int from = Math.abs(id_from.intValue()) % 6999;
-                int dest = Math.abs(id_to.intValue()) % 6999;
-            
-                System.out.println(from + " " + dest);
+            // System.out.println("I have gotten as longs: " + id_from + " " + id_to);
+            int from = ((Long)(id_from % 300000)).intValue();
+            int dest = ((Long)(id_to % 300000)).intValue();
+            // if (== from || 1049101 == dest)
+            //     System.out.println("Long conversion from: " + id_from + " " + id_to + " gave from, dest: " + from + " " + dest);
 
-                graph.addEdge(new Edge(from, dest, weight));
-                cnt++;
-            } catch (Exception e) {
-                System.out.println("Got exception");
-            }
+            graph.addEdge(new Edge(from, dest, weight));
+            cnt++;
         }
 
         traverse(curr.left, graph);

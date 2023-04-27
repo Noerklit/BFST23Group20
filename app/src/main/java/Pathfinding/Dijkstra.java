@@ -10,9 +10,11 @@ import edu.princeton.cs.algs4.EdgeWeightedGraph;
 import edu.princeton.cs.algs4.MinPQ;
 
 public class Dijkstra {
-    public Dijkstra(EdgeWeightedGraph graph, int start, int end, double weight) {
+    public Dijkstra(EdgeWeightedGraph graph, long start, long end, double weight) {
         // BuildEdgeWeightedGraph();
-        RunDijkstra(graph, start, end, weight);
+        int start_int = ((Long)(start % 300000)).intValue();
+        int end_int = ((Long)(end % 300000)).intValue();
+        RunDijkstra(graph, start_int, end_int, weight);
     }
 
     // public void BuildEdgeWeightedGraph() {
@@ -75,6 +77,7 @@ public class Dijkstra {
         // Create our path from start to end, based on our mapping of edge to edge
         ArrayList<Edge> returnEdges = new ArrayList<>();
         Edge tmp = startEdge;
+        System.out.println("Size of our SPT " + previous.size());
         while (previous.containsKey(tmp)) {
             tmp = previous.get(tmp);
             System.out.println(tmp);

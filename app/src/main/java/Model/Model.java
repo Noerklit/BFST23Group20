@@ -9,14 +9,14 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.ZipInputStream;
-import edu.princeton.cs.algs4.Edge;
-import edu.princeton.cs.algs4.EdgeWeightedGraph;
 
 import Benchmark.TaskTimer;
 import KDTree.KDTree;
 import Pathfinding.Dijkstra;
+import edu.princeton.cs.algs4.EdgeWeightedGraph;
 
 public class Model implements Serializable {
 
@@ -111,7 +111,15 @@ public class Model implements Serializable {
         maxlon = parser.getMaxlon();
 
         EdgeWeightedGraph graph = wayKDTree.traverse();
-        new Dijkstra(graph, 1096, 6189, 0.0);
+
+        long s = 4421811728l % 300000; 
+        long e = 32464034l % 300000;
+
+        System.out.println("Trying to get from " + s + " to " + e);
+        System.out.println("Should give " + s % 300000 + " to " + e % 300000);
+
+        new Dijkstra(graph, s, e, 0.0);
+        System.out.println("Count for graph: " + wayKDTree.cnt);
         return;
         //EdgeWeightedGraph graph = new EdgeWeightedGraph();
     }
