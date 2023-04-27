@@ -286,6 +286,7 @@ public class MapDraw {
     
     public void setDarkMode(boolean darkMode) {
         this.darkMode = darkMode;
+        redraw();
     }
 
     public void setViewMode(boolean viewMode){
