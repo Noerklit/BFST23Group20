@@ -11,11 +11,10 @@ import edu.princeton.cs.algs4.MinPQ;
 
 public class Dijkstra {
     public Dijkstra() {
-        EdgeWeightedGraph g = DijkstraTest();
-        RunDijkstra(g, new Edge(0, 0, 0));
+        DijkstraTest();
     }
 
-    public ArrayList<Edge> RunDijkstra(EdgeWeightedGraph graph, Edge start) {
+    public ArrayList<Edge> RunDijkstra(EdgeWeightedGraph graph, Edge start, int end) {
         // Create a priority queue to sort the minimal weights
         MinPQ<Edge> priorityQueue = new MinPQ<>();
         priorityQueue.insert(start);
@@ -32,6 +31,9 @@ public class Dijkstra {
         // While there is a minimal weight in the priority queue
         while (!priorityQueue.isEmpty()) {
             Edge minimalEdge = priorityQueue.delMin();
+            if (minimalEdge.either() == end) {
+                break;
+            }
 
             // Get the destination vertex, we will look from this. I.e. 0-5, the int returned
             // would in this case be 5, as the structure is FROM - TO
@@ -41,7 +43,7 @@ public class Dijkstra {
             for (Edge neighbourEdge : graph.adj(destinationVertex)) {
                 int newDestination = neighbourEdge.other(destinationVertex);
 
-                if ( distanceTo[newDestination] > distanceTo[destinationVertex] + neighbourEdge.weight() ) {
+                if (distanceTo[newDestination] > distanceTo[destinationVertex] + neighbourEdge.weight()) {
                     distanceTo[newDestination] = distanceTo[destinationVertex] + neighbourEdge.weight();
                     int newSource = neighbourEdge.either();
 
@@ -72,7 +74,6 @@ public class Dijkstra {
         }
 
         return returnEdges;
-
     }
 
     public EdgeWeightedGraph DijkstraTest() {
@@ -93,6 +94,7 @@ public class Dijkstra {
         test.addEdge(new Edge(5, 3, 14));
         test.addEdge(new Edge(5, 4, 10));
 
+        RunDijkstra(test, new Edge(0, 0, 0), 4);
         return test;
     }
 }
