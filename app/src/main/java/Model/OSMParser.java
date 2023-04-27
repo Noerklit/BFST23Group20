@@ -19,8 +19,6 @@ public class OSMParser {
     private ArrayList<Node> allNodes;
     private ArrayList<Way> allWays;
 
-    private ArrayList<String> addresses;
-
     public OSMParser(InputStream inputStream, AddressSearch addressSearch) {
         mainOSMParsing(inputStream, addressSearch);
     }
@@ -42,13 +40,12 @@ public class OSMParser {
         return maxlon;
     }
 
-    public List<String> getAddresses() {
-        return addresses;
-    }
-
     private void mainOSMParsing(InputStream inputStream, AddressSearch addressSearch) {
         //System.out.println("løl");
         //System.exit(0);
+
+        TemporaryAddressFile temporaryAddressFile = new TemporaryAddressFile();
+
         TaskTimer.recordTask("Begin OSM parsing");
         
         try {
@@ -58,7 +55,7 @@ public class OSMParser {
             parseBounds(input);
 
             TaskTimer.recordTask("Nodes");
-            parseNodes(input, addressSearch);
+            parseNodes(input, addressSearch, temporaryAddressFile);
 
             TaskTimer.recordTask("Ways");
             parseWays(input);
@@ -71,6 +68,18 @@ public class OSMParser {
         } catch (XMLStreamException e) {
             throw new RuntimeException(e); // We should probably throw our own exception type here
         }
+
+        allNodes = null;
+        allWays = null;
+
+        temporaryAddressFile.openReadStream();
+
+        while (temporaryAddressFile.hasAddress()) {
+            String address = temporaryAddressFile.getAddress();
+            addressSearch.addAddress(address);
+        }
+
+        temporaryAddressFile.closeReadStream();
     }
 
     private XMLStreamReader2 getXMLReader(InputStream inputStream) throws XMLStreamException {
@@ -107,15 +116,13 @@ public class OSMParser {
         }
     }
 
-    private void parseNodes(XMLStreamReader2 input, AddressSearch addressSearch) throws XMLStreamException {
+    private void parseNodes(XMLStreamReader2 input, AddressSearch addressSearch, TemporaryAddressFile temporaryAddressFile) throws XMLStreamException {
 
         allNodes = new ArrayList<Node>();
-        addresses = new ArrayList<String>();
         Node currentNode = null;
 
         TemporaryAddress temporaryAddress = null;
 
-        TemporaryAddressFile temporaryAddressFile = new TemporaryAddressFile();
         temporaryAddressFile.openStream();
 
         while (input.hasNext()) {
@@ -142,7 +149,7 @@ public class OSMParser {
                         //temporaryAddressFile.writeToStream(currentNode.getAddress());
                         temporaryAddressFile.writeToStream(temporaryAddress.get());
                         //addressSearch.addAddress(currentNode.getAddress());
-                        addressSearch.addAddress(temporaryAddress.get());
+                        //addressSearch.addAddress(temporaryAddress.get());
                         //System.out.println(currentNode.getAddress());
                         //addresses.add(currentNode.getAddress());
                     }

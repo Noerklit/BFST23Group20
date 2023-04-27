@@ -6,12 +6,13 @@ import java.util.ArrayList;
 // https://www.youtube.com/watch?v=3CbFFVHQrk4
 
 public class TrieNode implements Serializable {
-    // private static char[] SYMTABLE = "abcdefghijklmnopqrstuwvxyzæøå0123456789áćéǵíj́ḱḿńóṕŕśúẃýźǽǿ,.-_'`& ";
+    private static String characters = "'(),-./0123456789aAåÅäæÆbBcCdDeEéëfFgGhHiIjJkKlLmMnNoOóöøØpPqQrRsStTuUüÜvVwWxXyYÿzZ ";
     // The first char is ' ' (unicode decimal: 32)
     public static int firstChar = 32;
     // The last char is 'ü' (unicode decimal: 252)
     private static int lastChar = 252;
-    public static int SIZE = lastChar + 1 - firstChar; // SYMTABLE.length();
+    //public static int SIZE = lastChar + 1 - firstChar; // SYMTABLE.length();
+    public static int SIZE = characters.length(); // SYMTABLE.length();
     
     public TrieNode[] children = new TrieNode[SIZE];
     public boolean terminal;
@@ -38,9 +39,9 @@ public class TrieNode implements Serializable {
     }
 
     public static char indexToChar(int index) {
-        return (char)(index + firstChar);
+        return characters.charAt(index);
     }
     public static int charToIndex(char c) {
-        return (int)c - firstChar;
+        return characters.indexOf(c);
     }
 }
