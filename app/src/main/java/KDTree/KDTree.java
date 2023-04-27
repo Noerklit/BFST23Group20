@@ -41,7 +41,7 @@ public class KDTree implements Serializable {
                 if(way2Insert.xVal < current.xVal) current = current.left;
                 else current = current.right;
             } else {
-                if(way2Insert.yVal < current.yVal) current = current.left;
+                if(way2Insert.yVal > current.yVal) current = current.left;
                 else current = current.right;
             }
             depth++;
@@ -52,7 +52,7 @@ public class KDTree implements Serializable {
             else parent.right = way2Insert;
         } else {
             way2Insert.depth = depth;
-            if(way2Insert.yVal < parent.yVal) parent.left = way2Insert;
+            if(way2Insert.yVal > parent.yVal) parent.left = way2Insert;
             else parent.right = way2Insert;
         }
         return root;
@@ -90,7 +90,7 @@ public class KDTree implements Serializable {
             tooSmall = current.xVal < left;
         } else {
             inRange = up < current.yVal && current.yVal < down;
-            tooSmall = current.yVal < up;
+            tooSmall = current.yVal > down;
         }
         if (inRange) {
             current.draw();
