@@ -127,6 +127,13 @@ public class View {
     public void redrawMap() {
         mapDraw.redraw();
     }
+
+    public double convertMouseLon(double mouseCoord) {
+        return mapDraw.convertMouseLon(mouseCoord);
+    }
+    public double convertMouseLat(double mouseCoord) {
+        return mapDraw.convertMouseLat(mouseCoord);
+    }
     
     public MenuBar getMenuBar() {
         return menuBar;

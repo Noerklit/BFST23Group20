@@ -104,4 +104,23 @@ public class KDTree implements Serializable {
             drawTree(current.left, left, right, up, down, fidelity);
         }
     }
+    public void findWay(double xVal, double yVal){
+        findWay(root, root, xVal, yVal, Double.MAX_VALUE);
+    }
+    private Way findWay(Way curr, Way parent, double xVal, double yVal, double minDist){
+        if (curr == null)
+            return parent;
+
+        int cmpX;
+        if (curr.xVal > xVal)
+            cmpX = -1;
+        else if (curr.xVal == xVal)
+            cmpX = 0;
+        else
+            cmpX = 1;
+        return curr;
+
+    }
+
+
 }
