@@ -28,7 +28,7 @@ public class MapDraw {
     public static HashMap<DrawType, Color> defaultColorMap;
     public static int fidelity;
 
-    private boolean darkMode, debugMode;
+    private boolean darkMode, debugMode, viewMode;
 
     private final double defaultCutoffFactor;
     private  double debugCutoffFactor;
@@ -42,6 +42,7 @@ public class MapDraw {
         this.canvas = canvas;
         this.darkMode = false;
         this.debugMode = false;
+        this.viewMode = false;
 
         this.trans = new Affine();
         this.gc = canvas.getGraphicsContext2D();
@@ -94,11 +95,16 @@ public class MapDraw {
 
         gc.setLineWidth(1/Math.sqrt(trans.determinant()));
         gc.beginPath();
-        for(Way coast: model.coastlines)
+
+        for (Way coast: model.coastlines)
             coast.draw();
-        model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
-        model.wayKDTree.drawTree(left, right, up, down, fidelity);
-        model.buildingKdtree.drawTree(left, right, up, down, fidelity);
+        if(viewMode){
+            model.wayKDTree.drawTree(left, right, up, down, fidelity);
+        } else {
+            model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
+            model.wayKDTree.drawTree(left, right, up, down, fidelity);
+            model.buildingKdtree.drawTree(left, right, up, down, fidelity);
+        }
 
         //traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
 
@@ -282,6 +288,12 @@ public class MapDraw {
     
     public void setDarkMode(boolean darkMode) {
         this.darkMode = darkMode;
+        redraw();
+    }
+
+    public void setViewMode(boolean viewMode){
+        this.viewMode = viewMode;
+        redraw();
     }
 
     public void toggleDebug() {
@@ -325,18 +337,18 @@ public class MapDraw {
         defaultColorMap.put(DrawType.trunk, Color.web("#FCC0AC")); // salmon
         defaultColorMap.put(DrawType.coastline, Color.web("#000000")); //Black
       
-        defaultColorMap.put(DrawType.landuseFarmland, Color.web("#f0f4d4")); // Beige
-        defaultColorMap.put(DrawType.landuseResidential, Color.web("#cecfcc")); // Light grey
-        defaultColorMap.put(DrawType.landuseForest,Color.web("8cbc7c")); //forest green
-        defaultColorMap.put(DrawType.wetland, Color.BLUE); //Grim blå, skal skiftes
-        defaultColorMap.put(DrawType.landuseMeadow,Color.web("d0ecb4")); //Very light green
-        defaultColorMap.put(DrawType.landuseSand,Color.web("f8ecc4")); // Yellow-orange
-        defaultColorMap.put(DrawType.landuseSand, Color.web("fff4bc")); // Yellow
-        defaultColorMap.put(DrawType.landuseFarmyard, Color.web("f0c49c")); // Mix between Salmon and Clay?
-        defaultColorMap.put(DrawType.landuseIndustrial, Color.web("e8d4e4")); // Light purple
-        defaultColorMap.put(DrawType.landuseRecreationground, Color.web("e0fce4")); // Turquoise green?
-        defaultColorMap.put(DrawType.naturalHeath,Color.web("d8dc9c")); // Light brown
-        defaultColorMap.put(DrawType.naturalWater,Color.web("3EBDDC")); // Light blue
+        defaultColorMap.put(DrawType.landuseFarmland, Color.web("#eef0d5")); // correct Beige/green
+        defaultColorMap.put(DrawType.landuseResidential, Color.web("#dadada")); // correct Light grey
+        defaultColorMap.put(DrawType.landuseForest,Color.web("9dca8a")); //correct forest green
+        defaultColorMap.put(DrawType.wetland, Color.web("caf0d6")); //corret blå/grøn
+        defaultColorMap.put(DrawType.landuseMeadow,Color.web("cdebb0")); //correct green
+        defaultColorMap.put(DrawType.landuseFarmyard, Color.web("eacca4")); // correct between Salmon and Clay
+        defaultColorMap.put(DrawType.landuseIndustrial, Color.web("e6d1e3")); // correct Light purple
+        defaultColorMap.put(DrawType.landuseRecreationground, Color.web("dffce2")); // correct Turquoise green?
+        defaultColorMap.put(DrawType.naturalHeath,Color.web("d6d99f")); // correct Light brown/green
+        defaultColorMap.put(DrawType.naturalWater,Color.web("aad3df")); // correct Light blue
+        defaultColorMap.put(DrawType.naturalSand,Color.web("f5e9c6")); //correct beige
+        defaultColorMap.put(DrawType.leisurePark,Color.web("cdf7c9")); // correct light grass green
 
 
         defaultColorMap.put(DrawType.primary, Color.web("#FDD7A1")); // light orange

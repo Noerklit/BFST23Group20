@@ -191,6 +191,7 @@ public class OSMParser {
                             else if ((drawtypeString.equals("landuse") ||
                                 drawtypeString.equals("natural") ||
                                 drawtypeString.equals("wetland") ||
+                                drawtypeString.equals("leisure")||
                                 currentDrawType == DrawType.coastline) &&
                                 !drawtypeString.equals("buildin")){
                                 backgroundKdtree.insert(wayToAdd);
@@ -308,8 +309,6 @@ public class OSMParser {
                         return DrawType.landuseForest;
                     case "meadow":
                         return DrawType.landuseMeadow;
-                    case "sand":
-                        return DrawType.landuseSand;
                     case "beach":
                         return DrawType.landuseBeach;
                     case "farmyard":
@@ -320,6 +319,12 @@ public class OSMParser {
                         return DrawType.landuseRecreationground;
                 }
                 break;
+            case "leisure":
+                switch (val){
+                    case "park":
+                        return DrawType.leisurePark;
+                }
+                break;
             case "natural":
                 switch (val) {
                     case "wetland":
@@ -328,6 +333,8 @@ public class OSMParser {
                         return DrawType.naturalHeath;
                     case "water":
                         return DrawType.naturalWater;
+                    case "sand":
+                        return DrawType.naturalSand;
                 }
         }
 

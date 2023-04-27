@@ -91,6 +91,19 @@ public class Controller {
             view.setDarkMode(menuItem.getText());
         });
     });
+
+    view.getMenuBar()
+            .getMenus()
+            .get(2) //View mode toggle
+            .getItems()
+            .forEach(menuItem -> {
+                menuItem.setOnAction(event -> {
+                    view.setViewRoads(menuItem.getText());
+                });
+            });
+
+
+
     }
 
 
