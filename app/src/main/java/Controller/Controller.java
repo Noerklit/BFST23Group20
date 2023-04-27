@@ -25,6 +25,7 @@ public class Controller {
         lastY = e.getY();
     });
 
+
     view.getCanvas().setOnMouseDragged(e -> {
         double dx = e.getX() - lastX;
         double dy = e.getY() - lastY;
