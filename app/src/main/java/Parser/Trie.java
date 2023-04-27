@@ -17,8 +17,9 @@ public class Trie implements Serializable {
    
         // Get an iterable string
         for ( char c : word.toCharArray() ) {
-            if ( current.children[c] == null ) {
-                current.children[c] = new TrieNode();
+            int index = TrieNode.charToIndex(c);
+            if ( current.children[index] == null ) {
+                current.children[index] = new TrieNode();
             }
             current = current.getChild(c);
         }
@@ -30,9 +31,9 @@ public class Trie implements Serializable {
             returnStrings.add(word);
         }
 
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < TrieNode.SIZE; i++) {
             if ( end.getChild(i) != null ) {
-                getSuggestions(end.getChild(i), word + (char) i);
+                getSuggestions(end.getChild(i), word + TrieNode.indexToChar(i));
             }
         }
     }
@@ -66,14 +67,5 @@ public class Trie implements Serializable {
           
         getSuggestions(current, autoCompletedWord);
         return returnStrings;
-    }
-
-    private boolean tempName(char c, TrieNode current, String autoCompletedWord) {
-        if ( current.getChild(c) != null ) {
-            current = current.getChild(c);
-            autoCompletedWord += c;
-            return true;
-        }
-        return false;
     }
 }

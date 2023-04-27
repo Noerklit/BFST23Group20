@@ -8,6 +8,7 @@ import javax.xml.stream.XMLStreamException;
 import org.codehaus.stax2.*;
 
 import Benchmark.TaskTimer;
+import Parser.AddressSearch;
 
 public class OSMParser {
 
@@ -20,8 +21,8 @@ public class OSMParser {
 
     private ArrayList<String> addresses;
 
-    public OSMParser(InputStream inputStream) {
-        mainOSMParsing(inputStream);
+    public OSMParser(InputStream inputStream, AddressSearch addressSearch) {
+        mainOSMParsing(inputStream, addressSearch);
     }
 
     public List<Way> getWays() {
@@ -45,7 +46,7 @@ public class OSMParser {
         return addresses;
     }
 
-    private void mainOSMParsing(InputStream inputStream) {
+    private void mainOSMParsing(InputStream inputStream, AddressSearch addressSearch) {
         //System.out.println("løl");
         //System.exit(0);
         TaskTimer.recordTask("Begin OSM parsing");
@@ -57,7 +58,7 @@ public class OSMParser {
             parseBounds(input);
 
             TaskTimer.recordTask("Nodes");
-            parseNodes(input);
+            parseNodes(input, addressSearch);
 
             TaskTimer.recordTask("Ways");
             parseWays(input);
@@ -106,11 +107,16 @@ public class OSMParser {
         }
     }
 
-    private void parseNodes(XMLStreamReader2 input) throws XMLStreamException {
+    private void parseNodes(XMLStreamReader2 input, AddressSearch addressSearch) throws XMLStreamException {
 
         allNodes = new ArrayList<Node>();
         addresses = new ArrayList<String>();
         Node currentNode = null;
+
+        TemporaryAddress temporaryAddress = null;
+
+        TemporaryAddressFile temporaryAddressFile = new TemporaryAddressFile();
+        temporaryAddressFile.openStream();
 
         while (input.hasNext()) {
             if (input.isStartElement()) {
@@ -121,14 +127,24 @@ public class OSMParser {
                     var lat = queryDouble(input, "lat");
                     var lon = queryDouble(input, "lon");
                     currentNode = new Node(lat, lon, id);
+                    // we need to test this makes it faster. Alternatively we can make a clear() method
+                    temporaryAddress = null;
+                    temporaryAddress = new TemporaryAddress();
                     allNodes.add(currentNode);
                 } else if (name == "tag") {
                     String k = queryString(input, "k");
                     String v = queryString(input, "v");
                     if (k.startsWith("addr:")) {
-                        setAddressInfo(currentNode, k, v);
+                        //setAddressInfo(currentNode, k, v);
+                        setAddressInfo(temporaryAddress, k, v);
                     } else if (k.equals("osak:identifier")) {
-                        addresses.add(currentNode.getAddress());
+                        //temporaryAddressFile.saveAddress(currentNode.getAddress());
+                        //temporaryAddressFile.writeToStream(currentNode.getAddress());
+                        temporaryAddressFile.writeToStream(temporaryAddress.get());
+                        //addressSearch.addAddress(currentNode.getAddress());
+                        addressSearch.addAddress(temporaryAddress.get());
+                        //System.out.println(currentNode.getAddress());
+                        //addresses.add(currentNode.getAddress());
                     }
                 } else {
                     break;
@@ -137,10 +153,31 @@ public class OSMParser {
             input.next();
         }
 
+        temporaryAddressFile.closeStream();
+
         TaskTimer.recordTask("Sort node array");
         Collections.sort(allNodes);
     }
 
+    
+    
+    private void setAddressInfo(TemporaryAddress temporaryAddress, String k, String v) {
+        
+        if (k.equals("addr:postcode")) {
+            temporaryAddress.setPostcode(v);
+        }
+        if (k.equals("addr:city")) {
+            temporaryAddress.setCity(v);
+        }
+        if (k.equals("addr:housenumber")) {
+            temporaryAddress.setHousenumber(v);
+        }
+        if (k.equals("addr:street")) {
+            temporaryAddress.setStreet(v);
+        }
+    }
+    
+    /*/
     private void setAddressInfo(Node node, String k, String v) {
         
         if (k.equals("addr:country")) {
@@ -165,6 +202,7 @@ public class OSMParser {
             node.setStreet(v);
         }
     }
+    //*/
 
     private void parseWays(XMLStreamReader2 input) throws XMLStreamException {
 

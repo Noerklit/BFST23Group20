@@ -68,15 +68,17 @@ public class Model implements Serializable {
     }
 
     private void parseOSM(InputStream inputStream) {
-        OSMParser parser = new OSMParser(inputStream);
+        OSMParser parser = new OSMParser(inputStream, addressSearch);
         ways = parser.getWays();
         minlat = parser.getMinlat();
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();
         maxlon = parser.getMaxlon();
+        /*/
         for (String address : parser.getAddresses()) {
             addressSearch.addAddress(address);
         }
+        //*/
     }
 
     public List<String> searchAddresses(String text) {

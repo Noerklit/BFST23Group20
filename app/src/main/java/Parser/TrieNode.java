@@ -7,7 +7,11 @@ import java.util.ArrayList;
 
 public class TrieNode implements Serializable {
     // private static char[] SYMTABLE = "abcdefghijklmnopqrstuwvxyzæøå0123456789áćéǵíj́ḱḿńóṕŕśúẃýźǽǿ,.-_'`& ";
-    private static int SIZE = 256; // SYMTABLE.length();
+    // The first char is ' ' (unicode decimal: 32)
+    public static int firstChar = 32;
+    // The last char is 'ü' (unicode decimal: 252)
+    private static int lastChar = 252;
+    public static int SIZE = lastChar + 1 - firstChar; // SYMTABLE.length();
     
     public TrieNode[] children = new TrieNode[SIZE];
     public boolean terminal;
@@ -24,7 +28,19 @@ public class TrieNode implements Serializable {
         return children[charSymbolLookUp(index)];
     }
 
+    public TrieNode getChild(char c) {
+        int index = charToIndex(c);
+        return children[charSymbolLookUp(index)];
+    }
+
     public int charSymbolLookUp(int index) {
         return index;
+    }
+
+    public static char indexToChar(int index) {
+        return (char)(index + firstChar);
+    }
+    public static int charToIndex(char c) {
+        return (int)c - firstChar;
     }
 }
