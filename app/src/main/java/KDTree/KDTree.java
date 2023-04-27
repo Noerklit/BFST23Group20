@@ -104,4 +104,17 @@ public class KDTree implements Serializable {
             drawTree(current.left, left, right, up, down, fidelity);
         }
     }
+
+    // public void traverse(){
+    //     traverse(root);
+    // }
+
+    // private void traverse(Way curr){
+    //     if (curr == null)
+    //         return;
+    //     
+    //     // do something
+    //     traverse(curr.left);
+    //     traverse(curr.right);
+    // }
 }
