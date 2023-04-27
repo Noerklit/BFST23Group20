@@ -87,7 +87,7 @@ public class MapDraw {
 
         double up = getScreenLat(0 + cutoffFactor);
         double down = getScreenLat(1 - cutoffFactor);
-
+//        System.out.println(up);
         double left = getScreenLon(0 + cutoffFactor);
         double right = getScreenLon(1 - cutoffFactor);
 
@@ -242,6 +242,12 @@ public class MapDraw {
     }
     private double getScreenLat(double factor) {
         return (trans.getTy() * -1 + canvas.getHeight() * factor) * scalingConst;
+    }
+    public double convertMouseLon(double mouseCoord) {
+        return (trans.getTx() * -1 - canvas.getWidth()+(canvas.getWidth() + mouseCoord))*scalingConst;
+    }
+    public double convertMouseLat(double mouseCoord) {
+        return (trans.getTy() * -1 + canvas.getHeight() - mouseCoord)*scalingConst;
     }
 
     private void calculateFidelity() {
