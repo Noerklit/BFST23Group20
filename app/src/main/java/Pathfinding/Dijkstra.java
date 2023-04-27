@@ -2,6 +2,8 @@ package Pathfinding;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.HashMap;
 
 import edu.princeton.cs.algs4.Edge;
 import edu.princeton.cs.algs4.EdgeWeightedGraph;
@@ -9,13 +11,67 @@ import edu.princeton.cs.algs4.MinPQ;
 
 public class Dijkstra {
     public Dijkstra() {
-        DijkstraTest();
+        EdgeWeightedGraph g = DijkstraTest();
+        RunDijkstra(g, new Edge(0, 0, 0));
     }
 
-    public void DijkstraTest() {
-        // Generate testcase from this
-        // https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/
+    public ArrayList<Edge> RunDijkstra(EdgeWeightedGraph graph, Edge start) {
+        // Create a priority queue to sort the minimal weights
+        MinPQ<Edge> priorityQueue = new MinPQ<>();
+        priorityQueue.insert(start);
 
+        // Create array dist that holds distance to certain vertices
+        // Create map which holds the previous node, used to reach the current node
+        double distanceTo[] = new double[graph.V()];
+        Map<Edge, Edge> previous = new HashMap<>();
+
+        // Fill the array with max value, except for the start
+        Arrays.fill(distanceTo, Double.MAX_VALUE);
+        distanceTo[start.either()] = 0;
+
+        // While there is a minimal weight in the priority queue
+        while (!priorityQueue.isEmpty()) {
+            Edge minimalEdge = priorityQueue.delMin();
+
+            // Get the destination vertex, we will look from this. I.e. 0-5, the int returned
+            // would in this case be 5, as the structure is FROM - TO
+            int destinationVertex = minimalEdge.other(minimalEdge.either());
+
+            // Find adjacents to this destination, this will be the new source
+            for (Edge neighbourEdge : graph.adj(destinationVertex)) {
+                int newDestination = neighbourEdge.other(destinationVertex);
+
+                if ( distanceTo[newDestination] > distanceTo[destinationVertex] + neighbourEdge.weight() ) {
+                    distanceTo[newDestination] = distanceTo[destinationVertex] + neighbourEdge.weight();
+
+                    //Edge toInsert = new Edge(v.other(current), newDestination, v.weight());
+                    Edge toInsert = new Edge(neighbourEdge.either(), newDestination, neighbourEdge.weight());
+                    if (previous.containsKey(minimalEdge)) {
+                        if (previous.get(minimalEdge).weight() > toInsert.weight() + distanceTo[newDestination]) {
+                            previous.put(minimalEdge, toInsert);
+                        }
+                    } else {
+                        previous.put(minimalEdge, toInsert);
+                    }
+
+                    priorityQueue.insert(toInsert);
+                }
+            }
+        }
+       
+        ArrayList<Edge> returnEdges = new ArrayList<>();
+        Edge tmp = start;
+        while (previous.containsKey(tmp)) {
+            tmp = previous.get(tmp);
+            System.out.println(tmp);
+            returnEdges.add(tmp);
+        }
+
+        return returnEdges;
+
+    }
+
+    public EdgeWeightedGraph DijkstraTest() {
         EdgeWeightedGraph test = new EdgeWeightedGraph(9);
 
         test.addEdge(new Edge(0, 1, 4));
@@ -33,36 +89,6 @@ public class Dijkstra {
         test.addEdge(new Edge(5, 3, 14));
         test.addEdge(new Edge(5, 4, 10));
 
-        MinPQ<Edge> priorityQueue = new MinPQ<>();
-
-
-        // Only src parameter and weight matters
-        Edge start = new Edge(0, 0 , 0);
-        priorityQueue.insert(start); // new Edge(0, 0, 4));
-
-        double dist[] = new double[test.V()];
-        Arrays.fill(dist, Double.MAX_VALUE);
-        dist[0] = 0;
-
-        while (!priorityQueue.isEmpty()) {
-            Edge min = priorityQueue.delMin();    
-            int src = min.either();
-
-            System.out.println(src);
-            for (Edge v : test.adj(src)) {
-                int current = v.other(src);
-                if ( dist[current] > dist[src] + v.weight() ) {
-                    dist[current] = dist[src] + v.weight();
-
-                    Edge toInsert = new Edge(current, 0, v.weight());
-                    priorityQueue.insert(toInsert);
-                }
-            }
-        }
-
-        System.out.println("Vertex Distance from Source");
-        for (int i = 0; i < test.V(); i++) {
-            System.out.println(i + "\t\t" + dist[i]);
-        }
+        return test;
     }
 }
