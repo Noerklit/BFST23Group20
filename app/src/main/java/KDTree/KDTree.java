@@ -4,6 +4,8 @@ import Model.Model;
 import Model.Way;
 import View.MapDraw;
 
+import java.awt.*;
+import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -104,22 +106,29 @@ public class KDTree implements Serializable {
             drawTree(current.left, left, right, up, down, fidelity);
         }
     }
-    public void findWay(double xVal, double yVal){
-        findWay(root, root, xVal, yVal, Double.MAX_VALUE);
-    }
-    private Way findWay(Way curr, Way parent, double xVal, double yVal, double minDist){
-        if (curr == null)
-            return parent;
+//    public void findWay(Point2D point2d){
+//        findWay(root, root, point2d, Double.MAX_VALUE);
+//    }
+//    private Way findWay(Way curr, Way nearest, Point2D point, double minDist){
+//        if (curr == null)
+//            return nearest;
+//
+//        if (curr.xVal == point.getX() && curr.yVal == point.getY())
+//            return curr;
+//
+//        if (distTo(curr, point) < distTo(nearest, point))
+//            nearest = curr;
+//
+//        if (curr.depth%2==0){
+//
+//        }
+//        else {
+//
+//        }
+//    }
 
-        int cmpX;
-        if (curr.xVal > xVal)
-            cmpX = -1;
-        else if (curr.xVal == xVal)
-            cmpX = 0;
-        else
-            cmpX = 1;
-        return curr;
-
+    private double distTo(Way way, Point2D point){
+        return Math.sqrt(Math.pow(way.xVal - point.getX(),2) + Math.pow(way.yVal-point.getY(), 2));
     }
 
 
