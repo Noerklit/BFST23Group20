@@ -43,10 +43,13 @@ public class Dijkstra {
 
                 if ( distanceTo[newDestination] > distanceTo[destinationVertex] + neighbourEdge.weight() ) {
                     distanceTo[newDestination] = distanceTo[destinationVertex] + neighbourEdge.weight();
+                    int newSource = neighbourEdge.either();
 
-                    //Edge toInsert = new Edge(v.other(current), newDestination, v.weight());
-                    Edge toInsert = new Edge(neighbourEdge.either(), newDestination, neighbourEdge.weight());
+                    Edge toInsert = new Edge(newSource, newDestination, neighbourEdge.weight());
+
                     if (previous.containsKey(minimalEdge)) {
+                        // If the minimal edge is already in our 'previous' hashmap, check if it's
+                        // a better way from source to new destination, if it is, then we update our mapping
                         if (previous.get(minimalEdge).weight() > toInsert.weight() + distanceTo[newDestination]) {
                             previous.put(minimalEdge, toInsert);
                         }
@@ -58,7 +61,8 @@ public class Dijkstra {
                 }
             }
         }
-       
+      
+        // Create our path from start to end, based on our mapping of edge to edge
         ArrayList<Edge> returnEdges = new ArrayList<>();
         Edge tmp = start;
         while (previous.containsKey(tmp)) {
