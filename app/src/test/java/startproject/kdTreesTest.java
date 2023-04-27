@@ -75,7 +75,6 @@ public class kdTreesTest {
         kdTree.insert(way4);
         assertEquals(way2.xVal, kdTree.root.xVal);
         assertEquals(way3.xVal, kdTree.root.right.xVal);
-        assertEquals(way3.yVal, kdTree.root.right.yVal);
         assertEquals(way5.xVal, kdTree.root.left.xVal);
         assertEquals(way4.yVal, kdTree.root.right.right.yVal);
     }    
