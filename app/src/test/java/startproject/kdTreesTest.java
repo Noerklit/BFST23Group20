@@ -27,21 +27,21 @@ public class kdTreesTest {
     private void makeTestWays () {
         List<Way> testWays = new ArrayList<Way>();
         ArrayList<Node> testNodes = new ArrayList<>();
-        testNodes.add(new Node(55.23, 22.53, null));
+        testNodes.add(new Node(55.23f,22.53f, null));
         way1 = new Way(testNodes, null, null);
-        way1.xVal = 3263.4674;
+        way1.xVal = 3263.4674f;
         testWays.add(way1);
         way2 = new Way(testNodes, null, null);
-        way2.xVal = 3663.4674;
+        way2.xVal = 3663.4674f;
         testWays.add(way2);
         way3 = new Way(testNodes, null, null);
-        way3.xVal = 3663.9674;
+        way3.xVal = 3663.9674f;
         testWays.add(way3);
         way4 = new Way(testNodes, null, null);
-        way4.xVal = 4063.4674;
+        way4.xVal = 4063.4674f;
         testWays.add(way4);
         way5 = new Way(testNodes, null, null);
-        way5.xVal = 2063.4674;
+        way5.xVal = 2063.4674f;
         testWays.add(way5);
     }
 
