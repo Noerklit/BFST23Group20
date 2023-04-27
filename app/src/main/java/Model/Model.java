@@ -11,9 +11,12 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
 import java.util.zip.ZipInputStream;
+import edu.princeton.cs.algs4.Edge;
+import edu.princeton.cs.algs4.EdgeWeightedGraph;
 
 import Benchmark.TaskTimer;
 import KDTree.KDTree;
+import Pathfinding.Dijkstra;
 
 public class Model implements Serializable {
 
@@ -106,6 +109,11 @@ public class Model implements Serializable {
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();
         maxlon = parser.getMaxlon();
+
+        EdgeWeightedGraph graph = wayKDTree.traverse();
+        new Dijkstra(graph, 1096, 6189, 0.0);
+        return;
+        //EdgeWeightedGraph graph = new EdgeWeightedGraph();
     }
 
     private DrawType keyValToDrawType(String key, String val) {

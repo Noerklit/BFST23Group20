@@ -9,11 +9,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.lang.Math;
+
+// import edu.princeton.cs.algs4.Edge;
+import edu.princeton.cs.algs4.Edge;
+import edu.princeton.cs.algs4.EdgeWeightedGraph;
 
 public class KDTree implements Serializable {
 
     /// Needs to be public because of unit tests
     public Way root;
+    public int cnt = 0;
 
     public KDTree() {
     }
@@ -105,16 +111,44 @@ public class KDTree implements Serializable {
         }
     }
 
-    // public void traverse(){
-    //     traverse(root);
-    // }
+    public EdgeWeightedGraph traverse(){
+        EdgeWeightedGraph graph = new EdgeWeightedGraph(7000);
+        traverse(root, graph);
+        return graph;
+    }
 
-    // private void traverse(Way curr){
-    //     if (curr == null)
-    //         return;
-    //     
-    //     // do something
-    //     traverse(curr.left);
-    //     traverse(curr.right);
-    // }
+    private void traverse(Way curr, EdgeWeightedGraph graph){
+        if (curr == null)
+            return;
+      
+        for (int i = 0; i < curr.coords.length/4; i+=2) {
+            try {
+                float source_x = curr.coords[i];
+                float source_y = curr.coords[i+1];
+                float dest_x = curr.coords[i+2];
+                float dest_y = curr.coords[i+3];
+
+                Long id_from = curr.ids[i];
+                Long id_to = curr.ids[i+2];
+
+                double delta_x = dest_x-source_x;
+                double delta_y = dest_y-source_y;
+
+                double weight = Math.sqrt(delta_x * delta_x + delta_y * delta_y);
+
+                int from = Math.abs(id_from.intValue()) % 6999;
+                int dest = Math.abs(id_to.intValue()) % 6999;
+            
+                System.out.println(from + " " + dest);
+
+                graph.addEdge(new Edge(from, dest, weight));
+                cnt++;
+            } catch (Exception e) {
+                System.out.println("Got exception");
+            }
+        }
+
+        traverse(curr.left, graph);
+        traverse(curr.right, graph);
+    }
 }

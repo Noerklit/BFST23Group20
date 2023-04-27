@@ -10,9 +10,9 @@ import edu.princeton.cs.algs4.EdgeWeightedGraph;
 import edu.princeton.cs.algs4.MinPQ;
 
 public class Dijkstra {
-    public Dijkstra() {
+    public Dijkstra(EdgeWeightedGraph graph, int start, int end, double weight) {
         // BuildEdgeWeightedGraph();
-        DijkstraTest();
+        RunDijkstra(graph, start, end, weight);
     }
 
     // public void BuildEdgeWeightedGraph() {
@@ -20,10 +20,12 @@ public class Dijkstra {
     //     return;
     // }
 
-    public ArrayList<Edge> RunDijkstra(EdgeWeightedGraph graph, Edge start, int end) {
+    public ArrayList<Edge> RunDijkstra(EdgeWeightedGraph graph, int start, int end, double weight) {
         // Create a priority queue to sort the minimal weights
         MinPQ<Edge> priorityQueue = new MinPQ<>();
-        priorityQueue.insert(start);
+
+        Edge startEdge = new Edge(start, start, weight);
+        priorityQueue.insert(startEdge);
 
         // Create array dist that holds distance to certain vertices
         // Create map which holds the previous node, used to reach the current node
@@ -32,7 +34,7 @@ public class Dijkstra {
 
         // Fill the array with max value, except for the start
         Arrays.fill(distanceTo, Double.MAX_VALUE);
-        distanceTo[start.either()] = 0;
+        distanceTo[start] = 0;
 
         // While there is a minimal weight in the priority queue
         while (!priorityQueue.isEmpty()) {
@@ -72,7 +74,7 @@ public class Dijkstra {
       
         // Create our path from start to end, based on our mapping of edge to edge
         ArrayList<Edge> returnEdges = new ArrayList<>();
-        Edge tmp = start;
+        Edge tmp = startEdge;
         while (previous.containsKey(tmp)) {
             tmp = previous.get(tmp);
             System.out.println(tmp);
@@ -82,25 +84,25 @@ public class Dijkstra {
         return returnEdges;
     }
 
-    public EdgeWeightedGraph DijkstraTest() {
-        EdgeWeightedGraph test = new EdgeWeightedGraph(9);
+    // public EdgeWeightedGraph DijkstraTest() {
+    //     EdgeWeightedGraph test = new EdgeWeightedGraph(9);
 
-        test.addEdge(new Edge(0, 1, 4));
-        test.addEdge(new Edge(1, 2, 8));
-        test.addEdge(new Edge(2, 3, 7));
-        test.addEdge(new Edge(3, 4, 9));
-        test.addEdge(new Edge(0, 7, 8));
-        test.addEdge(new Edge(7, 8, 7));
-        test.addEdge(new Edge(7, 1, 11));
-        test.addEdge(new Edge(7, 6, 1));
-        test.addEdge(new Edge(6, 8, 6));
-        test.addEdge(new Edge(6, 5, 2));
-        test.addEdge(new Edge(8, 2, 2));
-        test.addEdge(new Edge(2, 5, 4));
-        test.addEdge(new Edge(5, 3, 14));
-        test.addEdge(new Edge(5, 4, 10));
+    //     test.addEdge(new Edge(0, 1, 4));
+    //     test.addEdge(new Edge(1, 2, 8));
+    //     test.addEdge(new Edge(2, 3, 7));
+    //     test.addEdge(new Edge(3, 4, 9));
+    //     test.addEdge(new Edge(0, 7, 8));
+    //     test.addEdge(new Edge(7, 8, 7));
+    //     test.addEdge(new Edge(7, 1, 11));
+    //     test.addEdge(new Edge(7, 6, 1));
+    //     test.addEdge(new Edge(6, 8, 6));
+    //     test.addEdge(new Edge(6, 5, 2));
+    //     test.addEdge(new Edge(8, 2, 2));
+    //     test.addEdge(new Edge(2, 5, 4));
+    //     test.addEdge(new Edge(5, 3, 14));
+    //     test.addEdge(new Edge(5, 4, 10));
 
-        RunDijkstra(test, new Edge(0, 0, 0), 4);
-        return test;
-    }
+    //     RunDijkstra(test, new Edge(0, 0, 0), 4);
+    //     return test;
+    // }
 }
