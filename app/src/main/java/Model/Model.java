@@ -18,6 +18,7 @@ import KDTree.KDTree;
 public class Model implements Serializable {
 
     public List<Way> ways = new ArrayList<Way>();
+    public List<Way> coastlines;
 
     public double minlat, maxlat, minlon, maxlon;
     public KDTree wayKDTree, backgroundKdtree, buildingKdtree;
@@ -100,6 +101,7 @@ public class Model implements Serializable {
         wayKDTree = parser.wayKDTree;
         backgroundKdtree = parser.backgroundKdtree;
         buildingKdtree = parser.buildingKdtree;
+        coastlines = parser.coastlines;
         minlat = parser.getMinlat();
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();
