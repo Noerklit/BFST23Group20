@@ -39,7 +39,7 @@ public class App extends Application{
 
         new Dijkstra();
 
-        //launch(args);
+        launch(args);
     }
 
     @Override

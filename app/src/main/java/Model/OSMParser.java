@@ -140,7 +140,6 @@ public class OSMParser {
     }
 
     private void parseWays(XMLStreamReader2 input) throws XMLStreamException {
-
         allWays = new ArrayList<Way>();
         coastlines = new ArrayList<>();
         var nodesToWay = new ArrayList<Node>();
