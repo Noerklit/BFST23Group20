@@ -2,6 +2,7 @@ package KDTree;
 
 import Model.Model;
 import Model.Way;
+import View.MapDraw;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,26 +12,11 @@ import java.util.List;
 
 public class KDTree implements Serializable {
 
+    /// Needs to be public because of unit tests
     public Way root;
 
     public KDTree() {
     }
-
-//    private void buildTree(Way way, List<Way> ways, int from, int to, boolean isX){
-//        if(from == to) return;
-//        int mid = (from + to) >> 1;
-//        if(isX) {
-//            Collections.sort(ways, compareX);
-//        } else {
-//            Collections.sort(ways, compareY);
-//        }
-//        way = ways.get(mid);
-//        way.left = ways.get(mid >> 1);
-//        way.right = ways.get(mid + (mid >> 1));
-//        buildTree(way.left, ways, from, mid, !isX);
-//        buildTree(way.right, ways, mid + 1, to, !isX);
-//    }
-
 
     //Sets the first incoming way to the root of the tree. Each incoming way is compared to variable current that moves
     // down the tree until it finds an empty node where the way is placed.
@@ -72,7 +58,50 @@ public class KDTree implements Serializable {
         return root;
     }
 
+    /**
+     * Starts the drawing of the entire kd-tree by calling drawTree
+     * we dont want to give the tree it's own root as an argument
+     * @param left left bound of screen
+     * @param right right bound of screen
+     * @param up lower bound of screen
+     * @param down upper bound of screen
+     * @param fidelity current fidelity level
+     */
+    public void drawTree(double left, double right, double up, double down,int fidelity){
+        drawTree(root, left, right, up, down, fidelity);
+    }
 
+    private void drawTree(
+            Way current,
+            double left,
+            double right,
+            double up,
+            double down,
+            int fidelity)
+    {
+        boolean inRange;
+        boolean tooSmall;
+        if (current == null) {
+            return;
+        }
 
-
+        if (current.depth%2==0) {
+            inRange = left < current.xVal && current.xVal < right;
+            tooSmall = current.xVal < left;
+        } else {
+            inRange = up < current.yVal && current.yVal < down;
+            tooSmall = current.yVal > down;
+        }
+        if (inRange) {
+            current.draw();
+            drawTree(current.left, left, right, up, down, fidelity);
+            drawTree(current.right, left, right, up, down, fidelity);
+            return;
+        }
+        if (tooSmall) {
+            drawTree(current.right, left, right, up, down, fidelity);
+        } else {
+            drawTree(current.left, left, right, up, down, fidelity);
+        }
+    }
 }

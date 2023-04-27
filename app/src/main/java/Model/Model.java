@@ -20,8 +20,7 @@ public class Model implements Serializable {
     public List<Way> ways = new ArrayList<Way>();
 
     public double minlat, maxlat, minlon, maxlon;
-    public KDTree wayKDTree;
-    public KDTree backgroundKdtree;
+    public KDTree wayKDTree, backgroundKdtree, buildingKdtree;
 
     public static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException {
         if (filename.endsWith(".obj")) {
@@ -100,6 +99,7 @@ public class Model implements Serializable {
         ways = parser.getWays();
         wayKDTree = parser.wayKDTree;
         backgroundKdtree = parser.backgroundKdtree;
+        buildingKdtree = parser.buildingKdtree;
         minlat = parser.getMinlat();
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();

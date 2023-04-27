@@ -23,17 +23,16 @@ public class OSMParser {
 
     private ArrayList<Node> allNodes;
     private ArrayList<Way> allWays;
-    public KDTree wayKDTree;
-    public KDTree backgroundKdtree;
+    public KDTree wayKDTree, backgroundKdtree, buildingKdtree;
 
     public OSMParser(InputStream inputStream) {
         wayKDTree = new KDTree();
         backgroundKdtree = new KDTree();
+        buildingKdtree = new KDTree();
         mainOSMParsing(inputStream);
     }
 
     public List<Way> getWays() {
-//        ways.sort(cmp);
         return ways;
     }
 
@@ -111,7 +110,7 @@ public class OSMParser {
 
     private void parseNodes(XMLStreamReader2 input) throws XMLStreamException {
 
-        allNodes = new ArrayList<Node>();
+        allNodes = new ArrayList<>();
 
         while (input.hasNext()) {
             if (input.isStartElement()) {
@@ -123,7 +122,7 @@ public class OSMParser {
                     var lon = queryFloat(input, "lon");
                     allNodes.add(new Node(lat, lon, id));
                 } else if (name == "tag") {
-                    
+
                 } else {
                     break;
                 }
@@ -179,15 +178,23 @@ public class OSMParser {
                     allWays.add(wayToAdd);
 
                     if (addWay) {
-                        if (
-                            (currentDrawType.toString().contains("landuse") ||
-                            currentDrawType.toString().contains("natural") ||
-                            currentDrawType.toString().contains("wet") ||
-                            currentDrawType == DrawType.coastline) &&
-                            !currentDrawType.toString().contains("building"))
-                            backgroundKdtree.insert(wayToAdd);
-                        else
+                        try {
+                            String drawtypeString = currentDrawType.toString().substring(0, 7);
+                            if ((drawtypeString.equals("landuse") ||
+                                drawtypeString.equals("natural") ||
+                                drawtypeString.equals("wetland") ||
+                                currentDrawType == DrawType.coastline) &&
+                                !drawtypeString.equals("buildin")){
+                                backgroundKdtree.insert(wayToAdd);
+                            }
+                            else if (drawtypeString.equals("buildin")) {
+                                buildingKdtree.insert(wayToAdd);
+                            } else
+                                wayKDTree.insert(wayToAdd);
+                        } catch (Exception e)
+                        {
                             wayKDTree.insert(wayToAdd);
+                        }
                     }
                 }
             }
@@ -249,8 +256,10 @@ public class OSMParser {
                 if  (name == "relation" && addRelation) {
                     for(Way way : outerWays){
                         way.drawType = currentDrawType;
-                        backgroundKdtree.insert(way);
-//                        ways.add(way);
+                        if (way.drawType == DrawType.building)
+                            buildingKdtree.insert(way);
+                        else
+                            backgroundKdtree.insert(way);
                     }
                 }
             }

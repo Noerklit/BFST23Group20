@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import View.MapDraw;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -40,8 +41,10 @@ public class Way implements Serializable, Comparable<Way> {
 
 
 
-    public void draw(GraphicsContext gc, HashMap<DrawType, Color> colorMap, int fidelity) {
-        Color color = colorMap.get(drawType);
+    public void draw() {
+        GraphicsContext gc = MapDraw.gc;
+        Color color = MapDraw.defaultColorMap.get(drawType);
+        int fidelity = MapDraw.fidelity;
         if(drawType.fidelity <= fidelity) {
             makePath(gc, fidelity);
             if(drawType.shouldFill) {

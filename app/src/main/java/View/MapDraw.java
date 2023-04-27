@@ -18,16 +18,15 @@ import Benchmark.FrameRateTimer;
 
 public class MapDraw {
     private Canvas canvas;
-    private GraphicsContext gc;
+    public static GraphicsContext gc;
 
     private double scalingConst;
 
     private Affine trans;
 
     private Model model;
-    private Way[] waysArr;
-    private HashMap<DrawType, Color> defaultColorMap;
-    private int fidelity;
+    public static HashMap<DrawType, Color> defaultColorMap;
+    public static int fidelity;
 
     private boolean darkMode, debugMode;
 
@@ -37,22 +36,9 @@ public class MapDraw {
 
     private Text debugText;
 
-    Comparator<Way> cmp = new Comparator<Way>() {
-        public int compare(Way o1, Way o2) {
-            if (o1.coords.length < o2.coords.length){
-                return 1;
-            }
-            if (o1.coords.length > o2.coords.length){
-                return -1;
-            }
-            return 0;
-        }
-    };
 
     public MapDraw(Model model, Canvas canvas) {
         this.model = model;
-        this.waysArr = model.ways.toArray(new Way[0]);
-//        this.waysArr = model.ways;
         this.canvas = canvas;
         this.darkMode = false;
         this.debugMode = false;
@@ -65,9 +51,7 @@ public class MapDraw {
 
         createColorMap();
 
-        Collections.sort(model.ways, cmp);
         calculateFidelity();
-        System.out.println(model.maxlat);
         pan(-0.56*model.minlon, model.maxlat);
         zoom(0, 0, canvas.getHeight() / (model.maxlat - model.minlat));
         scalingConst = (model.maxlat - model.minlat) / canvas.getHeight();
@@ -107,67 +91,19 @@ public class MapDraw {
         double right = getScreenLon(1 - cutoffFactor);
 
         gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
-//        System.out.println("hej med dig");
-        for (int i = model.ways.size()-1; i>0; i--) {
-            var way = model.ways.get(i);
-            int mid = way.coords.length>>1;
-            int trueMid = mid%2==0?mid:mid-1;
-            double lon = way.coords[trueMid];
-            double lat = way.coords[trueMid+1];
-            boolean inHorizontal = left < lon && lon < right;
-            boolean inVertical = up < lat && lat < down;
 
-            if (inHorizontal && inVertical) {
-                way.draw(gc, defaultColorMap, fidelity);
-            } else if (way.getDrawType() == DrawType.coastline) {
-                way.draw(gc, defaultColorMap, fidelity);
-            }
-
-        }
-
-        Way rootBackground = model.backgroundKdtree.root;
-        Way rootWay = model.wayKDTree.root;
         gc.setLineWidth(1/Math.sqrt(trans.determinant()));
         gc.beginPath();
-        traverse(rootBackground, left, right, up, down);
-        traverse(rootWay, left, right, up, down);
+        model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
+        model.wayKDTree.drawTree(left, right, up, down, fidelity);
+        model.buildingKdtree.drawTree(left, right, up, down, fidelity);
+
         //traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
 
         FrameRateTimer.endFrame();
     }
 
-    private void traverse(
-            Way current,
-            double left,
-            double right,
-            double up,
-            double down)
-    {
-        boolean inRange;
-        boolean tooSmall;
-        if (current == null) {
-            return;
-        }
 
-        if (current.depth%2==0) {
-            inRange = left < current.xVal && current.xVal < right;
-            tooSmall = current.xVal < left;
-        } else {
-            inRange = up < current.yVal && current.yVal < down;
-            tooSmall = current.yVal > down;
-        }
-        if (inRange) {
-            current.draw(gc, defaultColorMap, fidelity);
-            traverse(current.left, left, right, up, down);
-            traverse(current.right, left, right, up, down);
-            return;
-        }
-        if (tooSmall) {
-            traverse(current.right, left, right, up, down);
-        } else {
-            traverse(current.left, left, right, up, down);
-        }
-    }
     private void traverseDebug(
             Way current,
             double left,
