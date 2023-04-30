@@ -16,6 +16,7 @@ import java.util.zip.ZipInputStream;
 import Benchmark.TaskTimer;
 import KDTree.KDTree;
 import Pathfinding.Dijkstra;
+import edu.princeton.cs.algs4.Edge;
 import edu.princeton.cs.algs4.EdgeWeightedGraph;
 
 public class Model implements Serializable {
@@ -110,18 +111,40 @@ public class Model implements Serializable {
         maxlat = parser.getMaxlat();
         maxlon = parser.getMaxlon();
 
+        // Dijkstra o = new Dijkstra(new EdgeWeightedGraph(2), 0,0,0);
+        // o.DijkstraTest();
+
+        wayKDTree.prep();
+        System.out.println("Checkpoint 1");
         EdgeWeightedGraph graph = wayKDTree.traverse();
+        System.out.println("Checkpoint 2");
+        int start = wayKDTree.map.get(773457415l);
+        int end = wayKDTree.map.get(4377832286l);
+        Dijkstra o = new Dijkstra(graph, start, end, 0.0);
+        // o.DijkstraTest();
 
-        long s = 4421811728l % 300000; 
-        long e = 32464034l % 300000;
+        Edge[] shortestPath = o.RunDijkstra(graph, start, end, 0.0);
+        System.out.println("Checkpoint 3");
 
-        System.out.println("Trying to get from " + s + " to " + e);
-        System.out.println("Should give " + s % 300000 + " to " + e % 300000);
+        // System.out.println(graph);
 
-        new Dijkstra(graph, s, e, 0.0);
-        System.out.println("Count for graph: " + wayKDTree.cnt);
+        // for (Edge bob : shortestPath) {
+        //     System.out.print(wayKDTree.intToID.get(bob.either()));
+        //     System.out.print(" gives ");
+        //     System.out.println(bob.either());
+        // }
+
+        //start = wayKDTree.map.get(3656978407l);
+        //end = wayKDTree.map.get(32948635l);
+        //o = new Dijkstra(graph, start, end, 0.0);
+        //System.out.println(graph);
+        //shortestPath = o.RunDijkstra(graph, start, end, 0.0);
+
+        //for (Edge bob : shortestPath) {
+        //    System.out.println(wayKDTree.intToID.get(bob.either()));
+        //}
+
         return;
-        //EdgeWeightedGraph graph = new EdgeWeightedGraph();
     }
 
     private DrawType keyValToDrawType(String key, String val) {
