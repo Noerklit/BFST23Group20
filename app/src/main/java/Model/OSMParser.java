@@ -4,10 +4,12 @@ import java.io.InputStream;
 
 import java.util.*;
 
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import KDTree.KDTree;
-import org.codehaus.stax2.*;
+//import org.codehaus.stax2.*;
 
 import Benchmark.TaskTimer;
 
@@ -78,14 +80,14 @@ public class OSMParser {
         }
     }
 
-    private XMLStreamReader2 getXMLReader(InputStream inputStream) throws XMLStreamException {
-        var stax = (XMLInputFactory2) XMLInputFactory2.newInstance();
-        stax.configureForSpeed();
-        var input = (XMLStreamReader2) stax.createXMLStreamReader(inputStream);
+    private XMLStreamReader getXMLReader(InputStream inputStream) throws XMLStreamException {
+        var stax = XMLInputFactory.newInstance();
+//        stax.configureForSpeed();
+        var input = stax.createXMLStreamReader(inputStream);
         return input;
     }
 
-    private void initialParsing(XMLStreamReader2 input) throws XMLStreamException {
+    private void initialParsing(XMLStreamReader input) throws XMLStreamException {
         while (input.hasNext()) {
             if (input.hasName()) {
                 var name = input.getLocalName();
@@ -96,7 +98,7 @@ public class OSMParser {
         }
     }
 
-    private void parseBounds(XMLStreamReader2 input) throws XMLStreamException {
+    private void parseBounds(XMLStreamReader input) throws XMLStreamException {
         while (input.hasNext()) {
             if (input.isStartElement()) {
                 var name = input.getLocalName();
@@ -113,7 +115,7 @@ public class OSMParser {
         }
     }
 
-    private void parseNodes(XMLStreamReader2 input) throws XMLStreamException {
+    private void parseNodes(XMLStreamReader input) throws XMLStreamException {
 
         allNodes = new ArrayList<>();
 
@@ -139,7 +141,7 @@ public class OSMParser {
         Collections.sort(allNodes);
     }
 
-    private void parseWays(XMLStreamReader2 input) throws XMLStreamException {
+    private void parseWays(XMLStreamReader input) throws XMLStreamException {
 
         allWays = new ArrayList<Way>();
         coastlines = new ArrayList<>();
@@ -214,7 +216,7 @@ public class OSMParser {
         Collections.sort(allWays);
     }
 
-    private void parseRelations(XMLStreamReader2 input) throws XMLStreamException {
+    private void parseRelations(XMLStreamReader input) throws XMLStreamException {
 
         List<Way> outerWays = new ArrayList<Way>();
 
@@ -278,15 +280,15 @@ public class OSMParser {
         // Collections.reverse(ways);
     }
 
-    private String queryString(XMLStreamReader2 input, String localName) {
+    private String queryString(XMLStreamReader input, String localName) {
         return input.getAttributeValue(null, localName);
     }
 
-    private float queryFloat(XMLStreamReader2 input, String localName) {
+    private float queryFloat(XMLStreamReader input, String localName) {
         return Float.parseFloat(queryString(input, localName));
     }
 
-    private long queryLong(XMLStreamReader2 input, String localName) {
+    private long queryLong(XMLStreamReader input, String localName) {
         return Long.parseLong(queryString(input, localName));
     }
 

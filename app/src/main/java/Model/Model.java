@@ -42,7 +42,7 @@ public class Model implements Serializable {
         } else {
             throw new IOException("Could not find .osm.zip or .osm file");
         }
-        save(filename+".obj");
+//        save(filename+".obj");
     }
 
     void save(String filename) throws IOException {
