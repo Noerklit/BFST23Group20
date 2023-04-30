@@ -22,6 +22,10 @@ public class kdTreesTest {
     Way way3;
     Way way4;
     Way way5;
+    Way way6;
+    Way way7;
+    Way way8;
+    Way way9;
     
     @BeforeEach
     private void makeTestWays () {
@@ -49,6 +53,10 @@ public class kdTreesTest {
         way5.xVal = 2063.4674f;
         way5.yVal = 2063.4674f;
         testWays.add(way5);
+        way6 = new Way(testNodes, null, null);
+        way6.xVal = 2063.4674f;
+        way6.yVal = 2063.4674f;
+
     }
     @Test
     public void testDoesKdTreeHaveRoot () {
@@ -63,6 +71,7 @@ public class kdTreesTest {
         kdTree.insert(way2);
         kdTree.insert(way3);
         kdTree.insert(way5);
+        assertEquals(way3.xVal, kdTree.root.right.xVal);
         assertEquals(way5.xVal, kdTree.root.left.xVal);
     }
     @Test
@@ -77,31 +86,29 @@ public class kdTreesTest {
         assertEquals(way3.xVal, kdTree.root.right.xVal);
         assertEquals(way5.xVal, kdTree.root.left.xVal);
         assertEquals(way4.yVal, kdTree.root.right.right.yVal);
-    }    
+    }
+    
+    @Test
+    public void testIfTwoWaysHaveSameXandYVal() {
+        KDTree kdTree = new KDTree();
+        kdTree.insert(way2);
+        kdTree.insert(way3);
+        kdTree.insert(way5);
+        kdTree.insert(way1);
+        kdTree.insert(way4);
+        kdTree.insert(way6);
+        assertEquals(way5.xVal, kdTree.root.left.xVal);
+        assertEquals(way6.xVal, kdTree.root.left.right.left.xVal);
+    }
+
+    @Test
+    public void testIsBiggerKdTreeBuiltCorrectlyOnBothXValAndYVal() {
+        KDTree kdTree = new KDTree();
+        kdTree.insert(way2);
+        kdTree.insert(way3);
+        kdTree.insert(way5);
+        kdTree.insert(way1);
+        kdTree.insert(way4);
+        kdTree.insert(way6);
+    }
 } 
-
-
-// public class AddressParsingTest {
-//     private AddressSearch addressSearch;
-
-    // @BeforeEach
-    // private void makeAddressTries () {
-    //     addressSearch = new AddressSearch();
-    //     addressSearch.addAddress("Bro");
-    //     addressSearch.addAddress("Brotastic");
-    //     addressSearch.addAddress("Bolle med Guf");
-    //     addressSearch.addAddress("Bussin");
-    //     addressSearch.addAddress("EbiSushi");
-    // }
-    // /**
-    //  * Makes a list of results based on search word, the list should only include strings that start with the search string,
-    //  * checks if the size of the result list is as expected.
-    //  */
-    // @Test 
-    // public void isResultListCorrectSize() {
-    //     List<String> result = new ArrayList<>();
-    //     result = addressSearch.getAddresses("br");
-    //     assertEquals(2, result.size(), "Expected size of result is 2");
-    //     result = addressSearch.getAddresses("b");
-    //     assertEquals(4, result.size(), "Expected size of result is 4");
-    // }
