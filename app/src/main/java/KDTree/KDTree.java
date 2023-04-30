@@ -1,6 +1,7 @@
 package KDTree;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 import Model.Way;
 import edu.princeton.cs.algs4.Edge;
@@ -10,7 +11,8 @@ public class KDTree implements Serializable {
 
     /// Needs to be public because of unit tests
     public Way root;
-    public int cnt = 0;
+    public int nodeCount = 0;
+    public HashMap<Long, Integer> map = new HashMap<>();
 
     public KDTree() {
     }
@@ -103,37 +105,58 @@ public class KDTree implements Serializable {
     }
 
     public EdgeWeightedGraph traverse(){
-        EdgeWeightedGraph graph = new EdgeWeightedGraph(300000);
-        traverse(root, graph);
-        return graph;
+        EdgeWeightedGraph g = new EdgeWeightedGraph(nodeCount);
+        traverse(root, g);
+        return g;
+    }
+
+    public void prep() {
+        prep(root);
+    }
+    private void prep(Way curr) {
+        if (curr == null)
+            return;
+        
+        for (int i = 0; i < curr.ids.length; i++) {
+            long nodeid = curr.ids[i];
+
+            // If we already have a unique identifier continue
+            if (map.containsKey(nodeid)) {
+                continue;
+            } else {
+                map.put(nodeid, nodeCount);
+                nodeCount++;
+            }
+        }
+
+        prep(curr.left);
+        prep(curr.right);
     }
 
     private void traverse(Way curr, EdgeWeightedGraph graph){
         if (curr == null)
             return;
-      
-        for (int i = 0; i < (curr.coords.length/4); i++) {
-            float source_x = curr.coords[i];
-            float source_y = curr.coords[i+1];
-            float dest_x = curr.coords[i+2];
-            float dest_y = curr.coords[i+3];
+     
+        for (int i = 0; i < (curr.coords.length)-2; i+=2) {
+            float x1 = curr.coords[i + 0];
+            float y1 = curr.coords[i + 1];
+            long id1 = curr.ids[i/2];
 
-            Long id_from = curr.ids[i];
-            Long id_to = curr.ids[i+1];
+            float x2 = curr.coords[i + 2];
+            float y2 = curr.coords[i + 3];
+            long id2 = curr.ids[i/2 + 1];
 
-            double delta_x = dest_x-source_x;
-            double delta_y = dest_y-source_y;
+            int id_src = map.get(id1);
+            int id_dest = map.get(id2);
 
-            double weight = Math.sqrt(delta_x * delta_x + delta_y * delta_y);
+            // if (id1 == 32948646 || id2 == 32948646) {
+            //     System.out.println(id_src + " " + id_dest + " " + id1 + " " + id2);
+            // }
+          
+            double weight = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+            Edge edgeToAdd = new Edge(id_src, id_dest, weight);
 
-            // System.out.println("I have gotten as longs: " + id_from + " " + id_to);
-            int from = ((Long)(id_from % 300000)).intValue();
-            int dest = ((Long)(id_to % 300000)).intValue();
-            // if (== from || 1049101 == dest)
-            //     System.out.println("Long conversion from: " + id_from + " " + id_to + " gave from, dest: " + from + " " + dest);
-
-            graph.addEdge(new Edge(from, dest, weight));
-            cnt++;
+            graph.addEdge(edgeToAdd);
         }
 
         traverse(curr.left, graph);
