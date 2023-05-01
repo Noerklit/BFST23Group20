@@ -13,6 +13,7 @@ public class KDTree implements Serializable {
     public Way root;
     public int nodeCount = 0;
     public HashMap<Long, Integer> map = new HashMap<>();
+    public HashMap<Integer, float[]> countToCoords = new HashMap<>();
 
     public KDTree() {
     }
@@ -149,9 +150,10 @@ public class KDTree implements Serializable {
             int id_src = map.get(id1);
             int id_dest = map.get(id2);
 
-            // if (id1 == 32948646 || id2 == 32948646) {
-            //     System.out.println(id_src + " " + id_dest + " " + id1 + " " + id2);
-            // }
+            if (!countToCoords.containsKey(id_src))
+                countToCoords.put(id_src, new float[]{x1, y1});
+            else if (!countToCoords.containsKey(id_dest))
+                countToCoords.put(id_dest, new float[]{x2, y2});
           
             double weight = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
             Edge edgeToAdd = new Edge(id_src, id_dest, weight);

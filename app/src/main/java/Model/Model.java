@@ -119,31 +119,29 @@ public class Model implements Serializable {
         System.out.println("Checkpoint 1");
         EdgeWeightedGraph graph = wayKDTree.traverse();
         System.out.println("Checkpoint 2");
-        int start = wayKDTree.map.get(773457415l);
-        int end = wayKDTree.map.get(4377832286l);
+        // int start = wayKDTree.map.get(773457415l);
+        // int end = wayKDTree.map.get(4377832286l);
+        int start = wayKDTree.map.get(738244853l);
+        int end = wayKDTree.map.get(1679649980l);
+
+        System.out.println("From start: " + start + " to " + end);
         Dijkstra o = new Dijkstra(graph, start, end, 0.0);
         // o.DijkstraTest();
 
-        Edge[] shortestPath = o.RunDijkstra(graph, start, end, 0.0);
-        System.out.println("Checkpoint 3");
+        Iterable<Edge> shortestPath = o.RunDijkstra(graph, start, end, 0.0);
 
-        // System.out.println(graph);
+        for (Edge e : shortestPath) {
+            int src = e.either();
+            int dest = e.other(src);
 
-        // for (Edge bob : shortestPath) {
-        //     System.out.print(wayKDTree.intToID.get(bob.either()));
-        //     System.out.print(" gives ");
-        //     System.out.println(bob.either());
-        // }
+            float x1 = wayKDTree.countToCoords.get(src)[0];
+            float y1 = wayKDTree.countToCoords.get(src)[1];
 
-        //start = wayKDTree.map.get(3656978407l);
-        //end = wayKDTree.map.get(32948635l);
-        //o = new Dijkstra(graph, start, end, 0.0);
-        //System.out.println(graph);
-        //shortestPath = o.RunDijkstra(graph, start, end, 0.0);
+            float x2 = wayKDTree.countToCoords.get(dest)[0];
+            float y2 = wayKDTree.countToCoords.get(dest)[1];
 
-        //for (Edge bob : shortestPath) {
-        //    System.out.println(wayKDTree.intToID.get(bob.either()));
-        //}
+            System.out.println("(" + x1 + ", " + y1 + ")" + " and " + "(" + x2 +", " + y2 + ")");
+        }
 
         return;
     }
