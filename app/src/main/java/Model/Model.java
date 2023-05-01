@@ -114,6 +114,7 @@ public class Model implements Serializable {
         // Dijkstra o = new Dijkstra(new EdgeWeightedGraph(2), 0,0,0);
         // o.DijkstraTest();
 
+        System.out.println("Checkpoint 0");
         wayKDTree.prep();
         System.out.println("Checkpoint 1");
         EdgeWeightedGraph graph = wayKDTree.traverse();
