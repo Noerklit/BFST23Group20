@@ -62,9 +62,6 @@ public class MapDraw {
         scalingConst = (model.maxlat - model.minlat) / canvas.getHeight();
 //        pan(-100,-100);
 //        zoom(380, 340, 40);
-        model.wayKDTree.prep();
-        EdgeWeightedGraph graph = model.wayKDTree.traverse();
-        dijkstraSPT = new Dijkstra(graph);
 
         redraw();
     }
@@ -114,38 +111,6 @@ public class MapDraw {
         }
 
         //traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
-        long start = 2752332804l;
-        long end = 7807444335l;
-
-        int start_ = model.wayKDTree.map.get(start);
-        int end_ = model.wayKDTree.map.get(end);
-        Iterable<Edge> shortestPath = dijkstraSPT.RunDijkstra(start_, end_);
-
-        gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
-        gc.beginPath();
-        int count = 0;
-        for (Edge e : shortestPath) {
-            int src = e.either();
-            int dest = e.other(src);
-
-            float x1 = model.wayKDTree.countToCoords.get(src)[0];
-            float y1 = model.wayKDTree.countToCoords.get(src)[1];
-
-            float x2 = model.wayKDTree.countToCoords.get(dest)[0];
-            float y2 = model.wayKDTree.countToCoords.get(dest)[1];
-
-            if (count == 0) {
-                gc.moveTo(x1, y1);
-                gc.lineTo(x2, y2);
-                count++;
-                continue;
-            }
-            gc.lineTo(x1, y1);
-            gc.lineTo(x2, y2);
-        }
-        gc.setStroke(Color.DARKVIOLET);
-        gc.stroke();
-        
         
         FrameRateTimer.endFrame();
     }
