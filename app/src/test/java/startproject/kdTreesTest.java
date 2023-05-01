@@ -27,40 +27,59 @@ public class kdTreesTest {
     private void makeTestWays () {
         List<Way> testWays = new ArrayList<Way>();
         ArrayList<Node> testNodes = new ArrayList<>();
-        testNodes.add(new Node(55.23, 22.53, null));
+
+        testNodes.add(new Node(55.23f,22.53f, null));
         way1 = new Way(testNodes, null, null);
-        way1.xVal = 3263.4674;
+        way1.xVal = 3263.4674f;
+        way1.yVal = 3263.4674f;
         testWays.add(way1);
         way2 = new Way(testNodes, null, null);
-        way2.xVal = 3663.4674;
+        way2.xVal = 3663.4674f;
+        way2.yVal = 3663.4674f;
         testWays.add(way2);
         way3 = new Way(testNodes, null, null);
-        way3.xVal = 3663.9674;
+        way3.xVal = 3863.9674f;
+        way3.yVal = 3863.9674f;
         testWays.add(way3);
         way4 = new Way(testNodes, null, null);
-        way4.xVal = 4063.4674;
+        way4.xVal = 4063.4674f;
+        way4.yVal = 4063.4674f;
         testWays.add(way4);
         way5 = new Way(testNodes, null, null);
-        way5.xVal = 2063.4674;
+        way5.xVal = 2063.4674f;
+        way5.yVal = 2063.4674f;
         testWays.add(way5);
     }
-
     @Test
-    public void doesKdTreeHaveRoot () {
+    public void testDoesKdTreeHaveRoot () {
         KDTree kdTree = new KDTree();
         kdTree.insert(way1);
         assertNotNull(kdTree.root);
     }
 
     @Test
-    public void isWayPlacedCorrectlyInKdTree() {
+    public void testIsWaySortedCorrectlyOnXValInKdTree() {
         KDTree kdTree = new KDTree();
         kdTree.insert(way2);
         kdTree.insert(way3);
         kdTree.insert(way5);
         assertEquals(way5.xVal, kdTree.root.left.xVal);
     }
+    @Test
+    public void testIsWaySortedCorrectlyOnYValInKdTree() {
+        KDTree kdTree = new KDTree();
+        kdTree.insert(way2);
+        kdTree.insert(way3);
+        kdTree.insert(way5);
+        kdTree.insert(way1);
+        kdTree.insert(way4);
+        assertEquals(way2.xVal, kdTree.root.xVal);
+        assertEquals(way3.xVal, kdTree.root.right.xVal);
+        assertEquals(way5.xVal, kdTree.root.left.xVal);
+        assertEquals(way4.yVal, kdTree.root.right.right.yVal);
+    }    
 } 
+
 
 // public class AddressParsingTest {
 //     private AddressSearch addressSearch;
