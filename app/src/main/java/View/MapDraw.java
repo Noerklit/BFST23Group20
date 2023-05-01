@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -25,7 +26,7 @@ public class MapDraw {
 
     private double scalingConst;
 
-    private Affine trans;
+    public Affine trans;
 
     private Model model;
     public static HashMap<DrawType, Color> defaultColorMap;
@@ -109,6 +110,21 @@ public class MapDraw {
             model.wayKDTree.drawTree(left, right, up, down, fidelity);
             model.buildingKdtree.drawTree(left, right, up, down, fidelity);
         }
+
+//        var temp  = model.wayKDTree.findWay(new Point2D( -55.1100540, 14.7530605));
+//        if (temp != null)
+//        {
+//            gc.setLineWidth(5 * 1/Math.sqrt(trans.determinant()));
+//            gc.beginPath();
+//            gc.moveTo(temp.coords[0], temp.coords[1]);
+//            for (int i = 2; i<temp.coords.length; i+=2)
+//            {
+//                gc.lineTo(temp.coords[i], temp.coords[i+1]);
+//            }
+//            gc.setStroke(Color.CHOCOLATE);
+//            gc.stroke();
+//
+//        }
 
         //traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
         
@@ -251,7 +267,7 @@ public class MapDraw {
         return (trans.getTx() * -1 - canvas.getWidth()+(canvas.getWidth() + mouseCoord))*scalingConst;
     }
     public double convertMouseLat(double mouseCoord) {
-        return (trans.getTy() * -1 + canvas.getHeight() - mouseCoord)*scalingConst;
+        return (trans.getTy() * -1 + canvas.getHeight() - (canvas.getHeight()- mouseCoord))*scalingConst;
     }
 
     private void calculateFidelity() {

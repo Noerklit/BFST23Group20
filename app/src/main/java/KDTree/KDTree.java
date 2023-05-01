@@ -1,5 +1,11 @@
 package KDTree;
 
+import Model.Model;
+import Model.Way;
+import View.MapDraw;
+import javafx.geometry.Point2D;
+
+
 import java.io.Serializable;
 import java.util.HashMap;
 
@@ -104,22 +110,40 @@ public class KDTree implements Serializable {
             drawTree(current.left, left, right, up, down, fidelity);
         }
     }
-    public void findWay(double xVal, double yVal){
-        findWay(root, root, xVal, yVal, Double.MAX_VALUE);
+    public Way findWay(Point2D point2d){
+        return findWay(root, root, point2d, Double.MAX_VALUE);
     }
-    private Way findWay(Way curr, Way parent, double xVal, double yVal, double minDist){
+    private Way findWay(Way curr, Way nearest, Point2D point, double minDist){
         if (curr == null)
-            return parent;
+            return nearest;
 
-        int cmpX;
-        if (curr.xVal > xVal)
-            cmpX = -1;
-        else if (curr.xVal == xVal)
-            cmpX = 0;
-        else
-            cmpX = 1;
-        return curr;
+        if (curr.xVal == point.getX() && curr.yVal == point.getY())
+            return curr;
 
+        if (distTo(curr, point) < distTo(nearest, point))
+            nearest = curr;
+
+        double outOfBounds = curr.depth%2==0? point.getX() - curr.xVal: point.getY()-curr.yVal;
+
+        if (outOfBounds<0){
+            nearest = findWay(curr.left, nearest, point, minDist);
+
+            if (distTo(nearest, point) >= Math.pow(outOfBounds, 2)){
+                nearest = findWay(curr.right, nearest, point, minDist);
+            }
+        }
+        else {
+            nearest = findWay(curr.right, nearest, point, minDist);
+            if (distTo(nearest, point) >= Math.pow(outOfBounds, 2)){
+                nearest = findWay(curr.left, nearest, point, minDist);
+            }
+        }
+
+        return nearest;
+    }
+
+    private double distTo(Way way, Point2D point){
+        return Math.sqrt(Math.pow(way.xVal - point.getX(),2) + Math.pow(way.yVal-point.getY(), 2));
     }
 
 
