@@ -2,6 +2,7 @@ package Controller;
 
 import Model.Model;
 import View.View;
+//import View.MapDraw;
 import javafx.geometry.Point2D;
 
 import javax.xml.stream.XMLStreamException;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import App.App;
 import javafx.scene.input.KeyEvent;
 import Parser.AddressParser;
+import javafx.scene.paint.Color;
 
 public class Controller {
     private String search;
@@ -21,6 +23,24 @@ public class Controller {
     parser = new AddressParser(); 
 
     view.getCanvas().setOnMousePressed(e -> {
+        if(e.isMiddleButtonDown()){
+//            System.out.println(view.convertMouseLon(e.getX()));
+//            System.out.println(view.convertMouseLat(e.getY()));
+            var temp  = model.wayKDTree.findWay(new Point2D( view.convertMouseLon(e.getX()), view.convertMouseLat(e.getY())));
+            if (temp != null)
+            {
+                view.getMapDraw().gc.setLineWidth(5 * 1/Math.sqrt(view.getMapDraw().trans.determinant()));
+                view.getMapDraw().gc.beginPath();
+                view.getMapDraw().gc.moveTo(temp.coords[0], temp.coords[1]);
+                for (int i = 2; i<temp.coords.length; i+=2)
+                {
+                    view.getMapDraw().gc.lineTo(temp.coords[i], temp.coords[i+1]);
+                }
+                view.getMapDraw().gc.setStroke(Color.CHOCOLATE);
+                view.getMapDraw().gc.stroke();
+
+            }
+        }
         lastX = e.getX();
         lastY = e.getY();
     });
