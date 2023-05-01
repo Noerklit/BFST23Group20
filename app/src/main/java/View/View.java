@@ -193,4 +193,8 @@ public class View {
             mapDraw.resizeCanvasHeight(deltaHeight);
         });
     }
+
+    public MapDraw getMapDraw(){
+        return mapDraw;
+    }
 }
