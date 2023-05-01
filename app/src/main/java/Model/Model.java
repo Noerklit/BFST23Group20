@@ -23,9 +23,10 @@ public class Model implements Serializable {
 
     public List<Way> ways = new ArrayList<Way>();
     public List<Way> coastlines;
-
+    
     public double minlat, maxlat, minlon, maxlon;
     public KDTree wayKDTree, backgroundKdtree, buildingKdtree;
+    // public Dijkstra dijkstraSPT;
 
     public static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException {
         if (filename.endsWith(".obj")) {
@@ -111,37 +112,6 @@ public class Model implements Serializable {
         maxlat = parser.getMaxlat();
         maxlon = parser.getMaxlon();
 
-        // Dijkstra o = new Dijkstra(new EdgeWeightedGraph(2), 0,0,0);
-        // o.DijkstraTest();
-
-        System.out.println("Checkpoint 0");
-        wayKDTree.prep();
-        System.out.println("Checkpoint 1");
-        EdgeWeightedGraph graph = wayKDTree.traverse();
-        System.out.println("Checkpoint 2");
-        // int start = wayKDTree.map.get(773457415l);
-        // int end = wayKDTree.map.get(4377832286l);
-        int start = wayKDTree.map.get(738244853l);
-        int end = wayKDTree.map.get(1679649980l);
-
-        System.out.println("From start: " + start + " to " + end);
-        Dijkstra o = new Dijkstra(graph, start, end, 0.0);
-        // o.DijkstraTest();
-
-        Iterable<Edge> shortestPath = o.RunDijkstra(graph, start, end, 0.0);
-
-        for (Edge e : shortestPath) {
-            int src = e.either();
-            int dest = e.other(src);
-
-            float x1 = wayKDTree.countToCoords.get(src)[0];
-            float y1 = wayKDTree.countToCoords.get(src)[1];
-
-            float x2 = wayKDTree.countToCoords.get(dest)[0];
-            float y2 = wayKDTree.countToCoords.get(dest)[1];
-
-            System.out.println("(" + x1 + ", " + y1 + ")" + " and " + "(" + x2 +", " + y2 + ")");
-        }
 
         return;
     }

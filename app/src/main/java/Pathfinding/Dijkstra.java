@@ -16,39 +16,36 @@ public class Dijkstra {
     int end;
     double weight;
 
-    public Dijkstra(EdgeWeightedGraph graph, int start, int end, double weight) {
+    public Dijkstra(EdgeWeightedGraph graph) {
         // BuildEdgeWeightedGraph();
-        this.start = start;
-        this.end = end;
-        this.weight = weight;
         this.graph = new EdgeWeightedGraph(graph);
     }
 
-    public Iterable<Edge> RunDijkstra(EdgeWeightedGraph graph, int start, int end, double weight) {
-        DijkstraUndirectedSP test = new DijkstraUndirectedSP(graph, start);
+    public Iterable<Edge> RunDijkstra(int start, int end) {
+        DijkstraUndirectedSP test = new DijkstraUndirectedSP(this.graph, start);
 
         return test.pathTo(end);
     }
 
-    public void DijkstraTest() {
-        EdgeWeightedGraph test = new EdgeWeightedGraph(9);
+    // public void DijkstraTest() {
+    //     EdgeWeightedGraph test = new EdgeWeightedGraph(9);
 
-        test.addEdge(new Edge(0, 1, 4));
-        test.addEdge(new Edge(1, 2, 8));
-        test.addEdge(new Edge(2, 3, 7));
-        test.addEdge(new Edge(3, 4, 9));
-        test.addEdge(new Edge(0, 7, 8));
-        test.addEdge(new Edge(7, 8, 7));
-        test.addEdge(new Edge(7, 1, 11));
-        test.addEdge(new Edge(7, 6, 1));
-        test.addEdge(new Edge(6, 8, 6));
-        // test.addEdge(new Edge(5, 6, 2));
-        test.addEdge(new Edge(6, 5, 2));
-        test.addEdge(new Edge(8, 2, 2));
-        test.addEdge(new Edge(2, 5, 4));
-        test.addEdge(new Edge(5, 3, 14));
-        test.addEdge(new Edge(5, 4, 10));
+    //     test.addEdge(new Edge(0, 1, 4));
+    //     test.addEdge(new Edge(1, 2, 8));
+    //     test.addEdge(new Edge(2, 3, 7));
+    //     test.addEdge(new Edge(3, 4, 9));
+    //     test.addEdge(new Edge(0, 7, 8));
+    //     test.addEdge(new Edge(7, 8, 7));
+    //     test.addEdge(new Edge(7, 1, 11));
+    //     test.addEdge(new Edge(7, 6, 1));
+    //     test.addEdge(new Edge(6, 8, 6));
+    //     // test.addEdge(new Edge(5, 6, 2));
+    //     test.addEdge(new Edge(6, 5, 2));
+    //     test.addEdge(new Edge(8, 2, 2));
+    //     test.addEdge(new Edge(2, 5, 4));
+    //     test.addEdge(new Edge(5, 3, 14));
+    //     test.addEdge(new Edge(5, 4, 10));
 
-        RunDijkstra(test, 0, 4, 4);
-    }
+    //     RunDijkstra(test, 0, 4, 4);
+    // }
 }
