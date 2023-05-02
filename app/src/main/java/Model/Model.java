@@ -48,6 +48,7 @@ public class Model implements Serializable {
             throw new IOException("Could not find .osm.zip or .osm file");
         }
 
+        TaskTimer.recordTask("Save to obj-file");
         save(filename+".obj");
     }
 
@@ -84,7 +85,7 @@ public class Model implements Serializable {
         }
         //*/
     }
-    
+
     public List<String> searchAddresses(String text) {
         try {
             return addressSearch.getAddresses(text);

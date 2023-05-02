@@ -69,22 +69,26 @@ public class OSMParser {
             parseBounds(input);
 
             TaskTimer.recordTask("Nodes");
-            parseNodes(input, addressSearch, temporaryAddressFile);
+            parseNodes(input, temporaryAddressFile);
 
+            //*/
             TaskTimer.recordTask("Ways");
             parseWays(input);
-
+            
             TaskTimer.recordTask("Relations");
             parseRelations(input);
 
             TaskTimer.recordTask("Finalize parsing");
-
+            //*/
+            
         } catch (XMLStreamException e) {
             throw new RuntimeException(e); // We should probably throw our own exception type here
         }
 
         allNodes = null;
         allWays = null;
+
+        TaskTimer.recordTask("Add addresses to tries");
 
         temporaryAddressFile.openReadStream();
 
@@ -131,7 +135,7 @@ public class OSMParser {
         }
     }
 
-    private void parseNodes(XMLStreamReader2 input, AddressSearch addressSearch, TemporaryAddressFile temporaryAddressFile) throws XMLStreamException {
+    private void parseNodes(XMLStreamReader2 input, TemporaryAddressFile temporaryAddressFile) throws XMLStreamException {
         
         allNodes = new ArrayList<Node>();
         Node currentNode = null;
