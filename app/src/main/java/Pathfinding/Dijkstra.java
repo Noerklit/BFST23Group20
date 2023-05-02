@@ -18,8 +18,8 @@ public class Dijkstra {
     int nodeCount;
     double distance;
 
-    HashMap<Long, Integer> nodeIdToIntegerId = new HashMap<>();
-    HashMap<Integer, float[]> integerIdToCoords = new HashMap<>();
+    static HashMap<Long, Integer> nodeIdToIntegerId = new HashMap<>();
+    static HashMap<Integer, float[]> integerIdToCoords = new HashMap<>();
 
     public Dijkstra(KDTree tree, String filter) {
         this.tree = tree;
@@ -53,7 +53,7 @@ public class Dijkstra {
         buildEdgesFromWays(root);
     }
 
-    public float[] getCoordsFromNodeId(Long nodeId) {
+    public static float[] getCoordsFromNodeId(Long nodeId) {
         int integerId = nodeIdToIntegerId.get(nodeId);
         return integerIdToCoords.get(integerId);
     }
