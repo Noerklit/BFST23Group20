@@ -10,7 +10,7 @@ import javafx.scene.paint.Color;
 
 public class Way implements Serializable, Comparable<Way> {
     public float[] coords;
-    public long[] ids;
+    public long[] nodeIds;
     DrawType drawType;
 
     int trueMid;
@@ -24,13 +24,13 @@ public class Way implements Serializable, Comparable<Way> {
 
     public Way(ArrayList<Node> way, DrawType drawType, Long id) {
             coords = new float[way.size() * 2];
-            ids = new long[way.size()];
+            nodeIds = new long[way.size()];
 
             for (int i = 0; i < way.size(); ++i) {
                 var node = way.get(i);
                 coords[2 * i] = (float)0.56 * node.lon;
                 coords[2 * i + 1] = -node.lat;
-                ids[i] = node.id;
+                nodeIds[i] = node.id;
             }
             this.drawType = drawType;
             this.id = id;

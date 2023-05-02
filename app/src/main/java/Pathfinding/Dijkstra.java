@@ -15,20 +15,20 @@ public class Dijkstra {
     KDTree tree;
     Way root;
     int nodeCount;
-    HashMap<Long, Integer> map = new HashMap<>();
-    HashMap<Integer, float[]> countToCoords = new HashMap<>();
+    HashMap<Long, Integer> nodeIdToIntegerId = new HashMap<>();
+    HashMap<Integer, float[]> integerIdToCoords = new HashMap<>();
 
     public Dijkstra(KDTree tree) {
         this.tree = tree;
         this.root = tree.root;
 
-        prepareForSPT(root);
-        buildTree(nodeCount);
+        prepareForBuildGraph(root);
+        buildGraph(nodeCount);
     }
 
     public Iterable<Edge> RunDijkstra(long start, long end) {
-        int startAsInteger = map.get(start);
-        int endAsInteger = map.get(end);
+        int startAsInteger = nodeIdToIntegerId.get(start);
+        int endAsInteger = nodeIdToIntegerId.get(end);
 
         DijkstraUndirectedSP dijkstraShortestPath = new DijkstraUndirectedSP(graph, startAsInteger);
 
@@ -38,9 +38,9 @@ public class Dijkstra {
         return null; 
     }
 
-    private void buildTree(int treeSize) {
+    private void buildGraph(int treeSize) {
         graph = new EdgeWeightedGraph(treeSize);
-        traverse(root);
+        buildEdgesFromWays(root);
     }
 
     public ArrayList<Float> getCoords(Iterable<Edge> pathToDraw) {
@@ -49,74 +49,64 @@ public class Dijkstra {
             int src = e.either();
             int dest = e.other(src);
 
-            float x1 = countToCoords.get(src)[0];
-            float y1 = countToCoords.get(src)[1];
+            float x1 = integerIdToCoords.get(src)[0];
+            float y1 = integerIdToCoords.get(src)[1];
             coordList.add(x1);
             coordList.add(y1);
 
-            float x2 = countToCoords.get(dest)[0];
-            float y2 = countToCoords.get(dest)[1];
+            float x2 = integerIdToCoords.get(dest)[0];
+            float y2 = integerIdToCoords.get(dest)[1];
             coordList.add(x2);
             coordList.add(y2);
-//            System.out.println(x1 + ", " + y1);
         }
         return coordList;
     }
 
-    // public EdgeWeightedGraph traverse(){
-    //     this.graph = new EdgeWeightedGraph(nodeCount);
-    //     traverse(tree.root, this.graph);
-    //     return this.graph;
-    // }
-
-    private void traverse(Way curr){
+    private void buildEdgesFromWays(Way curr){
         if (curr == null)
             return;
      
         for (int i = 0; i < (curr.coords.length)-2; i+=2) {
             float x1 = curr.coords[i + 0];
             float y1 = curr.coords[i + 1];
-            long id1 = curr.ids[i/2];
+            long id1 = curr.nodeIds[i/2];
 
             float x2 = curr.coords[i + 2];
             float y2 = curr.coords[i + 3];
-            long id2 = curr.ids[i/2 + 1];
+            long id2 = curr.nodeIds[i/2 + 1];
 
-            int id_src = map.get(id1);
-            int id_dest = map.get(id2);
+            int id_src = nodeIdToIntegerId.get(id1);
+            int id_dest = nodeIdToIntegerId.get(id2);
 
-            if (!countToCoords.containsKey(id_src))
-                countToCoords.put(id_src, new float[]{x1, y1});
-            else if (!countToCoords.containsKey(id_dest))
-                countToCoords.put(id_dest, new float[]{x2, y2});
+            if (!integerIdToCoords.containsKey(id_src))
+                integerIdToCoords.put(id_src, new float[]{x1, y1});
+            else if (!integerIdToCoords.containsKey(id_dest))
+                integerIdToCoords.put(id_dest, new float[]{x2, y2});
           
-            double weight = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+            double weight = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)); // @todo: haversine
             Edge edgeToAdd = new Edge(id_src, id_dest, weight);
 
             graph.addEdge(edgeToAdd);
         }
 
-        traverse(curr.left);
-        traverse(curr.right);
+        buildEdgesFromWays(curr.left);
+        buildEdgesFromWays(curr.right);
     }
 
-    private void prepareForSPT(Way curr) {
+    private void prepareForBuildGraph(Way curr) {
         if (curr == null)
             return;
         
-        for (int i = 0; i < curr.ids.length; i++) {
-            long nodeid = curr.ids[i];
+        for (int i = 0; i < curr.nodeIds.length; i++) {
+            long nodeid = curr.nodeIds[i];
 
-            // If we already have a unique identifier continue
-            if (map.containsKey(nodeid)) {
-                continue;
-            } else {
-                map.put(nodeid, nodeCount);
+            if (!nodeIdToIntegerId.containsKey(nodeid)) {
+                nodeIdToIntegerId.put(nodeid, nodeCount);
                 nodeCount++;
             }
         }
 
-        prepareForSPT(curr.left);
-        prepareForSPT(curr.right);
+        prepareForBuildGraph(curr.left);
+        prepareForBuildGraph(curr.right);
     }
 }

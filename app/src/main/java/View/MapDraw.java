@@ -136,7 +136,7 @@ public class MapDraw {
     }
 
     public void runDijsktra(Way from, Way to){
-        var temp = dijkstra.getCoords(dijkstra.RunDijkstra(from.ids[0], to.ids[0]));
+        var temp = dijkstra.getCoords(dijkstra.RunDijkstra(from.nodeIds[0], to.nodeIds[0]));
         gc.setLineWidth(5 * 1/Math.sqrt(trans.determinant()));
         gc.beginPath();
         gc.moveTo(temp.get(0), temp.get(1));
