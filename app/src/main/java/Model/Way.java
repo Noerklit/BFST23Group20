@@ -67,9 +67,7 @@ public class Way implements Serializable, Comparable<Way> {
 
 
     public void draw(GraphicsContext gc, HashMap<DrawType, Color> colorMap, int fidelity) {
-        
         Color color = colorMap.get(drawType);
-        // if (drawType == DrawType.landuseForest) {
         if(drawType.fidelity <= fidelity) {
             makePath(gc, fidelity);
             if(drawType.shouldFill) {
@@ -78,16 +76,6 @@ public class Way implements Serializable, Comparable<Way> {
                 makeStroke(gc, color);
             }
         } 
-        // }
-
-        // if(drawType.fidelity <= fidelity) {
-        //     makePath(gc, fidelity);
-        //     if(drawType.shouldFill) {
-        //         makeFill(gc, color);
-        //     } else {
-        //         makeStroke(gc, color);
-        //     }
-        // } 
     }
 
     private void makePath(GraphicsContext gc, int fidelity) {

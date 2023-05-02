@@ -10,26 +10,15 @@ public class Multipolygon {
         ArrayList<Way> closedWays = new ArrayList<>();
         int counter = 0;
         Way temporaryWay;
-        // DEBUG
-        // if (outerWays.size() == 3) {
-        //     for (Way e : outerWays) {
-        //         System.out.println("This is one of the ways of 3: " + e.id);
-        //     }
-        // }
 
         for (Way way : outerWays) {
             if(way.getFirstNodeId() == way.getLastNodeId()) {
                 closedWays.add(way);
             }
             else if(way.getFirstNodeId() != way.getLastNodeId()) {
-                // DEBUG
-                // if (outerWays.size() == 3) {
                     for (Way e : outerWays) {
-                        // System.out.println("This is one of the ways of 3: " + e.id);
                         waysToPutTogether.add(e);
                     }
-                // }
-
                 break;
             }
         }

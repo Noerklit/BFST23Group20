@@ -234,13 +234,6 @@ public class OSMParser {
                     break;
                 }
             } else if (input.isEndElement()) {
-                // var name = input.getLocalName();
-                // if  (name == "relation" && addRelation) {
-                //     for(Way way : outerWays){
-                //         way.drawType = currentDrawType;
-                //         ways.add(way);
-                //     }
-                // }
                 var name = input.getLocalName();
                 if  (name == "relation" && addRelation) {
                     closedOuterWays = Multipolygon.outerRingAssignment(outerWays);
