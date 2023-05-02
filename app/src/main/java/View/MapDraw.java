@@ -66,7 +66,7 @@ public class MapDraw {
 //        pan(-100,-100);
 //        zoom(380, 340, 40);
 
-        dijkstra = new Dijkstra(model.wayKDTree);
+        dijkstra = new Dijkstra(model.wayKDTree, "SPEED");
         redraw();
     }
 
@@ -121,7 +121,7 @@ public class MapDraw {
 
     public void runDijsktra(Way from, Way to){
         var temp = dijkstra.getCoords(dijkstra.RunDijkstra(from.nodeIds[0], to.nodeIds[0]));
-        gc.setLineWidth(5 * 1/Math.sqrt(trans.determinant()));
+        gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
         gc.beginPath();
         gc.moveTo(temp.get(0), temp.get(1));
         for (int i = 2; i<temp.size()-2; i+=2){
