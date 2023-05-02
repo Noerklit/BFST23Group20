@@ -26,7 +26,7 @@ public class Controller {
 
         final boolean[] isStart = {true};
     view.getCanvas().setOnMousePressed(e -> {
-        if(e.isMiddleButtonDown()){
+        if(e.isPrimaryButtonDown() && e.isShiftDown()){
 //            System.out.println(view.convertMouseLon(e.getX()));
 //            System.out.println(view.convertMouseLat(e.getY()));
 
@@ -46,11 +46,15 @@ public class Controller {
             {
                 view.getMapDraw().gc.setLineWidth(5 * 1/Math.sqrt(view.getMapDraw().trans.determinant()));
                 view.getMapDraw().gc.beginPath();
-                view.getMapDraw().gc.moveTo(temp.coords[0], temp.coords[1]);
-                for (int i = 2; i<temp.coords.length; i+=2)
-                {
-                    view.getMapDraw().gc.lineTo(temp.coords[i], temp.coords[i+1]);
-                }
+                //view.getMapDraw().gc.moveTo(temp.coords[0], temp.coords[1]);
+
+                view.getMapDraw().gc.lineTo(temp.xVal, temp.yVal);
+
+
+                //for (int i = 2; i<temp.coords.length; i+=2)
+                //{
+                //    view.getMapDraw().gc.lineTo(temp.coords[i], temp.coords[i+1]);
+                //}
                 view.getMapDraw().gc.setStroke(Color.CHOCOLATE);
                 view.getMapDraw().gc.stroke();
 
@@ -140,7 +144,8 @@ public class Controller {
 
 
 
-    }
 
+
+    }
 
 }
