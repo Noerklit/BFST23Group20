@@ -17,7 +17,7 @@ public class TrieNode implements Serializable {
     
     public TrieNode[] children = new TrieNode[SIZE];
     public boolean terminal;
-    private List<String> cities;
+    private List<String> endWords;
 
     public TrieNode() {
         for (int i = 0; i < SIZE; i++) {
@@ -47,13 +47,13 @@ public class TrieNode implements Serializable {
         return characters.indexOf(c);
     }
 
-    public void addCity(String city) {
-        if (cities == null) {
-            cities = new ArrayList<>();
+    public void addEndWord(String endWord) {
+        if (endWords == null) {
+            endWords = new ArrayList<>();
         }
-        cities.add(city);
+        endWords.add(endWord.intern());
     }
-    public List<String> getCities() {
-        return cities;
+    public List<String> getEndWords() {
+        return endWords;
     }
 }
