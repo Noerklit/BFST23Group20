@@ -63,7 +63,7 @@ public class Controller {
                 }
 
             } catch (Exception ex) {
-
+                isStart[0] = true;
             }
         } else {
             lastX = e.getX();

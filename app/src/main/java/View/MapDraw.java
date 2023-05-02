@@ -29,6 +29,7 @@ public class MapDraw {
     private double scalingConst;
 
     public Affine trans;
+    private ArrayList<ArrayList<Float>> dijstraPathList;
 
     private Model model;
     public static HashMap<DrawType, Color> defaultColorMap;
@@ -50,7 +51,7 @@ public class MapDraw {
         this.darkMode = false;
         this.debugMode = false;
         this.viewMode = false;
-
+        this.dijstraPathList = new ArrayList<>();
         this.trans = new Affine();
         this.gc = canvas.getGraphicsContext2D();
 
@@ -113,7 +114,20 @@ public class MapDraw {
             model.wayKDTree.drawTree(left, right, up, down, fidelity);
             model.buildingKdtree.drawTree(left, right, up, down, fidelity);
         }
-
+        
+        if (dijstraPathList != null && dijstraPathList.size()>0)
+        {
+            for (ArrayList<Float> sub : dijstraPathList){
+                gc.setLineWidth(0.00015);
+                gc.beginPath();
+                gc.moveTo(sub.get(0), sub.get(1));
+                for (int i = 2; i<sub.size()-2; i+=2){
+                    gc.lineTo(sub.get(i), sub.get(i+1));
+                }
+                gc.setStroke(Color.DARKMAGENTA);
+                gc.stroke();
+            }
+        }
         //traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
         
         FrameRateTimer.endFrame();
@@ -121,14 +135,12 @@ public class MapDraw {
 
     public void runDijsktra(long from, long to){
         var temp = dijkstra.getCoords(dijkstra.RunDijkstra(from, to));
-        gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
-        gc.beginPath();
-        gc.moveTo(temp.get(0), temp.get(1));
-        for (int i = 2; i<temp.size()-2; i+=2){
-            gc.lineTo(temp.get(i), temp.get(i+1));
-        }
-        gc.setStroke(Color.DARKMAGENTA);
-        gc.stroke();
+        var tempList = new ArrayList<Float>();
+        for (int i = 0; i<temp.size(); i++)
+            tempList.add(temp.get(i));
+        dijstraPathList.add(tempList);
+        
+        redraw();
     }
 
 

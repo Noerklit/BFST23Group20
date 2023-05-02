@@ -18,6 +18,9 @@ public class Dijkstra {
     int nodeCount;
     double distance;
 
+    long start;
+    long end;
+
     static HashMap<Long, Integer> nodeIdToIntegerId = new HashMap<>();
     static HashMap<Integer, float[]> integerIdToCoords = new HashMap<>();
 
@@ -31,6 +34,9 @@ public class Dijkstra {
     }
 
     public Iterable<Edge> RunDijkstra(long start, long end) {
+        this.start = start;
+        this.end = end;
+
         int startAsInteger = nodeIdToIntegerId.get(start);
         int endAsInteger = nodeIdToIntegerId.get(end);
         distance = 0;
@@ -63,8 +69,9 @@ public class Dijkstra {
         float x1, y1 , x2, y2;
         int src, dest;
 
+        src = nodeIdToIntegerId.get(start);
+
         for (Edge e : pathToDraw) {
-            src = e.either();
             dest = e.other(src);
 
             x1 = integerIdToCoords.get(src)[0];
@@ -76,6 +83,8 @@ public class Dijkstra {
             y2 = integerIdToCoords.get(dest)[1];
             coordList.add(x2);
             coordList.add(y2);
+
+            src = dest;
         }
         return coordList;
     }
@@ -115,7 +124,7 @@ public class Dijkstra {
                 weight = distanceKm;
             }
 
-            Edge edgeToAdd = new Edge(id_src, id_dest, weight);
+            Edge edgeToAdd = new Edge(id_src, id_dest, (float)weight);
             
             graph.addEdge(edgeToAdd);
         }
