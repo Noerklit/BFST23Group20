@@ -2,8 +2,9 @@ package View;
 
 import Benchmark.FrameRateTimer;
 import Model.Model;
-
+import Parser.AddressSearch;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
@@ -16,6 +17,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
 import java.io.File;
+import java.util.List;
+
+import org.checkerframework.checker.units.qual.mol;
 
 public class View {
 
@@ -24,10 +28,12 @@ public class View {
     private MenuBar menuBar;
     private TextField searchbar;
     private Scene scene;
+    private Model model;
 
     public View(Model model, Stage primaryStage) {
         this.canvas = new Canvas(600, 500);
         
+        this.model = model;
         this.mapDraw = new MapDraw(model, canvas);
 
         this.scene = createGeneralUi();
@@ -48,6 +54,7 @@ public class View {
 //        TextField textField = new TextField("");
         this.menuBar = createMenuBar();
         this.searchbar = createSearchBar();
+        setSearchResults(null);
         var hBoxMenu = new HBox(menuBar,searchbar);
         hBoxMenu.setAlignment(Pos.CENTER);
 
@@ -96,9 +103,12 @@ public class View {
         return chooseFile;
     }
 
-    public TextField createSearchBar(){
+    private TextField createSearchBar(){
         TextField searchbar = new TextField("Search...");
-        searchbar.setAlignment(Pos.CENTER);
+        //searchbar.setAlignment(Pos.CENTER);
+        searchbar.setMinWidth(canvas.getWidth() - 300);
+        ContextMenu contextMenu = new ContextMenu();
+        searchbar.setContextMenu(contextMenu);
 
         return searchbar;
     }
@@ -116,6 +126,45 @@ public class View {
 
     public Canvas getCanvas() {
         return canvas;
+    }
+    private void setSearchResults(List<String> itemStrings) {
+        setSearchResults(itemStrings, Integer.MAX_VALUE);
+    }
+    private void setSearchResults(List<String> itemStrings, int cap) {
+        ContextMenu contextMenu = searchbar.getContextMenu();
+        var contextMenuItems = contextMenu.getItems();
+        contextMenuItems.clear();
+
+        if (itemStrings != null) {
+            int itemCount = 0;
+            for (String itemString : itemStrings) {
+                if (itemCount >= cap) {
+                    MenuItem menuItem = new MenuItem("--- Cap ---");
+                    contextMenuItems.add(menuItem);
+                    break;
+                }
+                itemCount++;
+                MenuItem menuItem = new MenuItem(itemCount + ": " + itemString);
+                menuItem.setOnAction(event -> {
+                    searchbar.setText(itemString);
+                    searchbar.positionCaret(itemString.length());
+                });
+                contextMenuItems.add(menuItem);
+            }
+        }
+
+        if (contextMenuItems.size() == 0) {
+            MenuItem menuItem = new MenuItem("No results");
+            contextMenuItems.add(menuItem);
+        }
+    }
+    public void showSearchResults() {
+        ContextMenu contextMenu = searchbar.getContextMenu();
+        contextMenu.show(searchbar, Side.BOTTOM, 0, 0);
+    }
+    public void hideSearchResults() {
+        ContextMenu contextMenu = searchbar.getContextMenu();
+        contextMenu.hide();
     }
 
     public void panMap(double dx, double dy) {
@@ -185,5 +234,14 @@ public class View {
             double deltaHeight = newVal.doubleValue() - oldVal.doubleValue();
             mapDraw.resizeCanvasHeight(deltaHeight);
         });
+    }
+
+    public void search(String text) {
+        if (text.equals("")) {
+            setSearchResults(null);
+        } else {
+            List<String> addresses = model.searchAddresses(text);
+            setSearchResults(addresses, 21);
+        }
     }
 }

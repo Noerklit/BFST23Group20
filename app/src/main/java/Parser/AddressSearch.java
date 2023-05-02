@@ -2,6 +2,7 @@ package Parser;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -14,26 +15,30 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 
-public class AddressParser {
-    private static boolean online;
+public class AddressSearch implements Serializable {
+    private boolean online;
+    private Trie addressesTrie;
 
-    public AddressParser() {
+    public AddressSearch() {
         this.online = isOnline();
+        this.online = false;
+        addressesTrie = new Trie();
     }
 
-    public static void getAddresses(String address) {
-        List<String> result = parse(address);         
-
-        for (String e : result) {
-            System.out.println(e);
-        }
+    public void addAddress(String address) {
+        addressesTrie.insert(address);
     }
 
-    private static String getUrlEncodedStr(String nonEncodedStr) {
+    public List<String> getAddresses(String text) {
+        List<String> result = search(text);
+        return result;
+    }
+
+    private String getUrlEncodedStr(String nonEncodedStr) {
         return URLEncoder.encode(nonEncodedStr);
     }
 
-    private static boolean isOnline() {
+    private boolean isOnline() {
         try {
             URL url = new URL("http://example.com/");
 
@@ -48,17 +53,17 @@ public class AddressParser {
         return false;
     }
 
-    private static List<String> parse(String toParse) {
+    private List<String> search(String toParse) {
         List<String> result = new ArrayList<>(); 
         if (online) {
-            result = onlineParsing(toParse);
+            result = onlineSearch(toParse);
         } else {
-            result = offlineParsing(toParse);
+            result = offlineSearch(toParse);
         }
         return result;
     }
 
-    private static List<String> onlineParsing(String searchFor) {
+    private List<String> onlineSearch(String searchFor) {
         String result = "";
 
         try {
@@ -69,7 +74,7 @@ public class AddressParser {
                 result = httpToString(connection);
             } else {
                 System.out.println("Could not connect to DAWA API\nStatus code: " + connection.getResponseCode());
-                List<String> return_strings = offlineParsing(searchFor);
+                List<String> return_strings = offlineSearch(searchFor);
                 return return_strings;
             }
         } catch (Exception e) {
@@ -86,27 +91,12 @@ public class AddressParser {
         return return_strings;
     }
 
-    private static List<String> offlineParsing(String toParse) {
-        Trie ourTrie = new Trie();
-
-        String fileToLoadPath = "/home/cave/UNI/Map/BFST23Group20/app/data/addresses_static";
-        File file = new File(fileToLoadPath);
-        
-        List<String> FileLines = new ArrayList<>();
-        try {
-            List<String> lines = Files.readAllLines(file.toPath());
-            for (String line : lines) {
-                ourTrie.insert(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        List<String> trieRes = ourTrie.autoComplete(toParse);
+    private List<String> offlineSearch(String toParse) {
+        List<String> trieRes = addressesTrie.autoComplete(toParse);
         return trieRes;
     }
 
-    private static String httpToString(HttpURLConnection conn) {
+    private String httpToString(HttpURLConnection conn) {
         String result = "";
 
         try {
