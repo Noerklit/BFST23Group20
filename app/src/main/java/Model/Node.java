@@ -1,7 +1,10 @@
 package Model;
 
-public class Node implements Comparable<Node> {
-    float lat, lon;
+import java.io.Serializable;
+
+public class Node implements Comparable<Node>,Serializable {
+    public float lat;
+    public float lon;
     Long id;
 
     public Node(float lat, float lon, Long id) {

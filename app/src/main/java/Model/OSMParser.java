@@ -21,6 +21,8 @@ public class OSMParser {
         }
     };
     private List<Way> ways = new ArrayList<Way>();
+    private List<Way> closedOuterWays = new ArrayList<Way>();
+    private List<Way> closedWaysToDraw = new ArrayList<Way>();
 
     private float minlat, maxlat, minlon, maxlon;
 
@@ -38,6 +40,14 @@ public class OSMParser {
 
     public List<Way> getWays() {
         return ways;
+    }
+
+    public List<Way> getClosedOuterWays() {
+        return closedOuterWays;
+    }
+    
+    public List<Way> getClosedWaysToDraw() {
+        return closedWaysToDraw;
     }
 
     public float getMinlat() {
@@ -273,6 +283,12 @@ public class OSMParser {
             } else if (input.isEndElement()) {
                 var name = input.getLocalName();
                 if (name == "relation" && addRelation) {
+                    closedOuterWays = MultipolygonRelations.mergingRelationWays(outerWays);
+                    for (Way closedWay : closedOuterWays){
+                        closedWay.drawType = currentDrawType;
+                        closedWaysToDraw.add(closedWay);
+                    }
+                    
                     for (Way way : outerWays) {
                         way.drawType = currentDrawType;
                         if (way.drawType == DrawType.building)

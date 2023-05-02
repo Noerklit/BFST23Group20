@@ -14,6 +14,7 @@ import javafx.scene.transform.Affine;
 import javafx.scene.text.Text;
 
 import Model.Model;
+import Model.Node;
 import Model.DrawType;
 import Model.Way;
 import Pathfinding.Dijkstra;
@@ -104,8 +105,14 @@ public class MapDraw {
         gc.setLineWidth(1/Math.sqrt(trans.determinant()));
         gc.beginPath();
 
-        for (Way coast: model.coastlines)
+        for (Way coast: model.coastlines) {
             coast.draw();
+        }
+        
+        // System.out.println("Size of closedWaysToDraw : " + model.closedWaysToDraw.size());
+        for (var closedOuterWay : model.closedWaysToDraw) {
+            drawFromCoords(closedOuterWay.getNodeList(),closedOuterWay.getDrawType());
+        }
         if(viewMode){
             model.wayKDTree.drawTree(left, right, up, down, fidelity);
         } else {
@@ -117,6 +124,24 @@ public class MapDraw {
         //traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
         
         FrameRateTimer.endFrame();
+    }
+
+    private void drawFromCoords (ArrayList<Node> way, DrawType drawType) {
+        double [] coords = new double[way.size() * 2];
+        for (int i = 0; i < way.size(); ++i) {
+            var node = way.get(i);
+            coords[2 * i] = 0.56 * node.lon;
+            coords[2 * i + 1] = -node.lat;
+        }
+        gc.beginPath();
+        gc.moveTo(coords[0], coords[1]);
+        for (int i = 2 ; i < coords.length ; i += 2) {       
+            gc.lineTo(coords[i], coords[i+1]);
+        }
+        gc.setStroke(defaultColorMap.get(drawType));
+        gc.stroke();
+        gc.setFill(defaultColorMap.get(drawType));
+        gc.fill();
     }
 
     public void runDijsktra(long from, long to){

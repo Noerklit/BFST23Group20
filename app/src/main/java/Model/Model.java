@@ -27,6 +27,8 @@ import edu.princeton.cs.algs4.EdgeWeightedGraph;
 public class Model implements Serializable {
 
     public List<Way> ways = new ArrayList<Way>();
+    public List<Way> closedOuterWays = new ArrayList<Way>();
+    public List<Way> closedWaysToDraw = new ArrayList<Way>();
     public List<Way> coastlines;
     
     public double minlat, maxlat, minlon, maxlon;
@@ -108,6 +110,8 @@ public class Model implements Serializable {
     private void parseOSM(InputStream inputStream) {
         OSMParser parser = new OSMParser(inputStream);
         ways = parser.getWays();
+        closedOuterWays = parser.getClosedOuterWays();
+        closedWaysToDraw = parser.getClosedWaysToDraw();
         wayKDTree = parser.wayKDTree;
         backgroundKdtree = parser.backgroundKdtree;
         buildingKdtree = parser.buildingKdtree;
