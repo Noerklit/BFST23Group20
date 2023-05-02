@@ -1,5 +1,6 @@
 package View;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javafx.scene.canvas.Canvas;
@@ -10,6 +11,7 @@ import javafx.scene.transform.Affine;
 import javafx.scene.text.Text;
 
 import Model.Model;
+import Model.Node;
 import Model.DrawType;
 import Benchmark.FrameRateTimer;
 
@@ -88,35 +90,56 @@ public class MapDraw {
         gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
         // System.out.println("Size of model.ClosedWaysToDraw " + model.closedWaysToDraw.size());
         // System.out.println(model.closedWaysToDraw.get(6).getNodeList().size());
-        for (var outerWay : model.closedWaysToDraw) {
-            int mid = outerWay.coords.length/2;
-            int trueMid = mid%2==0?mid:mid-1;
-            double lon = outerWay.coords[trueMid];
-            double lat = outerWay.coords[trueMid+1];
-            boolean inHorizontal = left < lon && lon < right;
-            boolean inVertical = up < lat && lat < down;
-
-            if (inHorizontal && inVertical) {
-                outerWay.draw(gc, defaultColorMap, fidelity);
-            }
-        }
-
-        // for (var way : model.ways) {
-        //     int mid = way.coords.length/2;
+        // for (var outerWay : model.closedWaysToDraw) {
+        //     int mid = outerWay.coords.length/2;
         //     int trueMid = mid%2==0?mid:mid-1;
-        //     double lon = way.coords[trueMid];
-        //     double lat = way.coords[trueMid+1];
+        //     double lon = outerWay.coords[trueMid];
+        //     double lat = outerWay.coords[trueMid+1];
         //     boolean inHorizontal = left < lon && lon < right;
         //     boolean inVertical = up < lat && lat < down;
 
         //     if (inHorizontal && inVertical) {
-        //         way.draw(gc, defaultColorMap, fidelity);
+        //         outerWay.draw(gc, defaultColorMap, fidelity);
         //     }
         // }
 
+        for (var outerWay : model.closedWaysToDraw) {
+            drawFromCoords(outerWay.getNodeList(),outerWay.getDrawType());
+        }
+
+        for (var way : model.ways) {
+            int mid = way.coords.length/2;
+            int trueMid = mid%2==0?mid:mid-1;
+            double lon = way.coords[trueMid];
+            double lat = way.coords[trueMid+1];
+            boolean inHorizontal = left < lon && lon < right;
+            boolean inVertical = up < lat && lat < down;
+
+            if (inHorizontal && inVertical) {
+                way.draw(gc, defaultColorMap, fidelity);
+            }
+        }
+
         FrameRateTimer.endFrame();
     }
-    
+
+    private void drawFromCoords (ArrayList<Node> way, DrawType drawType) {
+        double [] coords = new double[way.size() * 2];
+        for (int i = 0; i < way.size(); ++i) {
+            var node = way.get(i);
+            coords[2 * i] = 0.56 * node.lon;
+            coords[2 * i + 1] = -node.lat;
+        }
+        gc.beginPath();
+        gc.moveTo(coords[0], coords[1]);
+        for (int i = 2 ; i < coords.length ; i += 2) {       
+            gc.lineTo(coords[i], coords[i+1]);
+        }
+        gc.setStroke(defaultColorMap.get(drawType));
+        gc.stroke();
+        gc.setFill(defaultColorMap.get(drawType));
+        gc.fill();
+    }
     
     private void drawDebugLines() {
         gc.setLineWidth(10 * 1/Math.sqrt(trans.determinant()));

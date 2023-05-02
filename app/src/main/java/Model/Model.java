@@ -100,9 +100,7 @@ public class Model implements Serializable {
     private void parseOSM(InputStream inputStream) {
         OSMParser parser = new OSMParser(inputStream);
         ways = parser.getWays();
-        System.out.println(ways.size());
         closedOuterWays = parser.getClosedOuterWays();
-        System.out.println(closedOuterWays.size());
         closedWaysToDraw = parser.getClosedWaysToDraw();
         
         minlat = parser.getMinlat();

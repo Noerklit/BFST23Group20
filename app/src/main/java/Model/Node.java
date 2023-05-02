@@ -2,7 +2,8 @@ package Model;
 import java.io.Serializable;
 
 public class Node implements Comparable<Node>, Serializable {
-    double lat, lon;
+    public double lat;
+    public double lon;
     Long id;
 
     public Node(double lat, double lon, Long id) {

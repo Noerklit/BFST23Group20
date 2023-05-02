@@ -55,6 +55,7 @@ dependencies {
 application {
     // Define the main class for the application.
     mainClass = 'App.App'
+    applicationDefaultJvmArgs = ["-Xms6g", "-Xmx6g"]
 }
 
 tasks.named('test') {

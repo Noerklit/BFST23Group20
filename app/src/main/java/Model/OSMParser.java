@@ -248,23 +248,10 @@ public class OSMParser {
                         closedWay.drawType = currentDrawType;
                         closedWaysToDraw.add(closedWay);
                     }
-                    // System.out.println(closedOuterWays.size());
-                    // System.out.println(ways.size());
-                    // for (Way closedOuterWay : closedOuterWays) {
-                    //     closedOuterWay.drawType = currentDrawType;
-                    //     System.out.println(closedOuterWay.drawType);
-                    //     // ways.add(closedOuterWay);
-                    // }
-                    if(closedWaysToDraw.size() == 7) {
-                        Way tempWay = closedWaysToDraw.get(6);
-                        System.out.println("YOLO :" + tempWay.getNodeList().size());
-                        for (Node node : tempWay.getNodeList()) {
-                            System.out.println("NodeId : " + node.id);
-                        }
+                    for (Way closedOuterWay : closedOuterWays) {
+                        closedOuterWay.drawType = currentDrawType;
+                        ways.add(closedOuterWay);
                     }
-                    System.out.println("After for closedWaysToDraw Size: " + closedWaysToDraw.size());
-                    System.out.println("After for closedOuterWays Size: " + closedOuterWays.size());
-                    System.out.println("After :" + ways.size());
                 }
             }
             input.next();
