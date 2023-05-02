@@ -12,6 +12,7 @@ import Benchmark.TaskTimer;
 public class OSMParser {
     private List<Way> ways = new ArrayList<Way>();
     private List<Way> closedOuterWays = new ArrayList<Way>();
+    private List<Way> closedWaysToDraw = new ArrayList<Way>();
 
     private double minlat, maxlat, minlon, maxlon;
 
@@ -25,9 +26,13 @@ public class OSMParser {
     public List<Way> getWays() {
         return ways;
     }
-    public List<Way> getOuterWays() {
+    public List<Way> getClosedOuterWays() {
         return closedOuterWays;
     }
+    public List<Way> getClosedWaysToDraw() {
+        return closedWaysToDraw;
+    }
+
     public double getMinlat() {
         return minlat;
     }
@@ -239,10 +244,27 @@ public class OSMParser {
                 var name = input.getLocalName();
                 if  (name == "relation" && addRelation) {
                     closedOuterWays = Multipolygon.outerRingAssignment(outerWays);
-                    for (Way wayXX : closedOuterWays) {
-                        wayXX.drawType = currentDrawType;
-                        ways.add(wayXX);
+                    for (Way closedWay : closedOuterWays) {
+                        closedWay.drawType = currentDrawType;
+                        closedWaysToDraw.add(closedWay);
                     }
+                    // System.out.println(closedOuterWays.size());
+                    // System.out.println(ways.size());
+                    // for (Way closedOuterWay : closedOuterWays) {
+                    //     closedOuterWay.drawType = currentDrawType;
+                    //     System.out.println(closedOuterWay.drawType);
+                    //     // ways.add(closedOuterWay);
+                    // }
+                    if(closedWaysToDraw.size() == 7) {
+                        Way tempWay = closedWaysToDraw.get(6);
+                        System.out.println("YOLO :" + tempWay.getNodeList().size());
+                        for (Node node : tempWay.getNodeList()) {
+                            System.out.println("NodeId : " + node.id);
+                        }
+                    }
+                    System.out.println("After for closedWaysToDraw Size: " + closedWaysToDraw.size());
+                    System.out.println("After for closedOuterWays Size: " + closedOuterWays.size());
+                    System.out.println("After :" + ways.size());
                 }
             }
             input.next();

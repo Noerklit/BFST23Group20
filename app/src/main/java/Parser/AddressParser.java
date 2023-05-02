@@ -25,7 +25,7 @@ public class AddressParser {
         List<String> result = parse(address);         
 
         for (String e : result) {
-            System.out.println(e);
+            // System.out.println(e);
         }
     }
 

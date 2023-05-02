@@ -8,12 +8,8 @@ public class Multipolygon {
     public static ArrayList<Way> outerRingAssignment(List<Way> outerWays) {
         ArrayList<Way> waysToPutTogether = new ArrayList<>();
         ArrayList<Way> closedWays = new ArrayList<>();
-        // System.out.println(outerWays.size());
         int counter = 0;
         Way temporaryWay;
-        System.out.println("Size of outerWays :" + outerWays.size());
-
-
         // DEBUG
         // if (outerWays.size() == 3) {
         //     for (Way e : outerWays) {
@@ -21,10 +17,7 @@ public class Multipolygon {
         //     }
         // }
 
-
         for (Way way : outerWays) {
-            //boolean xCoordEqual = way.coords[0] == way.coords[way.coords.length-2];
-            //boolean yCoordEqual = way.coords[1] == way.coords[way.coords.length-1];
             if(way.getFirstNodeId() == way.getLastNodeId()) {
                 closedWays.add(way);
             }
@@ -32,7 +25,7 @@ public class Multipolygon {
                 // DEBUG
                 if (outerWays.size() == 3) {
                     for (Way e : outerWays) {
-                        System.out.println("This is one of the ways of 3: " + e.id);
+                        // System.out.println("This is one of the ways of 3: " + e.id);
                         waysToPutTogether.add(e);
                     }
                 }
@@ -40,65 +33,48 @@ public class Multipolygon {
                 break;
             }
         }
+        if(waysToPutTogether.size() == 3) {
+            for (Way way : waysToPutTogether) {
+                Way toAdd = new Way(way.getNodeList(), null, null);
+                // System.out.println("Size of waysToPutTogether :" + waysToPutTogether.size());
+                System.out.println("counter :" + counter);
+                // System.out.println(waysToPutTogether.get(0).getFirstNodeId() + " " + waysToPutTogether.get(0).getLastNodeId());
+                counter++;
+                for (Way wayToMerge : waysToPutTogether) {
+                    System.out.println("wayFirstNodeId :" + way.getFirstNodeId() + " WayLastNodeId :" + way.getLastNodeId());
+                    System.out.println("wayToMergeFirstNodeId :" + wayToMerge.getFirstNodeId() + " WayToMergeLastNodeId :" + wayToMerge.getLastNodeId());
+                    System.out.println(way != wayToMerge);
+                    if (way != wayToMerge) {
+                        if (way.getLastNodeId() == wayToMerge.getFirstNodeId()) {
+                            toAdd.addNodes(toAdd.getNodeList(), wayToMerge.getNodeList());
+                        } else if (way.getLastNodeId() == wayToMerge.getFirstNodeId()) {
+                            // reverse first
+                            Collections.reverse(way.getNodeList());
+                            toAdd.addNodes(toAdd.getNodeList(), wayToMerge.getNodeList());
+                        } else if (way.getLastNodeId() == wayToMerge.getLastNodeId()) {
+                            // reverse otherway, do same as one
+                            Collections.reverse(wayToMerge.getNodeList());
+                            toAdd.addNodes(toAdd.getNodeList(), wayToMerge.getNodeList());
+                        } else if (way.getLastNodeId() == wayToMerge.getLastNodeId()) {
+                            // reverse both
+                            Collections.reverse(way.getNodeList());
+                            Collections.reverse(wayToMerge.getNodeList());
+                            toAdd.addNodes(toAdd.getNodeList(), wayToMerge.getNodeList());
+                        }
 
-        for (Way way : waysToPutTogether) {
-            Way toAdd = new Way(way.getNodeList(), null, null);
-            System.out.println("counter :" + counter);
-            counter++;
-            for (Way otherWay : waysToPutTogether) {
-                if (way != otherWay) {
-                    if (way.getLastNodeId() == otherWay.getFirstNodeId()) {
-                        toAdd.addNodes(toAdd.getNodeList(), otherWay.getNodeList());
-                    } else if (way.getLastNodeId() == otherWay.getFirstNodeId()) {
-                        // reverse first
-                        Collections.reverse(way.getNodeList());
-                        toAdd.addNodes(toAdd.getNodeList(), otherWay.getNodeList());
-                    } else if (way.getLastNodeId() == otherWay.getLastNodeId()) {
-                        // reverse otherway, do same as one
-                        Collections.reverse(otherWay.getNodeList());
-                        toAdd.addNodes(toAdd.getNodeList(), otherWay.getNodeList());
-                    } else if (way.getLastNodeId() == otherWay.getLastNodeId()) {
-                        // reverse both
-                        Collections.reverse(way.getNodeList());
-                        Collections.reverse(otherWay.getNodeList());
-                        toAdd.addNodes(toAdd.getNodeList(), otherWay.getNodeList());
-                    }
-
-                    /*
-                     *
-                     * 155 nodes - start        end
-                     *          1827444000      1830746841
-                     *
-                     *
-                     *
-                     *
-                    */
-                    // System.out.println("------Before FLIP-------------");
-                    // System.out.print(toAdd.getFirstNodeId() + " --- ");
-                    // System.out.println(toAdd.getLastNodeId());
-                    // System.out.println("------------------------");
-
-                    // System.out.println("Now flipping...");
-
-                    // System.out.println("-------After FLIP-----------------");
-                    // System.out.print(toAdd.getFirstNodeId() + " --- ");
-                    // System.out.println(toAdd.getLastNodeId());
-                    // System.out.println("------------------------");
-
-                    // System.out.println("\n\n\n");
-
-                    if (toAdd.getFirstNodeId() == toAdd.getLastNodeId()) {
-                        System.out.println("This is a closedWay now: " + toAdd.getFirstNodeId());
-                        closedWays.add(toAdd);
-                        toAdd = new Way(way.getNodeList(), null, null);
-
-                        // waysToPutTogether.remove(way);
+                        if (toAdd.getFirstNodeId() == toAdd.getLastNodeId()) {
+                            System.out.println("This is a closedWay now: FirstNodeId " + toAdd.getFirstNodeId() + " LastNodeId " + toAdd.getLastNodeId());
+                            System.out.println("Size of toAdd :" + toAdd.getNodeList().size());
+                            closedWays.add(toAdd);
+                            toAdd = new Way(way.getNodeList(), null, null);
+                            return closedWays;
+                        } else {
+                            way = toAdd;
+                        }
                     }
                 }
             }
         }
-        System.out.println("Size of closedWays: " + closedWays.size());
-
         return closedWays;
     }
 }

@@ -20,7 +20,8 @@ import Benchmark.TaskTimer;
 public class Model implements Serializable {
 
     public List<Way> ways = new ArrayList<Way>();
-    public List<Way> closedOuterWays = new ArrayList<>();
+    public List<Way> closedOuterWays = new ArrayList<Way>();
+    public List<Way> closedWaysToDraw = new ArrayList<Way>();
     
     public double minlat, maxlat, minlon, maxlon;
 
@@ -99,8 +100,11 @@ public class Model implements Serializable {
     private void parseOSM(InputStream inputStream) {
         OSMParser parser = new OSMParser(inputStream);
         ways = parser.getWays();
-
-        closedOuterWays = parser.getOuterWays();
+        System.out.println(ways.size());
+        closedOuterWays = parser.getClosedOuterWays();
+        System.out.println(closedOuterWays.size());
+        closedWaysToDraw = parser.getClosedWaysToDraw();
+        
         minlat = parser.getMinlat();
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();

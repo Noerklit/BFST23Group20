@@ -34,13 +34,23 @@ public class Way implements Serializable, Comparable<Way> {
     }
 
     public void addNodes(ArrayList<Node> test, ArrayList<Node> toAdd) {
-        way = new ArrayList<>(toAdd);
+        way = new ArrayList<>(test);
+        System.out.println("How many nodes in way before adding :" + way.size());
 
-        for (Node e : test) {
+        for (Node e : toAdd) {
             way.add(e);
         }
-        firstNodeId = way.get(0).getId();
+        System.out.println("How many nodes in way after adding : " + way.size());
+        System.out.println(firstNodeId);
+        // firstNodeId = way.get(0).getId();
         lastNodeId = way.get(way.size()-1).getId();
+        System.out.println("FirstNodeId :" + firstNodeId);
+        System.out.println("LastNodeId :" + lastNodeId);
+        System.out.println("Done adding the ways together");
+        // if(way.get(way.size()-1) == way.get(way.size()-2)) {
+        //     way.remove(way.size()-1);
+        //     System.out.println("Hit that");
+        // }
     }
     
     public ArrayList<Node> getNodeList() {
@@ -57,13 +67,9 @@ public class Way implements Serializable, Comparable<Way> {
 
 
     public void draw(GraphicsContext gc, HashMap<DrawType, Color> colorMap, int fidelity) {
-        if (drawType == null) {
-            //System.out.println("HIT ME");
-            //drawType = DrawType.coastline;
-        }
-
+        
         Color color = colorMap.get(drawType);
-
+        if (drawType == DrawType.landuseForest) {
         if(drawType.fidelity <= fidelity) {
             makePath(gc, fidelity);
             if(drawType.shouldFill) {
@@ -72,12 +78,23 @@ public class Way implements Serializable, Comparable<Way> {
                 makeStroke(gc, color);
             }
         } 
+        }
+
+        // if(drawType.fidelity <= fidelity) {
+        //     makePath(gc, fidelity);
+        //     if(drawType.shouldFill) {
+        //         makeFill(gc, color);
+        //     } else {
+        //         makeStroke(gc, color);
+        //     }
+        // } 
     }
 
     private void makePath(GraphicsContext gc, int fidelity) {
         gc.beginPath();
         gc.moveTo(coords[0], coords[1]);
         for (int i = 2 ; i < coords.length ; i += 2) {
+            System.out.println();
             if (fidelity>0){
                 gc.lineTo(coords[i], coords[i+1]);
             } else if((i/2)%16==0){
