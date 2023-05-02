@@ -43,7 +43,7 @@ public class Dijkstra {
         traverse(root);
     }
 
-    private ArrayList<Float> getCoords(Iterable<Edge> pathToDraw) {
+    public ArrayList<Float> getCoords(Iterable<Edge> pathToDraw) {
         ArrayList<Float> coordList = new ArrayList<>();
         for (Edge e : pathToDraw) {
             int src = e.either();
@@ -58,7 +58,7 @@ public class Dijkstra {
             float y2 = countToCoords.get(dest)[1];
             coordList.add(x2);
             coordList.add(y2);
-            System.out.println(x1 + ", " + y1);
+//            System.out.println(x1 + ", " + y1);
         }
         return coordList;
     }

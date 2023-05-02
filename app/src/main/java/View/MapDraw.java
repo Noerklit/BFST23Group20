@@ -1,5 +1,6 @@
 package View;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import Benchmark.FrameRateTimer;
 public class MapDraw {
     private Canvas canvas;
     public static GraphicsContext gc;
+    private Dijkstra dijkstra;
 
     private double scalingConst;
 
@@ -64,6 +66,8 @@ public class MapDraw {
 //        pan(-100,-100);
 //        zoom(380, 340, 40);
 
+        dijkstra = new Dijkstra(model.wayKDTree);
+//        dijkstra.RunDijkstra(32842581l, 32842599l);
         redraw();
     }
 
@@ -129,6 +133,18 @@ public class MapDraw {
         //traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
         
         FrameRateTimer.endFrame();
+    }
+
+    public void runDijsktra(Way from, Way to){
+        var temp = dijkstra.getCoords(dijkstra.RunDijkstra(from.ids[0], to.ids[0]));
+        gc.setLineWidth(5 * 1/Math.sqrt(trans.determinant()));
+        gc.beginPath();
+        gc.moveTo(temp.get(0), temp.get(1));
+        for (int i = 2; i<temp.size()-2; i+=2){
+            gc.lineTo(temp.get(i), temp.get(i+1));
+        }
+        gc.setStroke(Color.DARKMAGENTA);
+        gc.stroke();
     }
 
 

@@ -2,6 +2,7 @@ package View;
 
 import Benchmark.FrameRateTimer;
 import Model.Model;
+import Model.Way;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -196,5 +197,9 @@ public class View {
 
     public MapDraw getMapDraw(){
         return mapDraw;
+    }
+
+    public void runDijstra(Way from, Way to){
+        mapDraw.runDijsktra(from, to);
     }
 }

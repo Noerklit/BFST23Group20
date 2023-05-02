@@ -1,6 +1,7 @@
 package Controller;
 
 import Model.Model;
+import Model.Way;
 import View.View;
 //import View.MapDraw;
 import javafx.geometry.Point2D;
@@ -16,17 +17,31 @@ public class Controller {
     private String search;
     private double lastX;
     private double lastY;
+    private Way startWay, endWay;
     AddressParser parser;
 
     public Controller(Model model, View view) {
     
-    parser = new AddressParser(); 
+    parser = new AddressParser();
 
+        final boolean[] isStart = {true};
     view.getCanvas().setOnMousePressed(e -> {
         if(e.isMiddleButtonDown()){
 //            System.out.println(view.convertMouseLon(e.getX()));
 //            System.out.println(view.convertMouseLat(e.getY()));
+
             var temp  = model.wayKDTree.findWay(new Point2D( view.convertMouseLon(e.getX()), view.convertMouseLat(e.getY())));
+            if (temp != null)
+            {
+                if (isStart[0]){
+                    startWay = temp;
+
+                } else {
+                    endWay = temp;
+                    view.runDijstra(startWay, endWay);
+                }
+                isStart[0] = !isStart[0];
+            }
             if (temp != null)
             {
                 view.getMapDraw().gc.setLineWidth(5 * 1/Math.sqrt(view.getMapDraw().trans.determinant()));

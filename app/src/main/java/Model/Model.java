@@ -116,9 +116,6 @@ public class Model implements Serializable {
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();
         maxlon = parser.getMaxlon();
-
-        Dijkstra Test = new Dijkstra(wayKDTree);
-        Test.RunDijkstra(32842581l, 32842599l);
         return;
     }
 
