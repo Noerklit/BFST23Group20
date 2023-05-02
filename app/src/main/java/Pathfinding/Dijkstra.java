@@ -43,6 +43,11 @@ public class Dijkstra {
         buildEdgesFromWays(root);
     }
 
+    public float[] getCoordsFromNodeId(Long nodeId) {
+        int integerId = nodeIdToIntegerId.get(nodeId);
+        return integerIdToCoords.get(integerId);
+    }
+
     public ArrayList<Float> getCoords(Iterable<Edge> pathToDraw) {
         ArrayList<Float> coordList = new ArrayList<>();
         for (Edge e : pathToDraw) {
