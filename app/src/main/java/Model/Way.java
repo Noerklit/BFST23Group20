@@ -47,10 +47,6 @@ public class Way implements Serializable, Comparable<Way> {
         // System.out.println("FirstNodeId :" + firstNodeId);
         // System.out.println("LastNodeId :" + lastNodeId);
         // System.out.println("Done adding the ways together");
-        // if(way.get(way.size()-1) == way.get(way.size()-2)) {
-        //     way.remove(way.size()-1);
-        //     System.out.println("Hit that");
-        // }
     }
     
     public ArrayList<Node> getNodeList() {
