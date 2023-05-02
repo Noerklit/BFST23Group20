@@ -199,7 +199,7 @@ public class View {
         return mapDraw;
     }
 
-    public void runDijstra(Way from, Way to){
+    public void runDijstra(long from, long to){
         mapDraw.runDijsktra(from, to);
     }
 }

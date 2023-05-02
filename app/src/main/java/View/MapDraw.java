@@ -119,8 +119,8 @@ public class MapDraw {
         FrameRateTimer.endFrame();
     }
 
-    public void runDijsktra(Way from, Way to){
-        var temp = dijkstra.getCoords(dijkstra.RunDijkstra(from.nodeIds[0], to.nodeIds[0]));
+    public void runDijsktra(long from, long to){
+        var temp = dijkstra.getCoords(dijkstra.RunDijkstra(from, to));
         gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
         gc.beginPath();
         gc.moveTo(temp.get(0), temp.get(1));

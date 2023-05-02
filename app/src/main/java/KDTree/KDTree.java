@@ -114,23 +114,24 @@ public class KDTree implements Serializable {
         }
     }
 
-    public Point2D inArea(Way way, Point2D target){
+    public long inArea(Way way, Point2D target){
         var dist = distTo(way, new Point2D(way.coords[0], way.coords[1]));
         Circle circle = new Circle(way.xVal, way.yVal,50);
         Point2D closest = new Point2D(way.xVal, way.yVal);
         return findNearby(circle, closest, target);
     }
-    private Point2D findNearby(Circle circle, Point2D closest, Point2D target){
-
+    private long findNearby(Circle circle, Point2D closest, Point2D target){
+        long id = 0;
         for (Way nearby: findNearby(root, circle, new ArrayList<Way>())){
             for (int i = 0; i<nearby.coords.length-2; i+=2) {
                 var dist = new Point2D(nearby.coords[i], nearby.coords[i+1]).distance(target);
                 if (dist < closest.distance(target)) {
                     closest = new Point2D(nearby.coords[i], nearby.coords[i+1]);
+                    id = nearby.nodeIds[i>>1];
                 }
             }
         }
-        return closest;
+        return id;
     }
 
     private List<Way> findNearby(

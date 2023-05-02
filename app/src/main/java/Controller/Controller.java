@@ -1,7 +1,7 @@
 package Controller;
 
 import Model.Model;
-import Model.Way;
+import Pathfinding.Dijkstra;
 import View.View;
 //import View.MapDraw;
 import javafx.geometry.Point2D;
@@ -17,7 +17,7 @@ public class Controller {
     private String search;
     private double lastX;
     private double lastY;
-    private Way startWay, endWay;
+    private long startId, endId;
     AddressParser parser;
 
     public Controller(Model model, View view) {
@@ -34,11 +34,11 @@ public class Controller {
             if (temp != null)
             {
                 if (isStart[0]){
-                    startWay = temp;
+                    startId = trueCoords;
 
                 } else {
-                    endWay = temp;
-                    view.runDijstra(startWay, endWay);
+                    endId = trueCoords;
+                    view.runDijstra(startId, endId);
                 }
                 isStart[0] = !isStart[0];
             }
@@ -46,8 +46,8 @@ public class Controller {
             {
                 view.getMapDraw().gc.setLineWidth(5 * 1/Math.sqrt(view.getMapDraw().trans.determinant()));
                 view.getMapDraw().gc.beginPath();
-
-                view.getMapDraw().gc.lineTo(trueCoords.getX(), trueCoords.getY());
+                var coords = Dijkstra.getCoordsFromNodeId(trueCoords);
+                view.getMapDraw().gc.lineTo(coords[0], coords[1]);
 
                 view.getMapDraw().gc.setStroke(Color.CHOCOLATE);
                 view.getMapDraw().gc.stroke();
