@@ -16,6 +16,7 @@ public class Way implements Serializable, Comparable<Way> {
     int trueMid;
     public float xVal;
     public float yVal;
+    public byte maxspeed;
 
     public Long id;
     public Way left = null;

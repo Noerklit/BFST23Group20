@@ -66,7 +66,7 @@ public class MapDraw {
 //        pan(-100,-100);
 //        zoom(380, 340, 40);
 
-        dijkstra = new Dijkstra(model.wayKDTree);
+        dijkstra = new Dijkstra(model.wayKDTree, "SPEED");
 //        dijkstra.RunDijkstra(32842581l, 32842599l);
         redraw();
     }

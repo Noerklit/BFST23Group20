@@ -128,13 +128,13 @@ public class KDTree implements Serializable {
         if (outOfBounds<0){
             nearest = findWay(curr.left, nearest, point, minDist);
 
-            if (distTo(nearest, point) >= Math.pow(outOfBounds, 2)){
+            if (distTo(nearest, point) >= Math.sqrt(Math.pow(outOfBounds, 2))){
                 nearest = findWay(curr.right, nearest, point, minDist);
             }
         }
         else {
             nearest = findWay(curr.right, nearest, point, minDist);
-            if (distTo(nearest, point) >= Math.pow(outOfBounds, 2)){
+            if (distTo(nearest, point) >= Math.sqrt(Math.pow(outOfBounds, 2))){
                 nearest = findWay(curr.left, nearest, point, minDist);
             }
         }

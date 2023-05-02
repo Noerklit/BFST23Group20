@@ -14,13 +14,17 @@ public class Dijkstra {
     EdgeWeightedGraph graph;
     KDTree tree;
     Way root;
+    String filter;
     int nodeCount;
+    double distance;
+
     HashMap<Long, Integer> nodeIdToIntegerId = new HashMap<>();
     HashMap<Integer, float[]> integerIdToCoords = new HashMap<>();
 
-    public Dijkstra(KDTree tree) {
+    public Dijkstra(KDTree tree, String filter) {
         this.tree = tree;
         this.root = tree.root;
+        this.filter = filter;
 
         prepareForBuildGraph(root);
         buildGraph(nodeCount);
@@ -29,11 +33,17 @@ public class Dijkstra {
     public Iterable<Edge> RunDijkstra(long start, long end) {
         int startAsInteger = nodeIdToIntegerId.get(start);
         int endAsInteger = nodeIdToIntegerId.get(end);
+        distance = 0;
 
         DijkstraUndirectedSP dijkstraShortestPath = new DijkstraUndirectedSP(graph, startAsInteger);
 
-        if (dijkstraShortestPath.hasPathTo(endAsInteger))
-            return dijkstraShortestPath.pathTo(endAsInteger);
+        if (dijkstraShortestPath.hasPathTo(endAsInteger)) {
+            Iterable<Edge> shortestPath = dijkstraShortestPath.pathTo(endAsInteger);
+            for (Edge e : shortestPath) {
+                distance += e.weight();
+            }
+            return shortestPath;
+        }
 
         return null; 
     }
@@ -50,17 +60,20 @@ public class Dijkstra {
 
     public ArrayList<Float> getCoords(Iterable<Edge> pathToDraw) {
         ArrayList<Float> coordList = new ArrayList<>();
-        for (Edge e : pathToDraw) {
-            int src = e.either();
-            int dest = e.other(src);
+        float x1, y1 , x2, y2;
+        int src, dest;
 
-            float x1 = integerIdToCoords.get(src)[0];
-            float y1 = integerIdToCoords.get(src)[1];
+        for (Edge e : pathToDraw) {
+            src = e.either();
+            dest = e.other(src);
+
+            x1 = integerIdToCoords.get(src)[0];
+            y1 = integerIdToCoords.get(src)[1];
             coordList.add(x1);
             coordList.add(y1);
 
-            float x2 = integerIdToCoords.get(dest)[0];
-            float y2 = integerIdToCoords.get(dest)[1];
+            x2 = integerIdToCoords.get(dest)[0];
+            y2 = integerIdToCoords.get(dest)[1];
             coordList.add(x2);
             coordList.add(y2);
         }
@@ -71,26 +84,39 @@ public class Dijkstra {
         if (curr == null)
             return;
      
+        float x1, y1, x2, y2;
+        long id1, id2;
+        int id_src, id_dest;
+        double distanceKm, weight = 0;
+
         for (int i = 0; i < (curr.coords.length)-2; i+=2) {
-            float x1 = curr.coords[i + 0];
-            float y1 = curr.coords[i + 1];
-            long id1 = curr.nodeIds[i/2];
+            x1 = curr.coords[i + 0];
+            y1 = curr.coords[i + 1];
+            id1 = curr.nodeIds[i/2];
 
-            float x2 = curr.coords[i + 2];
-            float y2 = curr.coords[i + 3];
-            long id2 = curr.nodeIds[i/2 + 1];
+            x2 = curr.coords[i + 2];
+            y2 = curr.coords[i + 3];
+            id2 = curr.nodeIds[i/2 + 1];
 
-            int id_src = nodeIdToIntegerId.get(id1);
-            int id_dest = nodeIdToIntegerId.get(id2);
+            id_src = nodeIdToIntegerId.get(id1);
+            id_dest = nodeIdToIntegerId.get(id2);
 
             if (!integerIdToCoords.containsKey(id_src))
                 integerIdToCoords.put(id_src, new float[]{x1, y1});
             else if (!integerIdToCoords.containsKey(id_dest))
                 integerIdToCoords.put(id_dest, new float[]{x2, y2});
-          
-            double weight = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)); // @todo: haversine
-            Edge edgeToAdd = new Edge(id_src, id_dest, weight);
+            
+            distanceKm = Haversine.haversine(x1, y1, x2, y2);
 
+            if (filter.equals("SPEED")) {
+                // Will get time it takes to drive distance
+                weight = distanceKm / curr.maxspeed;
+            } else if (filter.equals("DISTANCE")) {
+                weight = distanceKm;
+            }
+
+            Edge edgeToAdd = new Edge(id_src, id_dest, weight);
+            
             graph.addEdge(edgeToAdd);
         }
 
@@ -113,5 +139,9 @@ public class Dijkstra {
 
         prepareForBuildGraph(curr.left);
         prepareForBuildGraph(curr.right);
+    }
+
+    public double getDistance() {
+        return distance;
     }
 }
