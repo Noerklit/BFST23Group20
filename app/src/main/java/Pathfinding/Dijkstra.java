@@ -27,7 +27,7 @@ public class Dijkstra {
         buildTree(nodeCount);
     }
 
-    public Iterable<Edge> RunDijkstra(long start, long end) {
+    public Iterable<Edge> runDijkstra(long start, long end) {
         int startAsInteger = UniqueIdentifierMap.get(start);
         int endAsInteger = UniqueIdentifierMap.get(end);
 
