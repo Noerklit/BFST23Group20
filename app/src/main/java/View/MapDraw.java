@@ -66,8 +66,7 @@ public class MapDraw {
 //        pan(-100,-100);
 //        zoom(380, 340, 40);
 
-        dijkstra = new Dijkstra(model.wayKDTree, "SPEED");
-//        dijkstra.RunDijkstra(32842581l, 32842599l);
+        dijkstra = new Dijkstra(model.wayKDTree);
         redraw();
     }
 
@@ -114,21 +113,6 @@ public class MapDraw {
             model.wayKDTree.drawTree(left, right, up, down, fidelity);
             model.buildingKdtree.drawTree(left, right, up, down, fidelity);
         }
-
-//        var temp  = model.wayKDTree.findWay(new Point2D( -55.1100540, 14.7530605));
-//        if (temp != null)
-//        {
-//            gc.setLineWidth(5 * 1/Math.sqrt(trans.determinant()));
-//            gc.beginPath();
-//            gc.moveTo(temp.coords[0], temp.coords[1]);
-//            for (int i = 2; i<temp.coords.length; i+=2)
-//            {
-//                gc.lineTo(temp.coords[i], temp.coords[i+1]);
-//            }
-//            gc.setStroke(Color.CHOCOLATE);
-//            gc.stroke();
-//
-//        }
 
         //traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
         

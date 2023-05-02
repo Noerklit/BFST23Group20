@@ -7,11 +7,14 @@ import javafx.geometry.Point2D;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import Model.Way;
 import edu.princeton.cs.algs4.Edge;
 import edu.princeton.cs.algs4.EdgeWeightedGraph;
+import javafx.scene.shape.Circle;
 
 public class KDTree implements Serializable {
 
@@ -110,40 +113,116 @@ public class KDTree implements Serializable {
             drawTree(current.left, left, right, up, down, fidelity);
         }
     }
-    public Way findWay(Point2D point2d){
-        return findWay(root, root, point2d, Double.MAX_VALUE);
+
+    public Point2D inArea(Way way, Point2D target){
+        var dist = distTo(way, new Point2D(way.coords[0], way.coords[1]));
+        Circle circle = new Circle(way.xVal, way.yVal,50);
+        Point2D closest = new Point2D(way.xVal, way.yVal);
+        return findNearby(circle, closest, target);
     }
-    private Way findWay(Way curr, Way nearest, Point2D point, double minDist){
+    private Point2D findNearby(Circle circle, Point2D closest, Point2D target){
+
+        for (Way nearby: findNearby(root, circle, new ArrayList<Way>())){
+            for (int i = 0; i<nearby.coords.length-2; i+=2) {
+                var dist = new Point2D(nearby.coords[i], nearby.coords[i+1]).distance(target);
+                if (dist < closest.distance(target)) {
+                    closest = new Point2D(nearby.coords[i], nearby.coords[i+1]);
+                }
+            }
+        }
+        return closest;
+    }
+
+    private List<Way> findNearby(
+            Way current,
+            Circle circle,
+            List<Way> ways)
+    {
+        boolean inRange;
+        boolean tooSmall;
+        if (current == null) {
+            return ways;
+        }
+
+        inRange = circle.contains(current.xVal,current.yVal);
+        if (current.depth%2==0) {
+//            inRange = left < current.xVal && current.xVal < right;
+            tooSmall = current.xVal < circle.getCenterX() - circle.getRadius();
+        } else {
+//            inRange = up < current.yVal && current.yVal < down;
+            tooSmall = current.yVal < circle.getCenterY()+circle.getRadius();
+        }
+        if (inRange) {
+            ways.add(current);
+            findNearby(current.left, circle, ways);
+            findNearby(current.right, circle, ways);
+            return ways;
+        }
+        if (tooSmall) {
+            findNearby(current.right, circle, ways);
+        } else {
+            findNearby(current.left, circle, ways);
+        }
+        return ways;
+    }
+    public Way findWay(Point2D point2d){
+        return findWay(root, root, point2d ,Double.MAX_VALUE);
+    }
+
+    /**
+     * inspiration for this algorithm was found at
+     * https://github.com/mgruben/Kd-Trees/blob/master/KdTree.java
+     * @param curr
+     * @param nearest
+     * @param pointToFind
+     * @param minDist
+     * @return
+     */
+    private Way findWay(Way curr, Way nearest, Point2D pointToFind ,double minDist){
         if (curr == null)
             return nearest;
 
-        if (curr.xVal == point.getX() && curr.yVal == point.getY())
+        if (curr.xVal == pointToFind.getX() && curr.yVal == pointToFind.getY())
             return curr;
 
-        if (distTo(curr, point) < distTo(nearest, point))
+        if (distTo(curr, pointToFind) < distTo(nearest, pointToFind))
             nearest = curr;
 
-        double outOfBounds = curr.depth%2==0? point.getX() - curr.xVal: point.getY()-curr.yVal;
+        double outOfBounds = curr.depth%2==0? pointToFind.getX() - curr.xVal: pointToFind.getY()-curr.yVal;
 
         if (outOfBounds<0){
-            nearest = findWay(curr.left, nearest, point, minDist);
+            nearest = findWay(curr.left, nearest, pointToFind, minDist);
 
-            if (distTo(nearest, point) >= Math.sqrt(Math.pow(outOfBounds, 2))){
-                nearest = findWay(curr.right, nearest, point, minDist);
+            if (distTo(nearest, pointToFind) >= Math.sqrt(Math.pow(outOfBounds, 2))){
+                nearest = findWay(curr.right, nearest, pointToFind, minDist);
             }
         }
         else {
-            nearest = findWay(curr.right, nearest, point, minDist);
-            if (distTo(nearest, point) >= Math.sqrt(Math.pow(outOfBounds, 2))){
-                nearest = findWay(curr.left, nearest, point, minDist);
+            nearest = findWay(curr.right, nearest, pointToFind, minDist);
+            if (distTo(nearest, pointToFind) >= Math.sqrt(Math.pow(outOfBounds, 2))){
+                nearest = findWay(curr.left, nearest, pointToFind, minDist);
             }
         }
 
         return nearest;
     }
 
+    private Point2D findNearestCoordinates(Way way, Point2D nearestCoordinates, Point2D target){
+        Point2D nearest = new Point2D(nearestCoordinates.getX(), nearestCoordinates.getY());
+        for (int i = 0; i<way.coords.length-2; i+=2)
+        {
+            if(distToPoint(way.coords[i], way.coords[i+1], target)<distToPoint(nearest.getX(), nearest.getY(), target))
+                nearest = new Point2D(way.coords[i], way.coords[i+1]);
+        }
+        return nearest;
+    }
+
     private double distTo(Way way, Point2D point){
         return Math.sqrt(Math.pow(way.xVal - point.getX(),2) + Math.pow(way.yVal-point.getY(), 2));
+    }
+
+    private double distToPoint(double x, double y, Point2D point){
+        return Math.sqrt(Math.pow(x - point.getX(),2) + Math.pow(y-point.getY(), 2));
     }
 
 

@@ -27,10 +27,10 @@ public class Controller {
         final boolean[] isStart = {true};
     view.getCanvas().setOnMousePressed(e -> {
         if(e.isPrimaryButtonDown() && e.isShiftDown()){
-//            System.out.println(view.convertMouseLon(e.getX()));
-//            System.out.println(view.convertMouseLat(e.getY()));
 
-            var temp  = model.wayKDTree.findWay(new Point2D( view.convertMouseLon(e.getX()), view.convertMouseLat(e.getY())));
+            var target = new Point2D( view.convertMouseLon(e.getX()), view.convertMouseLat(e.getY()));
+            var temp  = model.wayKDTree.findWay(target);
+            var trueCoords = model.wayKDTree.inArea(temp, target);
             if (temp != null)
             {
                 if (isStart[0]){
@@ -46,22 +46,25 @@ public class Controller {
             {
                 view.getMapDraw().gc.setLineWidth(5 * 1/Math.sqrt(view.getMapDraw().trans.determinant()));
                 view.getMapDraw().gc.beginPath();
-                //view.getMapDraw().gc.moveTo(temp.coords[0], temp.coords[1]);
 
-                view.getMapDraw().gc.lineTo(temp.xVal, temp.yVal);
+                view.getMapDraw().gc.lineTo(trueCoords.getX(), trueCoords.getY());
 
-
-                //for (int i = 2; i<temp.coords.length; i+=2)
-                //{
-                //    view.getMapDraw().gc.lineTo(temp.coords[i], temp.coords[i+1]);
-                //}
                 view.getMapDraw().gc.setStroke(Color.CHOCOLATE);
                 view.getMapDraw().gc.stroke();
+//                view.getMapDraw().gc.setLineWidth(5 * 1/Math.sqrt(view.getMapDraw().trans.determinant()));
+//                view.getMapDraw().gc.beginPath();
+//
+//                view.getMapDraw().gc.lineTo(temp.xVal, temp.yVal);
+//
+//                view.getMapDraw().gc.setStroke(Color.CHOCOLATE);
+//                view.getMapDraw().gc.stroke();
+
 
             }
+        } else {
+            lastX = e.getX();
+            lastY = e.getY();
         }
-        lastX = e.getX();
-        lastY = e.getY();
     });
 
 
@@ -97,10 +100,9 @@ public class Controller {
     view.getSearchbar()
         .setOnKeyPressed(event -> {
             try {
-                System.out.println("Now searching for: " + view.getSearchbar().getText());
                 parser.getAddresses(view.getSearchbar().getText());
             } catch (Exception e) {
-                System.out.println(e);
+
             }
     });
 
