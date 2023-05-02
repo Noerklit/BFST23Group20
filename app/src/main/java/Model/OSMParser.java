@@ -94,7 +94,8 @@ public class OSMParser {
 
         while (temporaryAddressFile.hasAddress()) {
             String address = temporaryAddressFile.getAddress();
-            addressSearch.addAddress(address);
+            String[] addressInfo = address.split(", ");
+            addressSearch.addAddress(addressInfo[0], addressInfo[1]);
         }
 
         temporaryAddressFile.closeReadStream();

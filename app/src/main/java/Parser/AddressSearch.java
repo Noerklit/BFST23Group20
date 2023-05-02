@@ -9,6 +9,7 @@ import java.net.URLEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +19,8 @@ import java.nio.file.Files;
 public class AddressSearch implements Serializable {
     private boolean online;
     private Trie addressesTrie;
+    //private List<ArrayList> cities;
+    private Map<Integer, String> cities;
 
     public AddressSearch() {
         this.online = isOnline();
@@ -25,8 +28,15 @@ public class AddressSearch implements Serializable {
         addressesTrie = new Trie();
     }
 
-    public void addAddress(String address) {
-        addressesTrie.insert(address);
+    public void addAddress(String address, String city) {
+        addressesTrie.insert(address, city);
+        //addCity(city);
+    }
+
+    private void addCity(String city) {
+        if (cities.containsValue(city)) {
+            
+        }
     }
 
     public List<String> getAddresses(String text) {

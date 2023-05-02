@@ -5,8 +5,8 @@ public class TemporaryAddress {
     private String country, municipality, place, postcode, city, housenumber, street;
 
     public String get() {
-        //return String.format("%s %s, %s %s", street, housenumber, postcode, city);
-        return String.format("%s %s", street, housenumber);
+        return String.format("%s %s, %s %s", street, housenumber, postcode, city);
+        //return String.format("%s %s", street, housenumber);
     }
 
     public void setCountry(String country) {

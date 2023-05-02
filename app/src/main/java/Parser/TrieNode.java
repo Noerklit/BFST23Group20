@@ -16,6 +16,7 @@ public class TrieNode implements Serializable {
     
     public TrieNode[] children = new TrieNode[SIZE];
     public boolean terminal;
+    public String city;
 
     public TrieNode() {
         for (int i = 0; i < SIZE; i++) {
