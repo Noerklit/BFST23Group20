@@ -12,6 +12,7 @@ public class Way implements Serializable, Comparable<Way> {
     public float[] coords;
     public long[] nodeIds;
     DrawType drawType;
+    ArrayList<Node> way;
 
     int trueMid;
     public float xVal;
@@ -42,9 +43,8 @@ public class Way implements Serializable, Comparable<Way> {
                 xVal = coords[trueMid];
                 yVal = coords[trueMid+1];
             }
+            this.way = new ArrayList<>(way);
     }
-
-
 
     public void draw() {
         GraphicsContext gc = MapDraw.gc;
@@ -89,5 +89,16 @@ public class Way implements Serializable, Comparable<Way> {
 
     public DrawType getDrawType() {
         return drawType;
+    }
+
+    public ArrayList<Node> getNodeList() {
+        return way;
+    }
+
+    public void addNodes(ArrayList<Node> test, ArrayList<Node> toAdd) {
+        way = new ArrayList<>(test);
+        for (Node e : toAdd) {
+            way.add(e);
+        }
     }
 }
