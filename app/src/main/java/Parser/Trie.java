@@ -24,13 +24,15 @@ public class Trie implements Serializable {
             current = current.getChild(c);
         }
         current.terminal = true;
-        current.city = city.intern();
+        current.addCity(city);
     }
 
     private void getSuggestions(TrieNode end, String word) {
         if (end.terminal) {
-            String suggestion = String.format("%s, %s", word, end.city);
-            returnStrings.add(suggestion);
+            for (String city : end.getCities()) {
+                String suggestion = String.format("%s, %s", word, city);
+                returnStrings.add(suggestion);
+            }
         }
 
         for (int i = 0; i < TrieNode.SIZE; i++) {

@@ -2,6 +2,7 @@ package Parser;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 // https://www.youtube.com/watch?v=3CbFFVHQrk4
 
@@ -16,7 +17,7 @@ public class TrieNode implements Serializable {
     
     public TrieNode[] children = new TrieNode[SIZE];
     public boolean terminal;
-    public String city;
+    private List<String> cities;
 
     public TrieNode() {
         for (int i = 0; i < SIZE; i++) {
@@ -44,5 +45,15 @@ public class TrieNode implements Serializable {
     }
     public static int charToIndex(char c) {
         return characters.indexOf(c);
+    }
+
+    public void addCity(String city) {
+        if (cities == null) {
+            cities = new ArrayList<>();
+        }
+        cities.add(city);
+    }
+    public List<String> getCities() {
+        return cities;
     }
 }
