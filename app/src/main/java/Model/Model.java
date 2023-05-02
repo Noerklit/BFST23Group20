@@ -14,8 +14,11 @@ import java.util.zip.ZipInputStream;
 
 import Benchmark.TaskTimer;
 import KDTree.KDTree;
+import Parser.AddressSearch;
 
 public class Model implements Serializable {
+
+    private AddressSearch addressSearch;
 
     public List<Way> ways = new ArrayList<Way>();
     public List<Way> coastlines;
@@ -35,6 +38,8 @@ public class Model implements Serializable {
 
 
     public Model(String filename) throws IOException {
+        addressSearch = new AddressSearch();
+
         if (filename.endsWith(".osm.zip")) {
             parseZIP(filename);
         } else if (filename.endsWith(".osm")) {
@@ -42,6 +47,8 @@ public class Model implements Serializable {
         } else {
             throw new IOException("Could not find .osm.zip or .osm file");
         }
+
+        TaskTimer.recordTask("Save to obj-file");
         save(filename+".obj");
     }
 
@@ -61,42 +68,8 @@ public class Model implements Serializable {
         parseOSM(new FileInputStream(filename));
     }
 
-    private String parseAddress(String k, String v) {
-        // Currently not used, only used for creating data address file
-
-        if (k.contains("addr:country")) {
-            System.out.print(v+", ");
-        }
-        if (k.contains("addr:municipality")) {
-            System.out.print(v+", ");
-        }
-        if (k.contains("addr:place")) {
-            System.out.print(v+", ");
-        }
-        if (k.contains("addr:postcode")) {
-            System.out.print(v+", ");
-        }
-        if (k.contains("addr:city")) {
-            System.out.print(v+", ");
-        }
-        if (k.contains("addr:housenumber")) {
-            System.out.print(v+", ");
-        }
-        if (k.contains("addr:street")) {
-            System.out.print(v);
-        }
-
-
-        if (k.contains("osak:identifier")) {
-            System.out.println("");
-        }
-
-
-        return "";
-    }
-
     private void parseOSM(InputStream inputStream) {
-        OSMParser parser = new OSMParser(inputStream);
+        OSMParser parser = new OSMParser(inputStream, addressSearch);
         ways = parser.getWays();
         wayKDTree = parser.wayKDTree;
         backgroundKdtree = parser.backgroundKdtree;
@@ -106,51 +79,19 @@ public class Model implements Serializable {
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();
         maxlon = parser.getMaxlon();
+        /*/
+        for (String address : parser.getAddresses()) {
+            addressSearch.addAddress(address);
+        }
+        //*/
     }
 
-    private DrawType keyValToDrawType(String key, String val) {
-
-        switch (key) {
-            case "building":
-                return DrawType.building;
-            case "highway":
-                switch (val) {
-                    case "motorway":
-                        return DrawType.motorway;
-                    case "trunk":
-                        return DrawType.trunk;
-                    case "primary":
-                        return DrawType.primary;
-                    case "secondary":
-                        return DrawType.secondary;
-                    case "tertiary":
-                        return DrawType.tertiary;
-                    case "unclassified":
-                        return DrawType.unclassified;
-                    case "residential":
-                        return DrawType.residential;
-                    case "living_street":
-                        return DrawType.living_street;
-                    case "service":
-                        return DrawType.service;
-
-                }
-                break;
-            case "landuse":
-                switch(val) {
-                    case "forest":
-                        return DrawType.landuseFarmland;
-                    case "residential":
-                        return DrawType.landuseResidential; //Currently residential roads, not residential landuse.
-                }
-                break;
+    public List<String> searchAddresses(String text) {
+        try {
+            return addressSearch.getAddresses(text);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-
-        switch (val) {
-            case "coastline":
-                return DrawType.coastline;
-        }
-
-        return null;
     }
 }

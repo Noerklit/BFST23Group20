@@ -1,60 +1,75 @@
 package Parser;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Trie {
+public class Trie implements Serializable {
     private TrieNode root; 
-    private List<String> return_strings = new ArrayList<>();
+    private List<String> returnStrings;
 
     public Trie() {
         root = new TrieNode();
     }
 
-    public void insert(String word) { 
+    public void insert(String word, String endWord) { 
         TrieNode current = root;
    
         // Get an iterable string
         for ( char c : word.toCharArray() ) {
-            if ( current.children[c] == null ) {
-                current.children[c] = new TrieNode();
+            int index = TrieNode.charToIndex(c);
+            if ( current.children[index] == null ) {
+                current.children[index] = new TrieNode();
             }
             current = current.getChild(c);
         }
         current.terminal = true;
+        current.addEndWord(endWord);
     }
 
     private void getSuggestions(TrieNode end, String word) {
         if (end.terminal) {
-            return_strings.add(word);
+            for (String endWord : end.getEndWords()) {
+                String suggestion = String.format("%s, %s", word, endWord);
+                returnStrings.add(suggestion);
+            }
         }
 
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < TrieNode.SIZE; i++) {
             if ( end.getChild(i) != null ) {
-                getSuggestions(end.getChild(i), word + (char) i);
+                getSuggestions(end.getChild(i), word + TrieNode.indexToChar(i));
             }
         }
     }
 
-
+    // Assumes word isn't an empty string
     public List<String> autoComplete(String word) {
+        returnStrings = new ArrayList<>();
+        
         TrieNode current = root;
     
         char[] characterArrWord = word.toCharArray();
 
-        // Check if it even exists
-        if (current.getChild(characterArrWord[0]) == null) {
-            return null;
-        }
+        String autoCompletedWord = "";
 
         // Get end of string
         for ( char c : characterArrWord ) {
+            char upperCaseC = Character.toUpperCase(c);
             if ( current.getChild(c) != null ) {
                 current = current.getChild(c);
+                autoCompletedWord += c;
+            } else if (current.getChild(upperCaseC) != null) {
+                current = current.getChild(upperCaseC);
+                autoCompletedWord += upperCaseC;
+            } else if (current.getChild('.') != null) { // Doesn't work completely yet
+                current = current.getChild('.');
+                autoCompletedWord += '.';
+            } else {
+                return null;
             }
         }
           
-        getSuggestions(current, word);
-        return return_strings;
+        getSuggestions(current, autoCompletedWord);
+        return returnStrings;
     }
 }
