@@ -19,6 +19,7 @@ public class Way implements Serializable, Comparable<Way> {
     public float yVal;
     public byte maxspeed;
 
+    public Long lastNodeId;
     public Long id;
     public Way left = null;
     public Way right = null;
@@ -44,6 +45,9 @@ public class Way implements Serializable, Comparable<Way> {
                 yVal = coords[trueMid+1];
             }
             this.way = new ArrayList<>(way);
+            if(way.size()>0) {
+                this.lastNodeId = way.get(way.size()-1).id;
+            }
     }
 
     public void draw() {
@@ -100,5 +104,11 @@ public class Way implements Serializable, Comparable<Way> {
         for (Node e : toAdd) {
             way.add(e);
         }
+        System.out.println("How many nodes in way after adding : " + way.size());
+        //Problem now is that the id of the last node is not updated anymore.... No lastNodeId felt I can change either...
+
+        System.out.println("LastNodeId :" + lastNodeId);
+        System.out.println("LastNodeId :" + lastNodeId);
+        System.out.println("Done adding the ways together");
     }
 }

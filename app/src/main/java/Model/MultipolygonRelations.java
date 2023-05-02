@@ -26,11 +26,13 @@ public class MultipolygonRelations {
             for (Way wayToMerge : waysToPutTogether) {
                 System.out.println(way != wayToMerge);
                 if (way != wayToMerge) {
-                    System.out.println("firstWayFirstNodeId : " + way.nodeIds[0] + " firstWayLastNodeId : " + way.nodeIds[way.nodeIds.length-1]);
-                    System.out.println("wayToMergeFirstNodeId : " + wayToMerge.nodeIds[0] + " wayToMergeLastNodeId : " + wayToMerge.nodeIds[wayToMerge.nodeIds.length-1]);
-                    if (way.nodeIds[way.nodeIds.length-1] == wayToMerge.nodeIds[0]) {
+                    System.out.println("firstWayFirstNodeId : " + way.nodeIds[0] + " firstWayLastNodeId : " + way.lastNodeId);
+                    System.out.println("wayToMergeFirstNodeId : " + wayToMerge.nodeIds[0] + " wayToMergeLastNodeId : " + wayToMerge.lastNodeId);
+                    System.out.println("Size of wayNodeList : " + way.getNodeList().size() + " Size of wayToMergeNodeList : "+ wayToMerge.getNodeList().size());
+                    if (way.lastNodeId == wayToMerge.nodeIds[0]) {
                         System.out.println("Hit");
                         toAdd.addNodes(toAdd.getNodeList(), wayToMerge.getNodeList());
+                        System.out.println(toAdd.getNodeList().size());
                     }
                     else if (way.nodeIds[0] == wayToMerge.nodeIds[0]) {
                         // Reverse first
@@ -38,13 +40,14 @@ public class MultipolygonRelations {
                         Collections.reverse(way.getNodeList());
                         toAdd.addNodes(toAdd.getNodeList(), wayToMerge.getNodeList());
                     }
-                    else if (way.nodeIds[way.nodeIds.length-1] == wayToMerge.nodeIds[wayToMerge.nodeIds.length-1]) {
+                    else if (way.lastNodeId == wayToMerge.lastNodeId) {
                         //Reverse wayToMerge, do the same as one
                         System.out.println("Hit2");
                         Collections.reverse(wayToMerge.getNodeList());
                         toAdd.addNodes(toAdd.getNodeList(), wayToMerge.getNodeList());
+                        System.out.println(toAdd.getNodeList().size());
                     }
-                    else if (way.nodeIds[0] == wayToMerge.nodeIds[wayToMerge.nodeIds.length-1]) {
+                    else if (way.nodeIds[0] == wayToMerge.lastNodeId) {
                         //Reverse both
                         System.out.println("Hit3");
                         Collections.reverse(way.getNodeList());
@@ -52,7 +55,7 @@ public class MultipolygonRelations {
                         toAdd.addNodes(toAdd.getNodeList(), wayToMerge.getNodeList());
                     }
 
-                    if (toAdd.nodeIds[0] == toAdd.nodeIds[toAdd.nodeIds.length-1]) {
+                    if (toAdd.nodeIds[0] == toAdd.lastNodeId) {
                         System.out.println("This is a closedWay now: FirstNodeId " + toAdd.nodeIds[0] + " LastNodeId " + toAdd.nodeIds[toAdd.nodeIds.length-1]);
                         System.out.println("Size of toAdd :" + toAdd.getNodeList().size());
                         closedWays.add(toAdd);
@@ -64,8 +67,6 @@ public class MultipolygonRelations {
                 }
             }
         }
-
-
         return closedWays;
     }
 }
