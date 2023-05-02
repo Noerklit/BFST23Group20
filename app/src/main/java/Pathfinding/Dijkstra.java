@@ -15,8 +15,9 @@ public class Dijkstra {
     KDTree tree;
     Way root;
     int nodeCount;
-    HashMap<Long, Integer> map = new HashMap<>();
-    HashMap<Integer, float[]> countToCoords = new HashMap<>();
+
+    HashMap<Long, Integer> UniqueIdentifierMap = new HashMap<>();
+    HashMap<Integer, float[]> uniqueIdToCoordinates = new HashMap<>();
 
     public Dijkstra(KDTree tree) {
         this.tree = tree;
@@ -27,11 +28,13 @@ public class Dijkstra {
     }
 
     public Iterable<Edge> RunDijkstra(long start, long end) {
-        int startAsInteger = map.get(start);
-        int endAsInteger = map.get(end);
+        int startAsInteger = UniqueIdentifierMap.get(start);
+        int endAsInteger = UniqueIdentifierMap.get(end);
 
         DijkstraUndirectedSP dijkstraShortestPath = new DijkstraUndirectedSP(graph, startAsInteger);
 
+        // If we have found a path return that, otherwise
+        // we will return null
         if (dijkstraShortestPath.hasPathTo(endAsInteger))
             return dijkstraShortestPath.pathTo(endAsInteger);
 
@@ -40,7 +43,7 @@ public class Dijkstra {
 
     private void buildTree(int treeSize) {
         graph = new EdgeWeightedGraph(treeSize);
-        traverse(root);
+        traverseAndBuildSPT(root);
     }
 
     private ArrayList<Float> getCoords(Iterable<Edge> pathToDraw) {
@@ -49,13 +52,13 @@ public class Dijkstra {
             int src = e.either();
             int dest = e.other(src);
 
-            float x1 = countToCoords.get(src)[0];
-            float y1 = countToCoords.get(src)[1];
+            float x1 = uniqueIdToCoordinates.get(src)[0];
+            float y1 = uniqueIdToCoordinates.get(src)[1];
             coordList.add(x1);
             coordList.add(y1);
 
-            float x2 = countToCoords.get(dest)[0];
-            float y2 = countToCoords.get(dest)[1];
+            float x2 = uniqueIdToCoordinates.get(dest)[0];
+            float y2 = uniqueIdToCoordinates.get(dest)[1];
             coordList.add(x2);
             coordList.add(y2);
             System.out.println(x1 + ", " + y1);
@@ -63,60 +66,60 @@ public class Dijkstra {
         return coordList;
     }
 
-    // public EdgeWeightedGraph traverse(){
-    //     this.graph = new EdgeWeightedGraph(nodeCount);
-    //     traverse(tree.root, this.graph);
-    //     return this.graph;
-    // }
-
-    private void traverse(Way curr){
-        if (curr == null)
+    private void traverseAndBuildSPT(Way currentWay){
+        if (currentWay == null)
             return;
      
-        for (int i = 0; i < (curr.coords.length)-2; i+=2) {
-            float x1 = curr.coords[i + 0];
-            float y1 = curr.coords[i + 1];
-            long id1 = curr.ids[i/2];
+        float x1, y1, x2, y2;
+        long id1, id2;
+        int id_src;
+        int id_dest;
 
-            float x2 = curr.coords[i + 2];
-            float y2 = curr.coords[i + 3];
-            long id2 = curr.ids[i/2 + 1];
+        for (int i = 0; i < (currentWay.coords.length)-2; i+=2) {
+            x1 = currentWay.coords[i + 0];
+            y1 = currentWay.coords[i + 1];
+            id1 = currentWay.ids[i/2];
 
-            int id_src = map.get(id1);
-            int id_dest = map.get(id2);
+            x2 = currentWay.coords[i + 2];
+            y2 = currentWay.coords[i + 3];
+            id2 = currentWay.ids[i/2 + 1];
 
-            if (!countToCoords.containsKey(id_src))
-                countToCoords.put(id_src, new float[]{x1, y1});
-            else if (!countToCoords.containsKey(id_dest))
-                countToCoords.put(id_dest, new float[]{x2, y2});
-          
+            id_src = UniqueIdentifierMap.get(id1);
+            id_dest = UniqueIdentifierMap.get(id2);
+
+            if (!uniqueIdToCoordinates.containsKey(id_src))
+                uniqueIdToCoordinates.put(id_src, new float[]{x1, y1});
+
+            if (!uniqueIdToCoordinates.containsKey(id_dest))
+                uniqueIdToCoordinates.put(id_dest, new float[]{x2, y2});
+         
             double weight = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
             Edge edgeToAdd = new Edge(id_src, id_dest, weight);
 
             graph.addEdge(edgeToAdd);
         }
 
-        traverse(curr.left);
-        traverse(curr.right);
+        traverseAndBuildSPT(currentWay.left);
+        traverseAndBuildSPT(currentWay.right);
     }
 
-    private void prepareForSPT(Way curr) {
-        if (curr == null)
+    private void prepareForSPT(Way currentWay) {
+        if (currentWay == null)
             return;
         
-        for (int i = 0; i < curr.ids.length; i++) {
-            long nodeid = curr.ids[i];
+        for (int i = 0; i < currentWay.ids.length; i++) {
+            long nodeID = currentWay.ids[i];
 
-            // If we already have a unique identifier continue
-            if (map.containsKey(nodeid)) {
+            // If we already have a unique identifier for this node id continue
+            if (UniqueIdentifierMap.containsKey(nodeID)) {
                 continue;
             } else {
-                map.put(nodeid, nodeCount);
+                UniqueIdentifierMap.put(nodeID, nodeCount);
                 nodeCount++;
             }
         }
 
-        prepareForSPT(curr.left);
-        prepareForSPT(curr.right);
+        prepareForSPT(currentWay.left);
+        prepareForSPT(currentWay.right);
     }
 }
