@@ -11,14 +11,19 @@ import javafx.scene.input.KeyEvent;
 import Parser.AddressSearch;
 
 public class Controller {
+    private double startX;
+    private double startY;
+
     private double lastX;
     private double lastY;
+
+    private boolean setStart = true;
 
     public Controller(Model model, View view) {
 
     view.getCanvas().setOnMousePressed(e -> {
-        lastX = e.getX();
-        lastY = e.getY();
+        startX = lastX = e.getX();
+        startY = lastY = e.getY();
     });
 
     view.getCanvas().setOnMouseDragged(e -> {
@@ -28,6 +33,21 @@ public class Controller {
 
         lastX = e.getX();
         lastY = e.getY();
+
+        view.redrawMap();
+    });
+    view.getCanvas().setOnMouseClicked(e -> {
+        double clickX = e.getX();
+        double clickY = e.getY();
+
+        if (!(clickX == startX && clickY == startY)) return;
+
+        if (setStart) {
+            view.setStartClick(new Point2D(clickX, clickY));
+        } else {
+            view.setEndClick(new Point2D(clickX, clickY));
+        }
+        setStart = !setStart;
 
         view.redrawMap();
     });

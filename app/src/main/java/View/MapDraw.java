@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -36,6 +37,8 @@ public class MapDraw {
 
     private Text debugText;
 
+    private boolean showStartPoint, showEndPoint;
+    private Point2D startPoint, endPoint;
 
     public MapDraw(Model model, Canvas canvas) {
         this.model = model;
@@ -58,6 +61,9 @@ public class MapDraw {
         scalingConst = (model.maxlat - model.minlat) / canvas.getHeight();
 //        pan(-100,-100);
 //        zoom(380, 340, 40);
+
+        showStartPoint = false;
+
         redraw();
     }
 
@@ -108,7 +114,27 @@ public class MapDraw {
 
         //traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
 
+        if (showStartPoint) {
+            drawPoint(startPoint, Color.web("#ff0000"));
+        }
+        if (showEndPoint) {
+            drawPoint(endPoint, Color.web("#0000ff"));
+        }
+
         FrameRateTimer.endFrame();
+    }
+
+    private void drawPoint(Point2D point, Color color) {
+        gc.setLineWidth(10 * 1/Math.sqrt(trans.determinant()));
+        gc.setStroke(color);
+
+        double up = getScreenLat(0 + cutoffFactor);
+        double left = getScreenLon(0 + cutoffFactor);
+
+        gc.beginPath();
+        gc.lineTo(point.getX(), point.getY());
+        
+        gc.stroke();
     }
 
 
@@ -244,6 +270,13 @@ public class MapDraw {
         return (trans.getTy() * -1 + canvas.getHeight() * factor) * scalingConst;
     }
 
+    public double convertMouseLon(double mouseCoord) {
+        return (trans.getTx() * -1 - canvas.getWidth()+(canvas.getWidth() + mouseCoord))*scalingConst;
+    }
+    public double convertMouseLat(double mouseCoord) {
+        return (trans.getTy() -1 + canvas.getHeight() - (canvas.getHeight()- mouseCoord))*scalingConst;
+    }
+
     private void calculateFidelity() {
         double zoomLevel = trans.getMxx();
         fidelity = 0;
@@ -329,6 +362,19 @@ public class MapDraw {
     }
     public void setDebugText(Text debugText) {
         this.debugText = debugText;
+    }
+
+    public void setStartClick(Point2D click) {
+        try {
+            startPoint = trans.inverseTransform(click.getX(), click.getY());
+            showStartPoint = true;
+        } catch (Exception e) {}
+    }
+    public void setEndClick(Point2D click) {
+        try {
+            endPoint = trans.inverseTransform(click.getX(), click.getY());
+            showEndPoint = true;
+        } catch (Exception e) {}
     }
     
     private void createColorMap() {
