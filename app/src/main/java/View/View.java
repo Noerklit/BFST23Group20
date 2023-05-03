@@ -148,6 +148,11 @@ public class View {
                 menuItem.setOnAction(event -> {
                     searchbar.setText(itemString);
                     searchbar.positionCaret(itemString.length());
+                    
+                    // Very temporary. Delete this. 
+                    String[] addressInfo = itemString.split(", ");
+                    long id = Long.parseLong(addressInfo[2]);
+                    selectAdress(id);
                 });
                 contextMenuItems.add(menuItem);
             }
@@ -243,5 +248,9 @@ public class View {
             List<String> addresses = model.searchAddresses(text);
             setSearchResults(addresses, 21);
         }
+    }
+
+    public void selectAdress(long id) {
+        System.out.println(id);
     }
 }

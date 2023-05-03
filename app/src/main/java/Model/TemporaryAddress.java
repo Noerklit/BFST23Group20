@@ -3,10 +3,15 @@ package Model;
 public class TemporaryAddress {
     
     private String country, municipality, place, postcode, city, housenumber, street;
+    private long id;
 
     public String get() {
-        return String.format("%s %s, %s %s", street, housenumber, postcode, city);
+        return String.format("%s %s, %s %s, %s", street, housenumber, postcode, city, id);
         //return String.format("%s %s", street, housenumber);
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public void setCountry(String country) {

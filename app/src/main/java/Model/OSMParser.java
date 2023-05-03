@@ -95,7 +95,8 @@ public class OSMParser {
         while (temporaryAddressFile.hasAddress()) {
             String address = temporaryAddressFile.getAddress();
             String[] addressInfo = address.split(", ");
-            addressSearch.addAddress(addressInfo[0], addressInfo[1]);
+            long id = Long.parseLong(addressInfo[2]);
+            addressSearch.addAddress(addressInfo[0], addressInfo[1], id);
         }
 
         temporaryAddressFile.closeReadStream();
@@ -150,13 +151,14 @@ public class OSMParser {
                 var name = input.getLocalName();
                 if (name == "node") {
                     TaskTimer.incrementSubtask();
-                    var id = queryLong(input, "id");
-                    var lat = queryFloat(input, "lat");
-                    var lon = queryFloat(input, "lon");
+                    long id = queryLong(input, "id");
+                    float lat = queryFloat(input, "lat");
+                    float lon = queryFloat(input, "lon");
                     currentNode = new Node(lat, lon, id);
                     // we need to test this makes it faster. Alternatively we can make a clear() method
                     temporaryAddress = null;
                     temporaryAddress = new TemporaryAddress();
+                    temporaryAddress.setId(id);
                     allNodes.add(currentNode);
                 } else if (name == "tag") {
                     String k = queryString(input, "k");

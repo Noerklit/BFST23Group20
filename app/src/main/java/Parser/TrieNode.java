@@ -18,6 +18,7 @@ public class TrieNode implements Serializable {
     public TrieNode[] children = new TrieNode[SIZE];
     public boolean terminal;
     private List<String> endWords;
+    private List<Long> endIds;
 
     public TrieNode() {
         for (int i = 0; i < SIZE; i++) {
@@ -47,13 +48,18 @@ public class TrieNode implements Serializable {
         return characters.indexOf(c);
     }
 
-    public void addEndWord(String endWord) {
+    public void addEndInfo(String endWord, long id) {
         if (endWords == null) {
             endWords = new ArrayList<>();
+            endIds = new ArrayList<>();
         }
         endWords.add(endWord.intern());
+        endIds.add(id);
     }
     public List<String> getEndWords() {
         return endWords;
+    }
+    public List<Long> getEndIds() {
+        return endIds;
     }
 }

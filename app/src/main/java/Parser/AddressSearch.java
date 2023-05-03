@@ -21,8 +21,8 @@ public class AddressSearch implements Serializable {
         addressesTrie = new Trie();
     }
 
-    public void addAddress(String address, String city) {
-        addressesTrie.insert(address, city);
+    public void addAddress(String address, String city, long id) {
+        addressesTrie.insert(address, city, id);
     }
 
     public List<String> getAddresses(String text) {
