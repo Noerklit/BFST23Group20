@@ -29,33 +29,38 @@ public class kdTreesTest {
     
     @BeforeEach
     private void makeTestWays () {
-        List<Way> testWays = new ArrayList<Way>();
         ArrayList<Node> testNodes = new ArrayList<>();
 
         testNodes.add(new Node(55.23f,22.53f, null));
         way1 = new Way(testNodes, null, null);
         way1.xVal = 3263.4674f;
         way1.yVal = 3263.4674f;
-        testWays.add(way1);
         way2 = new Way(testNodes, null, null);
         way2.xVal = 3663.4674f;
         way2.yVal = 3663.4674f;
-        testWays.add(way2);
         way3 = new Way(testNodes, null, null);
         way3.xVal = 3863.9674f;
         way3.yVal = 3863.9674f;
-        testWays.add(way3);
         way4 = new Way(testNodes, null, null);
         way4.xVal = 4063.4674f;
         way4.yVal = 4063.4674f;
-        testWays.add(way4);
         way5 = new Way(testNodes, null, null);
         way5.xVal = 2063.4674f;
         way5.yVal = 2063.4674f;
-        testWays.add(way5);
         way6 = new Way(testNodes, null, null);
         way6.xVal = 2063.4674f;
         way6.yVal = 2063.4674f;
+        way7 = new Way(testNodes, null, null);
+        way7.xVal = 1063.4674f;
+        way7.yVal = 1063.4674f;
+        way8 = new Way(testNodes, null, null);
+        way8.xVal = 34.46f;
+        way8.yVal = 34.46f;
+        way9 = new Way(testNodes, null, null);
+        way9.xVal = 25.46f;
+        way9.yVal = 25.46f;
+
+
 
     }
     @Test
@@ -111,4 +116,8 @@ public class kdTreesTest {
         kdTree.insert(way4);
         kdTree.insert(way6);
     }
+
+    //Test depth
+
+
 } 
