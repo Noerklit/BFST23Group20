@@ -7,7 +7,7 @@ import java.util.List;
 // https://www.youtube.com/watch?v=3CbFFVHQrk4
 
 public class TrieNode implements Serializable {
-    private static String characters = "'(),-./0123456789aAåÅäæÆbBcCdDeEéëfFgGhHiIjJkKlLmMnNoOóöøØpPqQrRsStTuUüÜvVwWxXyYÿzZ ";
+    private static String characters = "'(),-./0123456789aAåÅäæÆbBcCdDeEéëfFgGhHiIjJkKlLmMnNoOóöøØpPqQrRsStTuUüÜvVwWxXyYÿzZõÕ ";
     // The first char is ' ' (unicode decimal: 32)
     public static int firstChar = 32;
     // The last char is 'ü' (unicode decimal: 252)
