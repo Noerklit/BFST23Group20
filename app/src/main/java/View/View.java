@@ -4,11 +4,16 @@ import Benchmark.FrameRateTimer;
 import Model.Model;
 import Model.Way;
 
+import com.sun.scenario.effect.Flood;
+import javafx.geometry.HPos;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -22,11 +27,14 @@ import javafx.event.EventHandler;
 import javafx.stage.StageStyle;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public class View {
 
     private Canvas canvas;
     private MapDraw mapDraw;
+
+    private Logo logo;
     private MenuBar menuBar;
 
     private VBox helpVBox;
@@ -37,12 +45,14 @@ public class View {
     private Scene scene;
     private boolean showHelp = false;
 
-    public View(Model model, Stage primaryStage) {
+    public View(Model model, Stage primaryStage) throws FileNotFoundException {
         this.canvas = new Canvas(600, 500);
         
         this.mapDraw = new MapDraw(model, canvas);
 
+        this.logo = new Logo();
         this.scene = createGeneralUi();
+
 
         primaryStage.setTitle("Draw Lines");
 
@@ -56,7 +66,7 @@ public class View {
         setCanvasResize();
     }
 
-    private Scene createGeneralUi(){
+    private Scene createGeneralUi() throws FileNotFoundException {
         Text fpsText = new Text();
         FrameRateTimer.setFpsText(fpsText);
         Text mapDrawDebugText = new Text();
@@ -67,35 +77,42 @@ public class View {
         this.helpButton = createHelpButton();
 
         helpStage = new Stage(StageStyle.DECORATED);
-        helpStage.setTitle("Creating popup");
-        //helpStage.setX(300);
-        //helpStage.setY(200);
-        helpStage.setWidth(400);
+        helpStage.setTitle("Help");
+        helpStage.setWidth(500);
         helpStage.setHeight(300);
 
-        Font font = Font.font("Verdana", FontWeight.BOLD, FontPosture.REGULAR, 10);
-        Text t = new Text(
-                """
-                    Help to use map:
-                    \n
-                    Find route: Press "shift" down and click on the app to choose a staring point
-                    Do the same thing again to choose an ending point. Now your route will be calculated.
-                    \n
-                    Debug mode: Press "tap" to create debuglines.
-                    Change the size of the debuglines by pressing 'A' to make the debuglines smaller.
-                    Press 'D' to make the debuglines bigger.
-                    \n
-                    
-                    """
 
-        );
-        t.setFont(font);
-        t.setWrappingWidth(400);
+        FlowPane rootNode = new FlowPane();
+        rootNode.setColumnHalignment(HPos.CENTER);
+        rootNode.setPrefWrapLength(200);
 
-        helpVBox = new VBox(t);
-        helpScene = new Scene(helpVBox);
+
+        ImageView aImage = new ImageView(logo.getLogo().getImage());
+
+        Label annLabel = new Label("""
+                  Help to use map:
+                  \n
+                  Find route: Press "shift" down and click on the app to
+                  choose a staring point. Do the same thing again to
+                  choose an ending point. Now your route will be calculated.
+                  \n
+                  Debug mode: Press "tap" to create debuglines.
+                  Change the size of the debuglines by pressing 'A' to
+                  make the debuglines smaller.
+                  Press 'D' to make the debuglines bigger.
+                  \n
+                """);
+
+        rootNode.getChildren().add(annLabel);
+        rootNode.getChildren().add(aImage);
+
+
+
+        helpScene = new Scene(rootNode, 300, 300, Color.WHITE);
+       rootNode.setStyle("-fx-background-color: #FDFEFE");
+
+
         helpStage.setScene(helpScene);
-
 
 
         var hBoxMenu = new HBox(helpButton,menuBar,searchbar);
@@ -205,7 +222,7 @@ public class View {
     public double convertMouseLat(double mouseCoord) {
         return mapDraw.convertMouseLat(mouseCoord);
     }
-    
+
     public MenuBar getMenuBar() {
         return menuBar;
     }
@@ -255,7 +272,7 @@ public class View {
         mapDraw.toggleDebug();
         //updateCanvasSize();
     }
-    
+
     public void increaseMapDebugZone() {
         mapDraw.increaseDebugZone();
     }
