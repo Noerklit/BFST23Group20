@@ -16,8 +16,6 @@ import javafx.scene.text.Text;
 import Model.Model;
 import Model.DrawType;
 import Model.Way;
-import Pathfinding.Dijkstra;
-import Benchmark.FrameRateTimer;
 import Benchmark.FrameRateTimer;
 
 public class MapDraw {
@@ -429,7 +427,7 @@ public class MapDraw {
             setEndPoint(point);
         } catch (Exception e) {}
     }
-    
+
     public void setStartPoint(Point2D point) {
         startPoint = point;
         showStartPoint = true;
@@ -438,8 +436,12 @@ public class MapDraw {
         startWayPoint = new Point2D(foundWay.xVal, foundWay.yVal);
 
         startPathId = model.wayKDTree.inArea(foundWay, startPoint);
-        float[] coords = model.dijkstraGraph.getCoordsFromNodeId(startPathId);
-        startPathPoint = new Point2D(coords[0], coords[1]);
+        if (startPathId != -1) {
+            float[] coords = model.getCoordsFromNodeId(startPathId);
+            startPathPoint = new Point2D(coords[0], coords[1]);
+        } else {
+            startPathPoint = null;
+        }
     }
     public void setEndPoint(Point2D point) {
         endPoint = point;
@@ -449,15 +451,21 @@ public class MapDraw {
         endWayPoint = new Point2D(foundWay.xVal, foundWay.yVal);
 
         endPathId = model.wayKDTree.inArea(foundWay, endPoint);
-        float[] coords = model.dijkstraGraph.getCoordsFromNodeId(endPathId);
-        endPathPoint = new Point2D(coords[0], coords[1]);
-
-        findShortestPath();
+        if (endPathId != -1) {
+            float[] coords = model.getCoordsFromNodeId(endPathId);
+            endPathPoint = new Point2D(coords[0], coords[1]);
+        } else {
+            endPathPoint = null;
+        }
     }
 
     public void findShortestPath() {
-        shortPath = model.dijkstraGraph.getShortestPathCoords(startPathId, endPathId);
+        if (startPathId == -1 || endPathId == -1) return;
+        shortPath = model.getShortestPathCoords(startPathId, endPathId);
         showShortPath = true;
+    }
+    public void hideShortestPath() {
+        showShortPath = false;
     }
     
     private void createColorMap() {

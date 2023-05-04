@@ -121,7 +121,7 @@ public class KDTree implements Serializable {
         return findNearby(circle, closest, target);
     }
     private long findNearby(Circle circle, Point2D closest, Point2D target){
-        long id = 0;
+        long id = -1;
         for (Way nearby: findNearby(root, circle, new ArrayList<Way>())){
             for (int i = 0; i<nearby.coords.length-2; i+=2) {
                 var dist = new Point2D(nearby.coords[i], nearby.coords[i+1]).distance(target);
