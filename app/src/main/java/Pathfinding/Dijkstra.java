@@ -60,8 +60,11 @@ public class Dijkstra {
     }
 
     public static float[] getCoordsFromNodeId(Long nodeId) {
-        int integerId = nodeIdToIntegerId.get(nodeId);
-        return integerIdToCoords.get(integerId);
+        if (nodeIdToIntegerId.containsKey(nodeId)) {
+            int integerId = nodeIdToIntegerId.get(nodeId);
+            return integerIdToCoords.get(integerId);
+        }
+        return null;
     }
 
     public ArrayList<Float> getCoords(Iterable<Edge> pathToDraw) {

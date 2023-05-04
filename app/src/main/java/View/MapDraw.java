@@ -118,7 +118,7 @@ public class MapDraw {
         if (dijstraPathList != null && dijstraPathList.size()>0)
         {
             for (ArrayList<Float> sub : dijstraPathList){
-                gc.setLineWidth(0.00015);
+                gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
                 gc.beginPath();
                 gc.moveTo(sub.get(0), sub.get(1));
                 for (int i = 2; i<sub.size()-2; i+=2){

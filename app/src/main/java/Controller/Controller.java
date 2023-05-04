@@ -47,7 +47,8 @@ public class Controller {
                     view.getMapDraw().gc.setLineWidth(5 * 1/Math.sqrt(view.getMapDraw().trans.determinant()));
                     view.getMapDraw().gc.beginPath();
                     var coords = Dijkstra.getCoordsFromNodeId(trueCoords);
-                    view.getMapDraw().gc.lineTo(coords[0], coords[1]);
+                    if (coords != null)
+                        view.getMapDraw().gc.lineTo(coords[0], coords[1]);
 
                     view.getMapDraw().gc.setStroke(Color.CHOCOLATE);
                     view.getMapDraw().gc.stroke();
@@ -58,7 +59,6 @@ public class Controller {
     //
     //                view.getMapDraw().gc.setStroke(Color.CHOCOLATE);
     //                view.getMapDraw().gc.stroke();
-
 
                 }
 
