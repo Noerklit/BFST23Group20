@@ -5,16 +5,21 @@ import Model.Model;
 import Model.Way;
 
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.*;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.stage.StageStyle;
 
 import java.io.File;
 
@@ -23,8 +28,14 @@ public class View {
     private Canvas canvas;
     private MapDraw mapDraw;
     private MenuBar menuBar;
+
+    private VBox helpVBox;
+    private Scene helpScene;
+    private Stage helpStage;
+    private Button helpButton;
     private TextField searchbar;
     private Scene scene;
+    private boolean showHelp = false;
 
     public View(Model model, Stage primaryStage) {
         this.canvas = new Canvas(600, 500);
@@ -38,6 +49,10 @@ public class View {
         primaryStage.setScene(scene);
         primaryStage.show();
 
+        //helpStage.setX(primaryStage.getX() + primaryStage.getWidth() / 2 );
+        //helpStage.setY(primaryStage.getY() + primaryStage.getHeight() / 2);
+
+
         setCanvasResize();
     }
 
@@ -49,7 +64,41 @@ public class View {
 //        TextField textField = new TextField("");
         this.menuBar = createMenuBar();
         this.searchbar = createSearchBar();
-        var hBoxMenu = new HBox(menuBar,searchbar);
+        this.helpButton = createHelpButton();
+
+        helpStage = new Stage(StageStyle.DECORATED);
+        helpStage.setTitle("Creating popup");
+        //helpStage.setX(300);
+        //helpStage.setY(200);
+        helpStage.setWidth(400);
+        helpStage.setHeight(300);
+
+        Font font = Font.font("Verdana", FontWeight.BOLD, FontPosture.REGULAR, 10);
+        Text t = new Text(
+                """
+                    Help to use map:
+                    \n
+                    Find route: Press "shift" down and click on the app to choose a staring point
+                    Do the same thing again to choose an ending point. Now your route will be calculated.
+                    \n
+                    Debug mode: Press "tap" to create debuglines.
+                    Change the size of the debuglines by pressing 'A' to make the debuglines smaller.
+                    Press 'D' to make the debuglines bigger.
+                    \n
+                    
+                    """
+
+        );
+        t.setFont(font);
+        t.setWrappingWidth(400);
+
+        helpVBox = new VBox(t);
+        helpScene = new Scene(helpVBox);
+        helpStage.setScene(helpScene);
+
+
+
+        var hBoxMenu = new HBox(helpButton,menuBar,searchbar);
         hBoxMenu.setAlignment(Pos.CENTER);
 
         hBoxMenu.setStyle("-fx-background-color: #5a9fb0");
@@ -62,6 +111,26 @@ public class View {
         return new Scene(vBox);
     }
 
+    public void showHelpStage(){
+
+        if (showHelp)
+            helpStage.show();
+        else{
+            helpStage.hide();
+        }
+    }
+
+    public void toggleHelp(){
+        showHelp = !showHelp;
+    }
+
+    private Button createHelpButton(){
+        Button showHelp = new Button("Help");
+        showHelp.setStyle("-fx-background-color: #5a9fb0");
+
+
+        return showHelp;
+    }
 
     private Menu chooseViewWidget(){
         MenuItem showRoads = new MenuItem("Show roads only");
@@ -129,6 +198,7 @@ public class View {
         mapDraw.redraw();
     }
 
+
     public double convertMouseLon(double mouseCoord) {
         return mapDraw.convertMouseLon(mouseCoord);
     }
@@ -143,7 +213,14 @@ public class View {
     public TextField getSearchbar() {
         return searchbar;
     }
-    
+
+    public Button getHelpButton(){
+        return helpButton;
+    }
+
+    public Stage getHelpStage(){
+        return helpStage;
+    }
     public void setDarkMode(String toggle){
         switch (toggle) {
             case "on":
@@ -166,6 +243,13 @@ public class View {
         }
 
     }
+
+   // public void setStartCoord(float startX, float startY){
+     //   mapDraw.setStartCoord(startX, startY);
+    //}
+    //public void setEndCoord(float endX, float endY){
+     //   mapDraw.setEndCoord(endX, endY);
+    //}
 
     public void toggleDebug(){
         mapDraw.toggleDebug();
