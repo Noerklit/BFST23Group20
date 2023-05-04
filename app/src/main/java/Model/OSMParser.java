@@ -28,6 +28,8 @@ public class OSMParser {
     private ArrayList<Node> allNodes;
     private ArrayList<Way> allWays;
     public ArrayList<Way> coastlines;
+
+    private ArrayList<Way> background = new ArrayList<>() , buildings = new ArrayList<>();
     public KDTree wayKDTree, backgroundKdtree, buildingKdtree;
 
     public OSMParser(InputStream inputStream, AddressSearch addressSearch) {
@@ -205,6 +207,8 @@ public class OSMParser {
         coastlines = new ArrayList<>();
         var nodesToWay = new ArrayList<Node>();
 
+        var waysToAdd = new ArrayList<Way>();
+
         var addWay = false;
         DrawType currentDrawType = null;
         Long wayId = null;
@@ -257,26 +261,27 @@ public class OSMParser {
                                 coastlines.add(wayToAdd);
                             } else if (drawtypeString.equals("buildin")
                                     || currentDrawType.toString().equals("naturalWater")) {
-                                buildingKdtree.insert(wayToAdd);
+//                                buildingKdtree.insert(wayToAdd);
+                                buildings.add(wayToAdd);
                             } else if ((drawtypeString.equals("landuse") ||
                                     drawtypeString.equals("natural") ||
                                     drawtypeString.equals("wetland") ||
                                     drawtypeString.equals("leisure") ||
                                     currentDrawType == DrawType.coastline) &&
                                     !drawtypeString.equals("buildin")) {
-                                backgroundKdtree.insert(wayToAdd);
+                                background.add(wayToAdd);
                             } else {
-                                wayKDTree.insert(wayToAdd);
+                                waysToAdd.add(wayToAdd);
                             }
                         } catch (Exception e) {
-                            wayKDTree.insert(wayToAdd);
+                            waysToAdd.add(wayToAdd);
                         }
                     }
                 }
             }
             input.next();
         }
-
+        wayKDTree.createFromList(waysToAdd);
         TaskTimer.recordTask("Sort way array");
         Collections.sort(allWays);
     }
@@ -284,6 +289,7 @@ public class OSMParser {
     private void parseRelations(XMLStreamReader2 input) throws XMLStreamException {
 
         List<Way> outerWays = new ArrayList<Way>();
+        var temp = new ArrayList<Way>();
 
         var addRelation = false;
         DrawType currentDrawType = null;
@@ -333,16 +339,18 @@ public class OSMParser {
                 if (name == "relation" && addRelation) {
                     for (Way way : outerWays) {
                         way.drawType = currentDrawType;
+//                            buildingKdtree.insert(way);
                         if (way.drawType == DrawType.building)
-                            buildingKdtree.insert(way);
+                            buildings.add(way);
                         else
-                            backgroundKdtree.insert(way);
+                            background.add(way);
                     }
                 }
             }
             input.next();
         }
-        // Collections.reverse(ways);
+        backgroundKdtree.createFromList(background);
+        buildingKdtree.createFromList(buildings);
     }
 
     private String queryString(XMLStreamReader2 input, String localName) {

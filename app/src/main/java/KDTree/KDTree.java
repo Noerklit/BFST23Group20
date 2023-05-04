@@ -1,15 +1,10 @@
 package KDTree;
-
-import Model.Model;
 import Model.Way;
-import View.MapDraw;
 import javafx.geometry.Point2D;
 
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import Model.Way;
 import edu.princeton.cs.algs4.Edge;
@@ -24,7 +19,33 @@ public class KDTree implements Serializable {
     public HashMap<Long, Integer> map = new HashMap<>();
     public HashMap<Integer, float[]> countToCoords = new HashMap<>();
 
+    private final transient Comparator<Way> cmpX = new Comparator<Way>() {
+        public int compare(Way o1, Way o2) {
+            return Float.compare(o1.xVal, o2.xVal);
+        }
+    };
+    private final transient Comparator<Way> cmpY = new Comparator<Way>() {
+        public int compare(Way o1, Way o2) {
+            return Float.compare(o1.yVal, o2.yVal);
+        }
+    };
+
     public KDTree() {
+
+    }
+
+    public void createFromList(List<Way> ways){
+        createFromList(ways, true);
+    }
+
+    private void createFromList(List<Way> ways, boolean isX){
+        if (ways.size()==0)
+            return;
+        var cmp = isX? cmpX: cmpY;
+        Collections.sort(ways, cmp);
+        insert(ways.get(ways.size()>>1));
+        createFromList(ways.subList(0,ways.size()>>1), !isX);
+        createFromList(ways.subList((ways.size()>>1)+1, ways.size()), !isX);
     }
 
     //Sets the first incoming way to the root of the tree. Each incoming way is compared to variable current that moves
@@ -35,6 +56,9 @@ public class KDTree implements Serializable {
      * @return the root of the tree
      */
     public Way insert(Way way2Insert){
+//        System.out.println("inserted");
+        if (way2Insert == null)
+            return null;
         if(root == null) {
             way2Insert.depth = 0;
             root = way2Insert;
@@ -55,6 +79,7 @@ public class KDTree implements Serializable {
             }
             depth++;
         }
+        nodeCount = Math.max(nodeCount, depth);
         if(depth%2!=0){
             way2Insert.depth = depth;
             if(way2Insert.xVal < parent.xVal) parent.left = way2Insert;
@@ -69,7 +94,7 @@ public class KDTree implements Serializable {
 
     /**
      * Starts the drawing of the entire kd-tree by calling drawTree
-     * we dont want to give the tree it's own root as an argument
+     * we don't want to give the tree its own root as an argument
      * @param left left bound of screen
      * @param right right bound of screen
      * @param up lower bound of screen
