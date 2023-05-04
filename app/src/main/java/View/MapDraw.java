@@ -111,9 +111,14 @@ public class MapDraw {
         if(viewMode){
             model.wayKDTree.drawTree(left, right, up, down, fidelity);
         } else {
-            model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
-            model.wayKDTree.drawTree(left, right, up, down, fidelity);
-            model.buildingKdtree.drawTree(left, right, up, down, fidelity);
+            if (fidelity == 0)
+                model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
+            else {
+                model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
+                model.wayKDTree.drawTree(left, right, up, down, fidelity);
+                if (fidelity == 4)
+                    model.buildingKdtree.drawTree(left, right, up, down, fidelity);
+                }
         }
         
         if (dijstraPathList != null && dijstraPathList.size()>0)
@@ -289,7 +294,7 @@ public class MapDraw {
         if (zoomLevel > 2000) {
             fidelity = 1;
         }
-        if (zoomLevel > 3200) {
+        if (zoomLevel > 7400) {
             fidelity = 2;
         }
         if (zoomLevel > 15000) {
