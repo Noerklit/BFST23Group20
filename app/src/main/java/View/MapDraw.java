@@ -112,9 +112,14 @@ public class MapDraw {
         if(viewMode){
             model.wayKDTree.drawTree(left, right, up, down, fidelity);
         } else {
-            model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
-            model.wayKDTree.drawTree(left, right, up, down, fidelity);
-            model.buildingKdtree.drawTree(left, right, up, down, fidelity);
+            if (fidelity == 0)
+                model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
+            else{
+                model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
+                model.wayKDTree.drawTree(left, right, up, down, fidelity);
+                if (fidelity == 4)
+                    model.buildingKdtree.drawTree(left, right, up, down, fidelity);
+            }
         }
         
         if (dijstraPathList != null && dijstraPathList.size()>0)
@@ -170,7 +175,7 @@ public class MapDraw {
         gc.setLineWidth(3 * 1/Math.sqrt(trans.determinant()));
         gc.beginPath();
         gc.moveTo(shortPath.get(0), shortPath.get(1));
-        for (int i = 2; i<shortPath.size()-2; i+=2){
+        for (int i = 2; i<shortPath.size()-1; i+=2){
             gc.lineTo(shortPath.get(i), shortPath.get(i+1));
         }
         gc.setStroke(Color.DARKMAGENTA);
