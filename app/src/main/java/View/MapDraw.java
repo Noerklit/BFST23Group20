@@ -18,11 +18,11 @@ import Model.DrawType;
 import Model.Way;
 import Pathfinding.Dijkstra;
 import Benchmark.FrameRateTimer;
+import Benchmark.FrameRateTimer;
 
 public class MapDraw {
     private Canvas canvas;
     public static GraphicsContext gc;
-    private Dijkstra dijkstra;
 
     private double scalingConst;
 
@@ -42,7 +42,11 @@ public class MapDraw {
     private Text debugText;
 
     private boolean showStartPoint, showEndPoint;
-    private Point2D startPoint, endPoint;
+    private Point2D startPoint, startWayPoint, startPathPoint, endPoint, endWayPoint, endPathPoint;
+    private long startPathId, endPathId;
+
+    private boolean showShortPath;
+    private ArrayList<Float> shortPath;
 
     public MapDraw(Model model, Canvas canvas) {
         this.model = model;
@@ -66,7 +70,7 @@ public class MapDraw {
 //        pan(-100,-100);
 //        zoom(380, 340, 40);
 
-        showStartPoint = false;
+        showStartPoint = showEndPoint = showShortPath = false;
 
         redraw();
     }
@@ -132,15 +136,24 @@ public class MapDraw {
 
         if (showStartPoint) {
             drawPoint(startPoint, Color.web("#ff0000"));
+            drawPoint(startWayPoint, Color.web("#ff7700"));
+            drawPoint(startPathPoint, Color.web("#ffff00"));
         }
         if (showEndPoint) {
-            drawPoint(endPoint, Color.web("#0000ff"));
+            drawPoint(endPoint, Color.web("#00ff00"));
+            drawPoint(endWayPoint, Color.web("#0000ff"));
+            drawPoint(endPathPoint, Color.web("#7700ff"));
+        }
+        if (showShortPath) {
+            drawShortPath();
         }
 
         FrameRateTimer.endFrame();
     }
 
     private void drawPoint(Point2D point, Color color) {
+        if (point == null) return;
+
         gc.setLineWidth(10 * 1/Math.sqrt(trans.determinant()));
         gc.setStroke(color);
 
@@ -150,6 +163,19 @@ public class MapDraw {
         gc.beginPath();
         gc.lineTo(point.getX(), point.getY());
         
+        gc.stroke();
+    }
+
+    private void drawShortPath() {
+        if (shortPath == null || shortPath.isEmpty()) return;
+
+        gc.setLineWidth(3 * 1/Math.sqrt(trans.determinant()));
+        gc.beginPath();
+        gc.moveTo(shortPath.get(0), shortPath.get(1));
+        for (int i = 2; i<shortPath.size()-2; i+=2){
+            gc.lineTo(shortPath.get(i), shortPath.get(i+1));
+        }
+        gc.setStroke(Color.DARKMAGENTA);
         gc.stroke();
     }
 
@@ -393,15 +419,45 @@ public class MapDraw {
 
     public void setStartClick(Point2D click) {
         try {
-            startPoint = trans.inverseTransform(click.getX(), click.getY());
-            showStartPoint = true;
+            Point2D point = trans.inverseTransform(click.getX(), click.getY());
+            setStartPoint(point);
         } catch (Exception e) {}
     }
     public void setEndClick(Point2D click) {
         try {
-            endPoint = trans.inverseTransform(click.getX(), click.getY());
-            showEndPoint = true;
+            Point2D point = trans.inverseTransform(click.getX(), click.getY());
+            setEndPoint(point);
         } catch (Exception e) {}
+    }
+    
+    public void setStartPoint(Point2D point) {
+        startPoint = point;
+        showStartPoint = true;
+
+        Way foundWay = model.wayKDTree.findWay(startPoint);
+        startWayPoint = new Point2D(foundWay.xVal, foundWay.yVal);
+
+        startPathId = model.wayKDTree.inArea(foundWay, startPoint);
+        float[] coords = model.dijkstraGraph.getCoordsFromNodeId(startPathId);
+        startPathPoint = new Point2D(coords[0], coords[1]);
+    }
+    public void setEndPoint(Point2D point) {
+        endPoint = point;
+        showEndPoint = true;
+
+        Way foundWay = model.wayKDTree.findWay(endPoint);
+        endWayPoint = new Point2D(foundWay.xVal, foundWay.yVal);
+
+        endPathId = model.wayKDTree.inArea(foundWay, endPoint);
+        float[] coords = model.dijkstraGraph.getCoordsFromNodeId(endPathId);
+        endPathPoint = new Point2D(coords[0], coords[1]);
+
+        findShortestPath();
+    }
+
+    public void findShortestPath() {
+        shortPath = model.dijkstraGraph.getShortestPathCoords(startPathId, endPathId);
+        showShortPath = true;
     }
     
     private void createColorMap() {

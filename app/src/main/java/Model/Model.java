@@ -15,6 +15,7 @@ import java.util.zip.ZipInputStream;
 import Benchmark.TaskTimer;
 import KDTree.KDTree;
 import Parser.AddressSearch;
+import Pathfinding.Dijkstra;
 
 public class Model implements Serializable {
 
@@ -26,11 +27,15 @@ public class Model implements Serializable {
     public double minlat, maxlat, minlon, maxlon;
     public KDTree wayKDTree, backgroundKdtree, buildingKdtree;
 
+    public transient Dijkstra dijkstraGraph;
+
     public static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException {
         if (filename.endsWith(".obj")) {
             TaskTimer.recordTask("Load obj-file");
             try (var in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
-                return (Model) in.readObject();
+                Model loadedModel = (Model) in.readObject();
+                loadedModel.initDijkstra();
+                return loadedModel;
             }
         }
         return new Model(filename);
@@ -79,11 +84,17 @@ public class Model implements Serializable {
         minlon = parser.getMinlon();
         maxlat = parser.getMaxlat();
         maxlon = parser.getMaxlon();
+        initDijkstra();
         /*/
         for (String address : parser.getAddresses()) {
             addressSearch.addAddress(address);
         }
         //*/
+    }
+
+    public void initDijkstra() {
+        TaskTimer.recordTask("Init Dijkstra");
+        dijkstraGraph = new Dijkstra(wayKDTree, "SPEED");
     }
 
     public List<String> searchAddresses(String text) {

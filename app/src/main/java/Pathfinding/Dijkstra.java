@@ -33,6 +33,11 @@ public class Dijkstra {
         buildGraph(nodeCount);
     }
 
+    public ArrayList<Float> getShortestPathCoords(long start, long end) {
+        Iterable<Edge> edges = RunDijkstra(start, end);
+        return getCoords(edges);
+    }
+
     public Iterable<Edge> RunDijkstra(long start, long end) {
         this.start = start;
         this.end = end;
