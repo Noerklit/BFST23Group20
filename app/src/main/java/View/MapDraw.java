@@ -1,5 +1,6 @@
 package View;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -15,15 +16,18 @@ import javafx.scene.text.Text;
 import Model.Model;
 import Model.DrawType;
 import Model.Way;
+import Pathfinding.Dijkstra;
 import Benchmark.FrameRateTimer;
 
 public class MapDraw {
     private Canvas canvas;
     public static GraphicsContext gc;
+    private Dijkstra dijkstra;
 
     private double scalingConst;
 
-    private Affine trans;
+    public Affine trans;
+    private ArrayList<ArrayList<Float>> dijstraPathList;
 
     private Model model;
     public static HashMap<DrawType, Color> defaultColorMap;
@@ -46,7 +50,7 @@ public class MapDraw {
         this.darkMode = false;
         this.debugMode = false;
         this.viewMode = false;
-
+        this.dijstraPathList = new ArrayList<>();
         this.trans = new Affine();
         this.gc = canvas.getGraphicsContext2D();
 
@@ -68,7 +72,6 @@ public class MapDraw {
     }
 
     public void redraw() {
-        FrameRateTimer.startFrame(trans.getMxx(), fidelity);
         gc.setTransform(new Affine());
         if (darkMode){
             gc.setFill(Color.web("#4a4a4a"));
@@ -93,7 +96,7 @@ public class MapDraw {
 
         double up = getScreenLat(0 + cutoffFactor);
         double down = getScreenLat(1 - cutoffFactor);
-
+//        System.out.println(up);
         double left = getScreenLon(0 + cutoffFactor);
         double right = getScreenLon(1 - cutoffFactor);
 
@@ -111,7 +114,20 @@ public class MapDraw {
             model.wayKDTree.drawTree(left, right, up, down, fidelity);
             model.buildingKdtree.drawTree(left, right, up, down, fidelity);
         }
-
+        
+        if (dijstraPathList != null && dijstraPathList.size()>0)
+        {
+            for (ArrayList<Float> sub : dijstraPathList){
+                gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
+                gc.beginPath();
+                gc.moveTo(sub.get(0), sub.get(1));
+                for (int i = 2; i<sub.size()-2; i+=2){
+                    gc.lineTo(sub.get(i), sub.get(i+1));
+                }
+                gc.setStroke(Color.DARKMAGENTA);
+                gc.stroke();
+            }
+        }
         //traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
 
         if (showStartPoint) {
@@ -136,6 +152,18 @@ public class MapDraw {
         
         gc.stroke();
     }
+
+    /*/
+    public void runDijsktra(long from, long to){
+        var temp = dijkstra.getCoords(dijkstra.RunDijkstra(from, to));
+        var tempList = new ArrayList<Float>();
+        for (int i = 0; i<temp.size(); i++)
+            tempList.add(temp.get(i));
+        dijstraPathList.add(tempList);
+        
+        redraw();
+    }
+    //*/
 
 
     private void traverseDebug(
@@ -269,12 +297,11 @@ public class MapDraw {
     private double getScreenLat(double factor) {
         return (trans.getTy() * -1 + canvas.getHeight() * factor) * scalingConst;
     }
-
     public double convertMouseLon(double mouseCoord) {
         return (trans.getTx() * -1 - canvas.getWidth()+(canvas.getWidth() + mouseCoord))*scalingConst;
     }
     public double convertMouseLat(double mouseCoord) {
-        return (trans.getTy() -1 + canvas.getHeight() - (canvas.getHeight()- mouseCoord))*scalingConst;
+        return (trans.getTy() * -1 + canvas.getHeight() - (canvas.getHeight()- mouseCoord))*scalingConst;
     }
 
     private void calculateFidelity() {

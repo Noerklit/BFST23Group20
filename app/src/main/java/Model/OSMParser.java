@@ -1,16 +1,19 @@
 package Model;
 
 import java.io.InputStream;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
-import KDTree.KDTree;
-import org.codehaus.stax2.*;
+import org.codehaus.stax2.XMLInputFactory2;
+import org.codehaus.stax2.XMLStreamReader2;
 
 import Benchmark.TaskTimer;
 import Parser.AddressSearch;
+import KDTree.KDTree;
 
 public class OSMParser {
     Comparator<Way> cmp = new Comparator<Way>() {
@@ -198,7 +201,6 @@ public class OSMParser {
     }
 
     private void parseWays(XMLStreamReader2 input) throws XMLStreamException {
-
         allWays = new ArrayList<Way>();
         coastlines = new ArrayList<>();
         var nodesToWay = new ArrayList<Node>();
@@ -206,6 +208,7 @@ public class OSMParser {
         var addWay = false;
         DrawType currentDrawType = null;
         Long wayId = null;
+        byte maxspeed = 0;
 
         while (input.hasNext()) {
             if (input.isStartElement()) {
@@ -215,6 +218,7 @@ public class OSMParser {
                     nodesToWay.clear();
                     addWay = false;
                     currentDrawType = null;
+                    maxspeed = 80; // default danish speed limit
 
                     wayId = queryLong(input, "id");
                 } else if (name == "nd") {
@@ -230,6 +234,11 @@ public class OSMParser {
                     if (currentDrawType != null) {
                         addWay = true;
                     }
+                    if (k.equals("maxspeed")) {
+                        if (k.matches("[0-9]+")) {
+                            maxspeed = (byte)Integer.parseInt(v);
+                        }
+                    }
                 } else {
                     break;
                 }
@@ -238,7 +247,7 @@ public class OSMParser {
                 if (name == "way") {
 
                     Way wayToAdd = new Way(nodesToWay, currentDrawType, wayId);
-
+                    wayToAdd.maxspeed = maxspeed;
                     allWays.add(wayToAdd);
 
                     if (addWay) {
@@ -342,6 +351,10 @@ public class OSMParser {
 
     private float queryFloat(XMLStreamReader2 input, String localName) {
         return Float.parseFloat(queryString(input, localName));
+    }
+
+    private int queryInt(XMLStreamReader2 input, String localName) {
+        return Integer.parseInt(queryString(input, localName));
     }
 
     private long queryLong(XMLStreamReader2 input, String localName) {
