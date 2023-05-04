@@ -25,9 +25,6 @@ public class KDTree implements Serializable {
     public HashMap<Long, Integer> map = new HashMap<>();
     public HashMap<Integer, float[]> countToCoords = new HashMap<>();
 
-    private int currFidelity=0;
-
-    private ArrayList<Way> buffer = new ArrayList<>();
     public KDTree() {
     }
 
@@ -94,13 +91,6 @@ public class KDTree implements Serializable {
             return;
         }
 
-        if (fidelity == currFidelity && buffer.size() > 0){
-            for(Way way : buffer)
-                way.draw();
-            return;
-        } else if (fidelity != currFidelity) {
-            buffer.clear();
-        }
 
         Stack<Way> stack = new Stack<>();
         stack.push(root);
@@ -125,7 +115,6 @@ public class KDTree implements Serializable {
             if (inRange) {
                 if (inRangeY && inRangeX){
                     current.draw();
-                    buffer.add(current);
                 }
                 if (current.right != null) {
                     stack.push(current.right);
