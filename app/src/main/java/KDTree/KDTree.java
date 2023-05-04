@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 import Model.Way;
 import edu.princeton.cs.algs4.Edge;
@@ -24,6 +25,9 @@ public class KDTree implements Serializable {
     public HashMap<Long, Integer> map = new HashMap<>();
     public HashMap<Integer, float[]> countToCoords = new HashMap<>();
 
+    private int currFidelity=0;
+
+    private ArrayList<Way> buffer = new ArrayList<>();
     public KDTree() {
     }
 
@@ -76,41 +80,68 @@ public class KDTree implements Serializable {
      * @param down upper bound of screen
      * @param fidelity current fidelity level
      */
-    public void drawTree(double left, double right, double up, double down,int fidelity){
-        drawTree(root, left, right, up, down, fidelity);
-    }
+//    public void drawTree(double left, double right, double up, double down,int fidelity){
+//        drawTree(root, left, right, up, down, fidelity);
+//    }
 
-    private void drawTree(
-            Way current,
+    public void drawTree(
             double left,
             double right,
             double up,
             double down,
-            int fidelity)
-    {
-        boolean inRange;
-        boolean tooSmall;
-        if (current == null) {
+            int fidelity) {
+        if (root == null) {
             return;
         }
 
-        if (current.depth%2==0) {
-            inRange = left < current.xVal && current.xVal < right;
-            tooSmall = current.xVal < left;
-        } else {
-            inRange = up < current.yVal && current.yVal < down;
-            tooSmall = current.yVal < up;
-        }
-        if (inRange) {
-            current.draw();
-            drawTree(current.left, left, right, up, down, fidelity);
-            drawTree(current.right, left, right, up, down, fidelity);
+        if (fidelity == currFidelity && buffer.size() > 0){
+            for(Way way : buffer)
+                way.draw();
             return;
+        } else if (fidelity != currFidelity) {
+            buffer.clear();
         }
-        if (tooSmall) {
-            drawTree(current.right, left, right, up, down, fidelity);
-        } else {
-            drawTree(current.left, left, right, up, down, fidelity);
+
+        Stack<Way> stack = new Stack<>();
+        stack.push(root);
+
+        while (!stack.empty()) {
+            Way current = stack.pop();
+
+            boolean inRange;
+            boolean inRangeX;
+            boolean inRangeY;
+            boolean tooSmall;
+
+            if (current.depth % 2 == 0) {
+                inRange = left < current.xVal && current.xVal < right;
+                tooSmall = current.xVal < left;
+            } else {
+                inRange = up < current.yVal && current.yVal < down;
+                tooSmall = current.yVal < down;
+            }
+            inRangeY = up < current.yVal && current.yVal < down;
+            inRangeX = left < current.xVal && current.xVal < right;
+            if (inRange) {
+                if (inRangeY && inRangeX){
+                    current.draw();
+                    buffer.add(current);
+                }
+                if (current.right != null) {
+                    stack.push(current.right);
+                }
+                if (current.left != null) {
+                    stack.push(current.left);
+                }
+            } else if (tooSmall) {
+                if (current.right != null) {
+                    stack.push(current.right);
+                }
+            } else {
+                if (current.left != null) {
+                    stack.push(current.left);
+                }
+            }
         }
     }
 
@@ -147,10 +178,8 @@ public class KDTree implements Serializable {
 
         inRange = circle.contains(current.xVal,current.yVal);
         if (current.depth%2==0) {
-//            inRange = left < current.xVal && current.xVal < right;
             tooSmall = current.xVal < circle.getCenterX() - circle.getRadius();
         } else {
-//            inRange = up < current.yVal && current.yVal < down;
             tooSmall = current.yVal < circle.getCenterY()+circle.getRadius();
         }
         if (inRange) {
