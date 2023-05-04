@@ -3,6 +3,7 @@ package View;
 import Benchmark.FrameRateTimer;
 import Model.Model;
 import Parser.AddressSearch;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Scene;
@@ -243,5 +244,12 @@ public class View {
             List<String> addresses = model.searchAddresses(text);
             setSearchResults(addresses, 21);
         }
+    }
+
+    public void setStartClick(Point2D click) {
+        mapDraw.setStartClick(click);
+    }
+    public void setEndClick(Point2D click) {
+        mapDraw.setEndClick(click);
     }
 }

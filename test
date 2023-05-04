@@ -1,0 +1,24 @@
+
+> Configure project :app
+Project :app => no module-info.java found
+
+> Task :app:compileJava UP-TO-DATE
+> Task :app:processResources NO-SOURCE
+> Task :app:classes UP-TO-DATE
+> Task :app:configJavafxRun
+
+> Task :app:run
+Hello World!
+-----------------
+00:00,006 - Start model load
+00:00,140 - Begin OSM parsing
+00:03,586 - Nodes (count: 650,698)
+00:00,036 - Sort node array
+00:02,243 - Ways (count: 76,824)
+00:00,020 - Sort way array
+00:00,045 - Relations (count: 499)
+lr: 33269 33270
+Neighbour: 21302-33269 1.00000 other: 33269-33270 1.00000
+
+> Task :app:run FAILED
+3 actionable tasks: 2 executed, 1 up-to-date

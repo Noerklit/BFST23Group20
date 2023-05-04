@@ -1,9 +1,11 @@
 package View;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -14,6 +16,8 @@ import javafx.scene.text.Text;
 import Model.Model;
 import Model.DrawType;
 import Model.Way;
+import Pathfinding.Dijkstra;
+import Benchmark.FrameRateTimer;
 import Benchmark.FrameRateTimer;
 
 public class MapDraw {
@@ -22,7 +26,8 @@ public class MapDraw {
 
     private double scalingConst;
 
-    private Affine trans;
+    public Affine trans;
+    private ArrayList<ArrayList<Float>> dijstraPathList;
 
     private Model model;
     public static HashMap<DrawType, Color> defaultColorMap;
@@ -36,6 +41,12 @@ public class MapDraw {
 
     private Text debugText;
 
+    private boolean showStartPoint, showEndPoint;
+    private Point2D startPoint, startWayPoint, startPathPoint, endPoint, endWayPoint, endPathPoint;
+    private long startPathId, endPathId;
+
+    private boolean showShortPath;
+    private ArrayList<Float> shortPath;
 
     public MapDraw(Model model, Canvas canvas) {
         this.model = model;
@@ -43,7 +54,7 @@ public class MapDraw {
         this.darkMode = false;
         this.debugMode = false;
         this.viewMode = false;
-
+        this.dijstraPathList = new ArrayList<>();
         this.trans = new Affine();
         this.gc = canvas.getGraphicsContext2D();
 
@@ -58,11 +69,13 @@ public class MapDraw {
         scalingConst = (model.maxlat - model.minlat) / canvas.getHeight();
 //        pan(-100,-100);
 //        zoom(380, 340, 40);
+
+        showStartPoint = showEndPoint = showShortPath = false;
+
         redraw();
     }
 
     public void redraw() {
-        FrameRateTimer.startFrame(trans.getMxx(), fidelity);
         gc.setTransform(new Affine());
         if (darkMode){
             gc.setFill(Color.web("#4a4a4a"));
@@ -87,7 +100,7 @@ public class MapDraw {
 
         double up = getScreenLat(0 + cutoffFactor);
         double down = getScreenLat(1 - cutoffFactor);
-
+//        System.out.println(up);
         double left = getScreenLon(0 + cutoffFactor);
         double right = getScreenLon(1 - cutoffFactor);
 
@@ -101,15 +114,87 @@ public class MapDraw {
         if(viewMode){
             model.wayKDTree.drawTree(left, right, up, down, fidelity);
         } else {
-            model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
-            model.wayKDTree.drawTree(left, right, up, down, fidelity);
-            model.buildingKdtree.drawTree(left, right, up, down, fidelity);
+            if (fidelity == 0)
+                model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
+            else{
+                model.backgroundKdtree.drawTree(left, right, up, down, fidelity);
+                model.wayKDTree.drawTree(left, right, up, down, fidelity);
+                if (fidelity == 4)
+                    model.buildingKdtree.drawTree(left, right, up, down, fidelity);
+            }
         }
-
+        
+        if (dijstraPathList != null && dijstraPathList.size()>0)
+        {
+            for (ArrayList<Float> sub : dijstraPathList){
+                gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
+                gc.beginPath();
+                gc.moveTo(sub.get(0), sub.get(1));
+                for (int i = 2; i<sub.size()-2; i+=2){
+                    gc.lineTo(sub.get(i), sub.get(i+1));
+                }
+                gc.setStroke(Color.DARKMAGENTA);
+                gc.stroke();
+            }
+        }
         //traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
+
+        if (showStartPoint) {
+            drawPoint(startPoint, Color.web("#ff0000"));
+            drawPoint(startWayPoint, Color.web("#ff7700"));
+            drawPoint(startPathPoint, Color.web("#ffff00"));
+        }
+        if (showEndPoint) {
+            drawPoint(endPoint, Color.web("#00ff00"));
+            drawPoint(endWayPoint, Color.web("#0000ff"));
+            drawPoint(endPathPoint, Color.web("#7700ff"));
+        }
+        if (showShortPath) {
+            drawShortPath();
+        }
 
         FrameRateTimer.endFrame();
     }
+
+    private void drawPoint(Point2D point, Color color) {
+        if (point == null) return;
+
+        gc.setLineWidth(10 * 1/Math.sqrt(trans.determinant()));
+        gc.setStroke(color);
+
+        double up = getScreenLat(0 + cutoffFactor);
+        double left = getScreenLon(0 + cutoffFactor);
+
+        gc.beginPath();
+        gc.lineTo(point.getX(), point.getY());
+        
+        gc.stroke();
+    }
+
+    private void drawShortPath() {
+        if (shortPath == null || shortPath.isEmpty()) return;
+
+        gc.setLineWidth(3 * 1/Math.sqrt(trans.determinant()));
+        gc.beginPath();
+        gc.moveTo(shortPath.get(0), shortPath.get(1));
+        for (int i = 2; i<shortPath.size()-1; i+=2){
+            gc.lineTo(shortPath.get(i), shortPath.get(i+1));
+        }
+        gc.setStroke(Color.DARKMAGENTA);
+        gc.stroke();
+    }
+
+    /*/
+    public void runDijsktra(long from, long to){
+        var temp = dijkstra.getCoords(dijkstra.RunDijkstra(from, to));
+        var tempList = new ArrayList<Float>();
+        for (int i = 0; i<temp.size(); i++)
+            tempList.add(temp.get(i));
+        dijstraPathList.add(tempList);
+        
+        redraw();
+    }
+    //*/
 
 
     private void traverseDebug(
@@ -243,6 +328,12 @@ public class MapDraw {
     private double getScreenLat(double factor) {
         return (trans.getTy() * -1 + canvas.getHeight() * factor) * scalingConst;
     }
+    public double convertMouseLon(double mouseCoord) {
+        return (trans.getTx() * -1 - canvas.getWidth()+(canvas.getWidth() + mouseCoord))*scalingConst;
+    }
+    public double convertMouseLat(double mouseCoord) {
+        return (trans.getTy() * -1 + canvas.getHeight() - (canvas.getHeight()- mouseCoord))*scalingConst;
+    }
 
     private void calculateFidelity() {
         double zoomLevel = trans.getMxx();
@@ -329,6 +420,49 @@ public class MapDraw {
     }
     public void setDebugText(Text debugText) {
         this.debugText = debugText;
+    }
+
+    public void setStartClick(Point2D click) {
+        try {
+            Point2D point = trans.inverseTransform(click.getX(), click.getY());
+            setStartPoint(point);
+        } catch (Exception e) {}
+    }
+    public void setEndClick(Point2D click) {
+        try {
+            Point2D point = trans.inverseTransform(click.getX(), click.getY());
+            setEndPoint(point);
+        } catch (Exception e) {}
+    }
+    
+    public void setStartPoint(Point2D point) {
+        startPoint = point;
+        showStartPoint = true;
+
+        Way foundWay = model.wayKDTree.findWay(startPoint);
+        startWayPoint = new Point2D(foundWay.xVal, foundWay.yVal);
+
+        startPathId = model.wayKDTree.inArea(foundWay, startPoint);
+        float[] coords = model.dijkstraGraph.getCoordsFromNodeId(startPathId);
+        startPathPoint = new Point2D(coords[0], coords[1]);
+    }
+    public void setEndPoint(Point2D point) {
+        endPoint = point;
+        showEndPoint = true;
+
+        Way foundWay = model.wayKDTree.findWay(endPoint);
+        endWayPoint = new Point2D(foundWay.xVal, foundWay.yVal);
+
+        endPathId = model.wayKDTree.inArea(foundWay, endPoint);
+        float[] coords = model.dijkstraGraph.getCoordsFromNodeId(endPathId);
+        endPathPoint = new Point2D(coords[0], coords[1]);
+
+        findShortestPath();
+    }
+
+    public void findShortestPath() {
+        shortPath = model.dijkstraGraph.getShortestPathCoords(startPathId, endPathId);
+        showShortPath = true;
     }
     
     private void createColorMap() {

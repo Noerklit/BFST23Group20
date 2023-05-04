@@ -11,14 +11,23 @@ import javafx.scene.input.KeyEvent;
 import Parser.AddressSearch;
 
 public class Controller {
+    private final double clickRadius = 8;
+    private boolean leftClickRange = false;
+
+    private double startX;
+    private double startY;
+
     private double lastX;
     private double lastY;
+
+    private boolean setStart = true;
 
     public Controller(Model model, View view) {
 
     view.getCanvas().setOnMousePressed(e -> {
-        lastX = e.getX();
-        lastY = e.getY();
+        startX = lastX = e.getX();
+        startY = lastY = e.getY();
+        leftClickRange = false;
     });
 
     view.getCanvas().setOnMouseDragged(e -> {
@@ -28,6 +37,25 @@ public class Controller {
 
         lastX = e.getX();
         lastY = e.getY();
+
+        if (!withinRange(e.getX() - startX, e.getY() - startY, clickRadius)) {
+            leftClickRange = true;
+        }
+
+        view.redrawMap();
+    });
+    view.getCanvas().setOnMouseClicked(e -> {
+        double clickX = e.getX();
+        double clickY = e.getY();
+
+        if (leftClickRange) return;
+
+        if (setStart) {
+            view.setStartClick(new Point2D(clickX, clickY));
+        } else {
+            view.setEndClick(new Point2D(clickX, clickY));
+        }
+        setStart = !setStart;
 
         view.redrawMap();
     });
@@ -109,5 +137,8 @@ public class Controller {
 
     }
 
-
+    private boolean withinRange(double deltaX, double deltaY, double range) {
+        double magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        return magnitude <= range;
+    }
 }
