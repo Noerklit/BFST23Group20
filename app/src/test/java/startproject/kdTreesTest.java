@@ -13,9 +13,6 @@ import KDTree.KDTree;
 import Model.Way;
 import Model.Node;
 
-//Indsæt nogen ways i et kdTree, prøv at teste om du bare kan lave en way som egentlig bare har null udover dens xVal og yVal
-//da det kun er disse som kdTree bruger til at sortere. Test at de placeres korrekt.
-
 public class kdTreesTest {
     Way way1;
     Way way2;
@@ -30,7 +27,7 @@ public class kdTreesTest {
     @BeforeEach
     private void makeTestWays () {
         ArrayList<Node> testNodes = new ArrayList<>();
-        testNodes.add(new Node(55.23f,22.53f, null));
+        testNodes.add(new Node(55.23f,22.53f, (long) 123456789));
         way1 = new Way(testNodes, null, null);
         way1.xVal = 3263.4674f;
         way1.yVal = 3263.4674f;
