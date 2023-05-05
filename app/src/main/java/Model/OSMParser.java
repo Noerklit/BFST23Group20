@@ -29,7 +29,7 @@ public class OSMParser {
     private ArrayList<Way> allWays;
     public ArrayList<Way> coastlines;
 
-    private ArrayList<Way> background = new ArrayList<>() , buildings = new ArrayList<>();
+    private ArrayList<Way> background = new ArrayList<>() , buildings = new ArrayList<>(), waysToAdd = new ArrayList<>();
     public KDTree wayKDTree, backgroundKdtree, buildingKdtree;
 
     public OSMParser(InputStream inputStream, AddressSearch addressSearch) {
@@ -207,7 +207,7 @@ public class OSMParser {
         coastlines = new ArrayList<>();
         var nodesToWay = new ArrayList<Node>();
 
-        var waysToAdd = new ArrayList<Way>();
+//        var waysToAdd = new ArrayList<Way>();
 
         var addWay = false;
         DrawType currentDrawType = null;
@@ -281,7 +281,7 @@ public class OSMParser {
             }
             input.next();
         }
-        wayKDTree.createFromList(waysToAdd);
+
         TaskTimer.recordTask("Sort way array");
         Collections.sort(allWays);
     }
@@ -349,8 +349,21 @@ public class OSMParser {
             }
             input.next();
         }
-        backgroundKdtree.createFromList(background);
-        buildingKdtree.createFromList(buildings);
+        Runnable r1 = () -> {
+            backgroundKdtree.createFromList(background);
+        };
+        Runnable r2 = () -> {
+            buildingKdtree.createFromList(buildings);
+        };
+        Runnable r3 = () -> {
+            wayKDTree.createFromList(waysToAdd);
+        };
+        Thread t1 = new Thread(r1);
+        Thread t2 = new Thread(r2);
+        Thread t3 = new Thread(r3);
+        t1.start();
+        t2.start();
+        t3.start();
     }
 
     private String queryString(XMLStreamReader2 input, String localName) {
