@@ -3,10 +3,18 @@ package Model;
 public class TemporaryAddress {
     
     private String country, municipality, place, postcode, city, housenumber, street;
+    private float lon, lat;
 
     public String get() {
-        return String.format("%s %s, %s %s", street, housenumber, postcode, city);
+        return String.format("%s %s, %s %s, %s, %s", street, housenumber, postcode, city, lon, lat);
         //return String.format("%s %s", street, housenumber);
+    }
+
+    public void setLon(float lon) {
+        this.lon = lon;
+    }
+    public void setLat(float lat) {
+        this.lat = lat;
     }
 
     public void setCountry(String country) {

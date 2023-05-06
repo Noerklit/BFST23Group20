@@ -12,7 +12,7 @@ public class Trie implements Serializable {
         root = new TrieNode();
     }
 
-    public void insert(String word, String endWord) { 
+    public void insert(String word, String endWord, float lon, float lat) { 
         TrieNode current = root;
    
         // Get an iterable string
@@ -24,13 +24,17 @@ public class Trie implements Serializable {
             current = current.getChild(c);
         }
         current.terminal = true;
-        current.addEndWord(endWord);
+        current.addEndInfo(endWord, lon, lat);
     }
 
     private void getSuggestions(TrieNode end, String word) {
         if (end.terminal) {
-            for (String endWord : end.getEndWords()) {
-                String suggestion = String.format("%s, %s", word, endWord);
+            List<String> endWords = end.getEndWords();
+            List<Float> endLons = end.getEndLons();
+            List<Float> endLats = end.getEndLats();
+
+            for (int i = 0; i < endWords.size(); i++) {
+                String suggestion = String.format("%s, %s, %s, %s", word, endWords.get(i), endLons.get(i), endLats.get(i));
                 returnStrings.add(suggestion);
             }
         }

@@ -149,6 +149,13 @@ public class View {
                 menuItem.setOnAction(event -> {
                     searchbar.setText(itemString);
                     searchbar.positionCaret(itemString.length());
+
+                    String[] addressInfo = itemString.split(", ");
+                    float lon = Float.parseFloat(addressInfo[2]);
+                    float lat = Float.parseFloat(addressInfo[3]);
+                    mapDraw.setEndPoint(projectPoint(lon, lat));
+                    mapDraw.findShortestPath();
+                    mapDraw.redraw();
                 });
                 contextMenuItems.add(menuItem);
             }
@@ -258,5 +265,9 @@ public class View {
     }
     public void hideShortestPath() {
         mapDraw.hideShortestPath();
+    }
+
+    private Point2D projectPoint(float lon, float lat) {
+        return new Point2D(0.56 * lon, -lat);
     }
 }
