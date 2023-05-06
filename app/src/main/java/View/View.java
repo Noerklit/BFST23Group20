@@ -252,4 +252,11 @@ public class View {
     public void setEndClick(Point2D click) {
         mapDraw.setEndClick(click);
     }
+    
+    public void findShortestPath() {
+        mapDraw.findShortestPath();
+    }
+    public void hideShortestPath() {
+        mapDraw.hideShortestPath();
+    }
 }

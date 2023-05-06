@@ -27,7 +27,6 @@ public class MapDraw {
     private double scalingConst;
 
     public Affine trans;
-    private ArrayList<ArrayList<Float>> dijstraPathList;
 
     private Model model;
     public static HashMap<DrawType, Color> defaultColorMap;
@@ -54,7 +53,6 @@ public class MapDraw {
         this.darkMode = false;
         this.debugMode = false;
         this.viewMode = false;
-        this.dijstraPathList = new ArrayList<>();
         this.trans = new Affine();
         this.gc = canvas.getGraphicsContext2D();
 
@@ -76,7 +74,6 @@ public class MapDraw {
     }
 
     public void redraw() {
-        FrameRateTimer.startFrame(trans.getMxx(), fidelity);
         gc.setTransform(new Affine());
         if (darkMode){
             gc.setFill(Color.web("#4a4a4a"));
@@ -122,20 +119,6 @@ public class MapDraw {
                 model.wayKDTree.drawTree(left, right, up, down, fidelity);
                 if (fidelity == 4)
                     model.buildingKdtree.drawTree(left, right, up, down, fidelity);
-            }
-        }
-        
-        if (dijstraPathList != null && dijstraPathList.size()>0)
-        {
-            for (ArrayList<Float> sub : dijstraPathList){
-                gc.setLineWidth(1.5 * 1/Math.sqrt(trans.determinant()));
-                gc.beginPath();
-                gc.moveTo(sub.get(0), sub.get(1));
-                for (int i = 2; i<sub.size()-2; i+=2){
-                    gc.lineTo(sub.get(i), sub.get(i+1));
-                }
-                gc.setStroke(Color.DARKMAGENTA);
-                gc.stroke();
             }
         }
         //traverseDebug(rootWay, left, right, up, down, left, right, up, down, 100);
@@ -184,18 +167,6 @@ public class MapDraw {
         gc.setStroke(Color.DARKMAGENTA);
         gc.stroke();
     }
-
-    /*/
-    public void runDijsktra(long from, long to){
-        var temp = dijkstra.getCoords(dijkstra.RunDijkstra(from, to));
-        var tempList = new ArrayList<Float>();
-        for (int i = 0; i<temp.size(); i++)
-            tempList.add(temp.get(i));
-        dijstraPathList.add(tempList);
-        
-        redraw();
-    }
-    //*/
 
 
     private void traverseDebug(
@@ -435,7 +406,6 @@ public class MapDraw {
             setEndPoint(point);
         } catch (Exception e) {}
     }
-    
     public void setStartPoint(Point2D point) {
         startPoint = point;
         showStartPoint = true;
@@ -444,8 +414,12 @@ public class MapDraw {
         startWayPoint = new Point2D(foundWay.xVal, foundWay.yVal);
 
         startPathId = model.wayKDTree.inArea(foundWay, startPoint);
-        float[] coords = model.dijkstraGraph.getCoordsFromNodeId(startPathId);
-        startPathPoint = new Point2D(coords[0], coords[1]);
+        if (startPathId != -1) {
+            float[] coords = model.getCoordsFromNodeId(startPathId);
+            startPathPoint = new Point2D(coords[0], coords[1]);
+        } else {
+            startPathPoint = null;
+        }
     }
     public void setEndPoint(Point2D point) {
         endPoint = point;
@@ -455,15 +429,21 @@ public class MapDraw {
         endWayPoint = new Point2D(foundWay.xVal, foundWay.yVal);
 
         endPathId = model.wayKDTree.inArea(foundWay, endPoint);
-        float[] coords = model.dijkstraGraph.getCoordsFromNodeId(endPathId);
-        endPathPoint = new Point2D(coords[0], coords[1]);
-
-        findShortestPath();
+        if (endPathId != -1) {
+            float[] coords = model.getCoordsFromNodeId(endPathId);
+            endPathPoint = new Point2D(coords[0], coords[1]);
+        } else {
+            endPathPoint = null;
+        }
     }
 
     public void findShortestPath() {
-        shortPath = model.dijkstraGraph.getShortestPathCoords(startPathId, endPathId);
+        if (startPathId == -1 || endPathId == -1) return;
+        shortPath = model.getShortestPathCoords(startPathId, endPathId);
         showShortPath = true;
+    }
+    public void hideShortestPath() {
+        showShortPath = false;
     }
     
     private void createColorMap() {

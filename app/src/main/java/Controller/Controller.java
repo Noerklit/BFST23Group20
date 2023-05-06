@@ -52,8 +52,11 @@ public class Controller {
 
         if (setStart) {
             view.setStartClick(new Point2D(clickX, clickY));
+            view.hideShortestPath();
         } else {
             view.setEndClick(new Point2D(clickX, clickY));
+            view.redrawMap();
+            view.findShortestPath();
         }
         setStart = !setStart;
 

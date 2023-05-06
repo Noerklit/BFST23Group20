@@ -27,7 +27,7 @@ public class Model implements Serializable {
     public double minlat, maxlat, minlon, maxlon;
     public KDTree wayKDTree, backgroundKdtree, buildingKdtree;
 
-    public transient Dijkstra dijkstraGraph;
+    private transient Dijkstra dijkstraGraph;
 
     public static Model load(String filename) throws FileNotFoundException, IOException, ClassNotFoundException {
         if (filename.endsWith(".obj")) {
@@ -95,6 +95,13 @@ public class Model implements Serializable {
     public void initDijkstra() {
         TaskTimer.recordTask("Init Dijkstra");
         dijkstraGraph = new Dijkstra(wayKDTree, "SPEED");
+    }
+
+    public float[] getCoordsFromNodeId(Long nodeId) {
+        return dijkstraGraph.getCoordsFromNodeId(nodeId);
+    }
+    public ArrayList<Float> getShortestPathCoords(long start, long end) {
+        return dijkstraGraph.getShortestPathCoords(start, end);
     }
 
     public List<String> searchAddresses(String text) {

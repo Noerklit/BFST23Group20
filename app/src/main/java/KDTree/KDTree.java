@@ -1,10 +1,19 @@
 package KDTree;
 import Model.Way;
+import View.MapDraw;
 import javafx.geometry.Point2D;
 
 
 import java.io.Serializable;
 import java.util.*;
+
+import Model.Way;
+import edu.princeton.cs.algs4.Edge;
+import edu.princeton.cs.algs4.EdgeWeightedGraph;
+import javafx.scene.shape.Circle;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import Model.Way;
 import edu.princeton.cs.algs4.Edge;
@@ -146,7 +155,7 @@ public class KDTree implements Serializable {
         return findNearby(circle, closest, target);
     }
     private long findNearby(Circle circle, Point2D closest, Point2D target){
-        long id = 0;
+        long id = -1;
         for (Way nearby: findNearby(root, circle, new ArrayList<Way>())){
             for (int i = 0; i<nearby.coords.length-2; i+=2) {
                 var dist = new Point2D(nearby.coords[i], nearby.coords[i+1]).distance(target);
